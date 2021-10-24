@@ -1,0 +1,52 @@
+name: deploy to prod pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [14]
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@master
+
+      - name: Setup node env 🏗
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: ${{ matrix.node }}
+          check-latest: true
+
+      - name: Install dependencies 👨🏻‍💻
+        run: yarn
+
+      - name: generate dist files
+        run: yarn generate
+
+      - name: clone pages repo
+        run: git clone https://github.com/gareth0712/gareth0712.github.io.git
+
+      - name: Copy files in dist to pages repo
+        run: cp -r ./dist/* ./gareth0712.github.io/
+
+      - name: commit changes
+        run: |
+          cd ./gareth0712.github.io
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add *
+          git commit -m "Update pages files"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          directory: "./gareth0712.github.io"
+          repository: "gareth0712/gareth0712.github.io"
