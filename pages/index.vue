@@ -28,6 +28,11 @@ export default Vue.extend({
       userAgent: 'I will be overwritten by asyncData'
     };
   },
+  mounted() {
+    console.log('tes', this.isDarkMode);
+    console.log('update des', this.$store.commit('changeDescription', 'new name'));
+    console.log('updated des', this.descriptionOnStore);
+  },
   computed: {
     computedMessage(): string {
       return this.message.replace('data()', 'computed()');
