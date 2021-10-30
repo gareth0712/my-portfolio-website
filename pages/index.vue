@@ -1,13 +1,11 @@
 <template>
-  <div class="the-container">
-    <div>
+  <div id="page-container">
+    <section class="introduction">
       <Logo />
       <h1 class="title">Gareth Lau</h1>
       <h2 class="subtitle">Full stack developer that helps clients build applications</h2>
-    </div>
-    <div>
-      <contact />
-    </div>
+    </section>
+    <contact />
   </div>
 </template>
 
@@ -55,20 +53,27 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.the-container {
+#page-container {
   margin: 0 auto;
   min-height: 100vh;
+  background-image: url('/background_cosmic_darkorchid.jpg');
+  background-size: cover;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  background-image: url('/background_cosmic_darkorchid.jpg');
-  background-size: cover;
+}
+
+.introduction {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .title {
-  font-family: 'neuzeit-grotesk', 'Quicksand', 'Source Sans Pro', -apple-system,
-    BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: block;
   font-weight: 300;
   font-size: 100px;
@@ -77,6 +82,7 @@ export default Vue.extend({
 }
 
 .subtitle {
+  font-family: 'Quicksand', sans-serif;
   font-weight: 300;
   font-size: 42px;
   color: #f2f2f2;
