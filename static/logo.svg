@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 133.38 150.87">
+  <defs>
+      <linearGradient id="Gradient1">
+        <stop class="stop1" offset="0%"/>
+        <stop class="stop2" offset="50%"/>
+        <stop class="stop3" offset="100%"/>
+      </linearGradient>
+      <style type="text/css"><![CDATA[
+        #rect1 { fill: url(#Gradient1); }
+        .stop1 { stop-color: rgba(117, 112, 200, 0.8); }
+        .stop2 { stop-color: rgba(92, 231, 171, 0.5); }
+        .stop3 { stop-color: rgba(0, 212, 255, 0.6); }
+      ]]></style>
+  </defs>
+  <title>Asset 1</title>
+  <g id="Layer_2" data-name="Layer 2">
+    <g id="Logo">
+      <g>
+        <path fill="url('#Gradient1')" d="M76.87,2.73a20.35,20.35,0,0,0-20.36,0L0,35.35v65.26a20.36,20.36,0,0,0,10.18,17.63l56.51,32.63,56.51-32.63a20.36,20.36,0,0,0,10.18-17.63V35.35Zm41.85,107.73-52,30L29.6,119.09V52.42L55.31,37.51l-9.77-5.65L19.78,46.73v66.69l-5.11-3A11.4,11.4,0,0,1,9,100.61V40.54L46.1,19.1l57.72,33.33.06,29.72,9.77-5.64V46.77L55.92,13.44,61,10.5a11.41,11.41,0,0,1,11.38,0l52,30V83.46L66.67,116.79,40.91,102v11.28l25.76,14.87L124.4,94.79v5.82A11.41,11.41,0,0,1,118.72,110.46Z"/>
+      </g>
+    </g>
+  </g>
+</svg>
