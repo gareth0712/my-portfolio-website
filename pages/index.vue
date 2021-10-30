@@ -1,16 +1,19 @@
 <template>
-  <div class="container">
+  <div class="the-container">
     <div>
       <Logo />
-      <h1 class="title">my-portfolio-website</h1>
-      <h2 class="subtitle">Built using Nuxt</h2>
+      <h1 class="title">Gareth Lau</h1>
+      <h2 class="subtitle">Full stack developer that helps clients build applications</h2>
+    </div>
+    <div>
+      <contact />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import type { MetaInfo } from 'vue-meta';
+import Contact from '~/components/Contact.vue';
 import { mapActions, mapState } from 'vuex';
 import type { RootState } from '~/store';
 import {
@@ -28,11 +31,10 @@ export default Vue.extend({
       userAgent: 'I will be overwritten by asyncData'
     };
   },
-  mounted() {
-    console.log('tes', this.isDarkMode);
-    console.log('update des', this.$store.commit('changeDescription', 'new name'));
-    console.log('updated des', this.descriptionOnStore);
+  components: {
+    Contact
   },
+  mounted() {},
   computed: {
     computedMessage(): string {
       return this.message.replace('data()', 'computed()');
@@ -53,29 +55,31 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.container {
+.the-container {
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+  background-image: url('/background_cosmic_darkorchid.jpg');
+  background-size: cover;
 }
 
 .title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'neuzeit-grotesk', 'Quicksand', 'Source Sans Pro', -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: block;
   font-weight: 300;
   font-size: 100px;
-  color: #35495e;
+  color: #f2f2f2;
   letter-spacing: 1px;
 }
 
 .subtitle {
   font-weight: 300;
   font-size: 42px;
-  color: #526488;
+  color: #f2f2f2;
   word-spacing: 5px;
   padding-bottom: 15px;
 }
