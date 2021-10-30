@@ -11,14 +11,10 @@ const config: NuxtConfig = {
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
   },
-  css: [
-    'element-ui/lib/theme-chalk/index.css',
-    '@/assets/css/global.scss',
-    '@/assets/font/neuzeitGro/NeuzeitGro.css'
-  ],
+  css: ['@/assets/css/global.scss', '@/assets/font/neuzeitGro/NeuzeitGro.css'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@/plugins/element-ui'],
+  plugins: [],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -28,7 +24,8 @@ const config: NuxtConfig = {
     // https://go.nuxtjs.dev/typescript
     '@nuxt/typescript-build',
     // https://go.nuxtjs.dev/stylelint
-    '@nuxtjs/stylelint-module'
+    '@nuxtjs/stylelint-module',
+    '@nuxtjs/vuetify'
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -55,9 +52,7 @@ const config: NuxtConfig = {
   content: {},
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {
-    transpile: [/^element-ui/]
-  }
+  build: {}
 };
 
 export default config;
