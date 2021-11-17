@@ -2,6 +2,7 @@ import type { NuxtConfig } from '@nuxt/types';
 
 const config: NuxtConfig = {
   target: 'static',
+  mode: 'spa',
   head: {
     title: "Gareth Lau's Portolio Website",
     meta: [
@@ -37,7 +38,7 @@ const config: NuxtConfig = {
   },
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: ['@/plugins/particles'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
