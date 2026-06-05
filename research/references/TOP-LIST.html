@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top List — World-Class Frontend / UI-UX — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,wght@0,400;0,560;1,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../best-practices/shared.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="../best-practices/UI-DESIGN.html">UI Design</a>
+      <a href="../best-practices/UX.html">UX</a>
+      <a href="../best-practices/TYPOGRAPHY.html">Typography</a>
+      <a href="../best-practices/COLOR.html">Color</a>
+      <a href="../best-practices/STYLING.html">Styling</a>
+      <a href="../best-practices/MOTIONS.html">Motion</a>
+      <a href="../best-practices/ANIMATIONS.html">Animation</a>
+      <a href="../best-practices/INTERACTIONS.html">Interaction</a>
+      <a href="../best-practices/SPATIAL.html">3D / Spatial</a>
+      <a href="../best-practices/MINI-GAMES.html">Mini-Games</a>
+      <a href="../best-practices/STATE-MANAGEMENT.html">State</a>
+      <a href="../best-practices/NEXTJS.html">Meta-Framework</a>
+      <a href="PORTFOLIO.html">Portfolio</a>
+      <a href="TOP-LIST.html" aria-current="page">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+  <main class="wide">
+    <div class="hero">
+      <span class="kicker">Craft Atlas · Reference / Top List</span>
+      <h1>A curated guide to world-class frontend &amp; UI/UX.</h1>
+      <p class="lede">A hand-picked atlas of the best frontend and UI/UX websites on the public web, grouped by industry. Every entry is backed by a first-hand teardown — sites we pulled apart at the DOM, stack, and motion level, not "sites we like the look of."</p>
+    </div>
+
+    <nav class="toc" aria-label="On this page">
+      <ol>
+        <li><a href="#means">1 · What "world-class" means here</a></li>
+        <li><a href="#how">2 · How to use this list</a></li>
+        <li><a href="#fame">3 · Hall of Fame</a></li>
+        <li><a href="#studios">4 · Creative Studios &amp; Agencies</a></li>
+        <li><a href="#saas">5 · SaaS &amp; Dev Tools</a></li>
+        <li><a href="#hardware">6 · Hardware &amp; Product</a></li>
+        <li><a href="#fashion">7 · Fashion &amp; Luxury</a></li>
+        <li><a href="#ecommerce">8 · Ecommerce</a></li>
+        <li><a href="#fintech">9 · Fintech</a></li>
+        <li><a href="#webgl">10 · 3D / WebGL Showcase</a></li>
+        <li><a href="#portfolios">11 · Dev &amp; Designer Portfolios</a></li>
+        <li><a href="#editorial">12 · Editorial &amp; Curation</a></li>
+        <li><a href="#signatures">13 · Cross-cutting signatures</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="means">1 · What "world-class UI/UX" means here</h2>
+    <p>It is <strong>not</strong> "the most animations." Across 50+ teardowns the same truth recurs: elite sites win on <strong>restraint, craft, and intent</strong>, not maximalism. Concretely, world-class means:</p>
+    <ul>
+      <li><strong>One idea, executed flawlessly</strong> — a single signature move (a cursor, a gradient, one 3D hero) instead of ten competing effects.</li>
+      <li><strong>The site proves the pitch</strong> — dev studios render real-time WebGL; design tools dogfood themselves; SaaS embeds live interactive product, not screenshots.</li>
+      <li><strong>Typography does the heavy lifting</strong> — bespoke or carefully-licensed display faces, aggressive tracking, oversized hierarchy. Type is the brand.</li>
+      <li><strong>Motion has a budget</strong> — buttery, weighty scroll (Lenis), purposeful GSAP/ScrollTrigger, and the discipline to <em>not</em> animate when stillness is stronger.</li>
+      <li><strong>Performance is part of the design</strong> — workers, scroll-scrubbed video over JS frames, lazy WebGL. Beauty that stays jank-free.</li>
+    </ul>
+
+    <h2 id="how">2 · How to use this list</h2>
+    <ol>
+      <li>Start with the <strong>Hall of Fame</strong> below — 10 sites that teach the most per minute.</li>
+      <li>Browse by <strong>industry</strong> to find references for the kind of thing you're building.</li>
+      <li>For any site, open its teardown (<code>../workings/&lt;slug&gt;.md</code>) for the stack, IA, motion system, and "what to steal."</li>
+      <li>Read the <strong>Cross-cutting signatures</strong> section last — it's the meta-pattern that ties the elite tier together.</li>
+    </ol>
+    <div class="callout warn">
+      <p>A few luxury/commerce sites (Gucci, Aēsop, SSENSE) are marked <code>reachable: false</code> — their bot-defense perimeters blocked live automated capture, so those teardowns are reconstructed from design-award reviews and documented facts rather than a fresh DOM snapshot.</p>
+    </div>
+
+    <h2 id="fame">3 · Hall of Fame — study these first</h2>
+    <table>
+      <thead><tr><th>#</th><th>Site</th><th>Why it's essential</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><span class="ref">Bruno Simon</span></td><td>The most-referenced 3D portfolio ever — a drivable open-world WebGL game as a résumé. Proof that <em>one</em> signature mechanic beats ten scroll tricks.</td></tr>
+        <tr><td>2</td><td><span class="ref">Stripe</span></td><td>The reference fintech site: a WebGL gradient that became a design meme, wrapped in ruthless motion discipline and a custom typeface.</td></tr>
+        <tr><td>3</td><td><span class="ref">Linear</span></td><td>The dark-mode SaaS benchmark — surgical type, near-zero chrome, and <em>live interactive product replicas</em> embedded in the page.</td></tr>
+        <tr><td>4</td><td><span class="ref">Apple</span></td><td>The definitive restraint reference — scroll-scrubbed canvas/video frame sequences turn hardware into hero objects without clutter.</td></tr>
+        <tr><td>5</td><td><span class="ref">Igloo Inc</span></td><td>A fully WebGL, scroll-scrubbed 3D experience (an igloo assembling as you scroll). Webby + Awwwards-grade scroll storytelling.</td></tr>
+        <tr><td>6</td><td><span class="ref">Locomotive</span></td><td>7× Awwwards Agency of the Year — proves a framework-free, near-monochrome site goes world-class on custom type + Three.js + Lenis alone.</td></tr>
+        <tr><td>7</td><td><span class="ref">Mercury</span></td><td>Redefined fintech by treating a bank like a luxury brand — variable typeface, cinematic near-black, levitating metal card. The new copy-target.</td></tr>
+        <tr><td>8</td><td><span class="ref">Teenage Engineering</span></td><td>Product-as-hero art direction at its purest — cinematic photography on black, Swiss grid, a custom pictographic nav that's itself a design artifact.</td></tr>
+        <tr><td>9</td><td><span class="ref">Rauno Freiberg</span></td><td>Proof that restraint + obsessive interaction detail (easing, sound, spring physics) beats flashy WebGL. A masterclass in the small stuff.</td></tr>
+        <tr><td>10</td><td><span class="ref">Family</span></td><td>How to make an intimidating category friendly — neutral interface + one bold element (hand-drawn mascots) + Awwwards-grade micro-interactions.</td></tr>
+      </tbody>
+    </table>
+
+    <figure class="figure">
+      <img src="../workings/shots/bruno-simon/01-hero.png" alt="Bruno Simon portfolio: a drivable 3D car in an open-world WebGL playground">
+      <figcaption><strong>Bruno Simon ↗</strong> — the single most-referenced 3D web portfolio. A fully drivable open-world WebGL physics playground as a résumé: one signature mechanic beats ten scroll tricks.</figcaption>
+    </figure>
+
+    <figure class="figure">
+      <img src="../workings/shots/stripe/01-hero.png" alt="Stripe homepage hero with its signature animated multi-hue WebGL mesh gradient">
+      <figcaption><strong>Stripe ↗</strong> — the reference fintech site. A real-time WebGL gradient (minigl) that became a design meme, wrapped in ruthless motion discipline and a custom typeface.</figcaption>
+    </figure>
+
+    <h2 id="studios">4 · Creative Studios &amp; Agencies</h2>
+    <p>The genre where "the site is the portfolio." Expect restraint-as-flex, custom scroll engines, and a single proof-of-craft hero.</p>
+    <table>
+      <thead><tr><th>Site</th><th>URL</th><th>Why world-class</th><th>Signature technique</th><th>Teardown</th></tr></thead>
+      <tbody>
+        <tr><td>14islands</td><td><a href="https://14islands.com/">14islands.com</a></td><td>Editorial WebGL with near-monochrome calm; authors the very tooling (r3f-scroll-rig) others copy</td><td>Asymmetric editorial grid + Lenis-driven scroll-synced WebGL</td><td><a href="../workings/14islands.md">14islands.md</a></td></tr>
+        <tr><td>Cuberto</td><td><a href="https://cuberto.com/">cuberto.com</a></td><td>Reference-grade agency polish from motion craft, not visual clutter</td><td>Open-sourced physics-based <code>mouse-follower</code> custom cursor</td><td><a href="../workings/cuberto.md">cuberto.md</a></td></tr>
+        <tr><td>Locomotive</td><td><a href="https://locomotive.ca/">locomotive.ca</a></td><td>7× Awwwards Agency of the Year; framework-free yet world-class</td><td>Three.js scroll-synced 3D team models (Polycam→Blender→Mixamo)</td><td><a href="../workings/locomotive.md">locomotive.md</a></td></tr>
+        <tr><td>Hello Monday</td><td><a href="https://www.hellomonday.com/">hellomonday.com</a></td><td>Awwwards Agency + Site of the Year, FWA Hall of Fame</td><td>Persistent curved-black SVG nav rail + Clarendon serif + line art</td><td><a href="../workings/hello-monday.md">hello-monday.md</a></td></tr>
+        <tr><td>Obys Agency</td><td><a href="https://obys.agency/">obys.agency</a></td><td>Swiss/neo-grotesque discipline over deep custom engineering</td><td>Bespoke sync-scroll work index + WebGL hover-bloom previews</td><td><a href="../workings/obys-agency.md">obys-agency.md</a></td></tr>
+        <tr><td>Basement Studio</td><td><a href="https://basement.studio/">basement.studio</a></td><td>"We make cool shit that performs" proven in the first second</td><td>Real-time 3D "basement" room on an OffscreenCanvas worker thread</td><td><a href="../workings/basement-studio.md">basement-studio.md</a></td></tr>
+        <tr><td>Refokus</td><td><a href="https://refokus.com/">refokus.com</a></td><td>Most-awarded Webflow agency — platform constraints are no excuse</td><td>Blur-to-focus scroll typography + WebGL/GSAP on a no-code CMS</td><td><a href="../workings/refokus.md">refokus.md</a></td></tr>
+        <tr><td>Studio Freight / Darkroom</td><td><a href="https://darkroom.engineering/">darkroom.engineering</a></td><td>Ships the scroll libs (Lenis, Hamo, Tempus) and proves them on itself</td><td>4-way theme switcher (dark/light/red/simple); CRT-mono editorial</td><td><a href="../workings/studio-freight-darkroom.md">studio-freight-darkroom.md</a></td></tr>
+        <tr><td>Dept Agency</td><td><a href="https://www.deptagency.com/">deptagency.com</a></td><td>Swiss-grid brutalism projecting absolute confidence</td><td>One screaming headline + single orange accent + full-bleed video</td><td><a href="../workings/dept-agency.md">dept-agency.md</a></td></tr>
+        <tr><td>Buzzworthy Studio</td><td><a href="https://buzzworthystudio.com/">buzzworthystudio.com</a></td><td>Sells creativity by <em>being</em> the demo reel</td><td>Breathing WebGL blob reused as a navigation motif</td><td><a href="../workings/buzzworthy-studio.md">buzzworthy-studio.md</a></td></tr>
+        <tr><td>Antinomy Studio</td><td><a href="https://antinomy.studio/">antinomy.studio</a></td><td>Awwwards SOTD on a 2-colour palette — restraint as a flex</td><td>Full-bleed media reveals + buttery Lenis scroll + WebGL</td><td><a href="../workings/antinomy-studio.md">antinomy-studio.md</a></td></tr>
+        <tr><td>Off Menu</td><td><a href="https://offmenu.design/">offmenu.design</a></td><td>AI-native studio; the site demos the "agentic interface" it sells</td><td>Physics-orbit of circular project mockups + embedded AI chat hero</td><td><a href="../workings/off-menu.md">off-menu.md</a></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="saas">5 · SaaS &amp; Dev Tools</h2>
+    <p>The discipline of "show, don't tell" — live interactive product replaces stock imagery, and the tool frequently builds its own marketing site.</p>
+    <table>
+      <thead><tr><th>Site</th><th>URL</th><th>Why world-class</th><th>Signature technique</th><th>Teardown</th></tr></thead>
+      <tbody>
+        <tr><td>Linear</td><td><a href="https://linear.app/">linear.app</a></td><td>The dark-mode SaaS benchmark</td><td>Live, interactive in-browser product replicas (real DOM, not images)</td><td><a href="../workings/linear.md">linear.md</a></td></tr>
+        <tr><td>Vercel</td><td><a href="https://vercel.com/">vercel.com</a></td><td>Restraint + live demos do the work of gradients and stock imagery</td><td>Geist type with aggressive negative tracking; product <em>is</em> the content</td><td><a href="../workings/vercel.md">vercel.md</a></td></tr>
+        <tr><td>Figma</td><td><a href="https://www.figma.com/">figma.com</a></td><td>Dogfoods its own product — the page is a live multiplayer canvas</td><td>Animated collaborative cursors with name tags as brand signature</td><td><a href="../workings/figma.md">figma.md</a></td></tr>
+        <tr><td>Framer</td><td><a href="https://www.framer.com/">framer.com</a></td><td>Makes a no-code builder feel like a premium creative instrument</td><td>Scroll-pinned "theater": sticky labels, transitioning product mockups</td><td><a href="../workings/framer.md">framer.md</a></td></tr>
+        <tr><td>Spline</td><td><a href="https://spline.design/">spline.design</a></td><td>The homepage <em>is</em> the product demo</td><td>Live, orbit-able real-time WebGL scenes on a black canvas</td><td><a href="../workings/spline.md">spline.md</a></td></tr>
+        <tr><td>Rive</td><td><a href="https://rive.app/">rive.app</a></td><td>Every section proves the pitch instead of describing it</td><td>Embedded live <code>.riv</code> canvases rendering the product itself</td><td><a href="../workings/rive.md">rive.md</a></td></tr>
+        <tr><td>Pitch</td><td><a href="https://pitch.com/">pitch.com</a></td><td>Turns the product's value prop (beautiful slides) into the site's language</td><td>Gradient-drenched, per-character letter-spacing stagger on load</td><td><a href="../workings/pitch.md">pitch.md</a></td></tr>
+        <tr><td>Arc Browser</td><td><a href="https://arc.net/">arc.net</a></td><td>Rejects the clean-SV-SaaS playbook for print-magazine warmth</td><td>Custom serif + scalloped section dividers + 3D wireframe arc graphic</td><td><a href="../workings/arc-browser.md">arc-browser.md</a></td></tr>
+        <tr><td>Things (Cultured Code)</td><td><a href="https://culturedcode.com/things/">culturedcode.com/things</a></td><td>A calm to-do app's site practices what it preaches</td><td>Anti-motion: jQuery/CSS only; whitespace and stillness as the craft</td><td><a href="../workings/things-cultured-code.md">things-cultured-code.md</a></td></tr>
+      </tbody>
+    </table>
+
+    <figure class="figure">
+      <img src="../workings/shots/linear/01-hero.png" alt="Linear homepage hero: dark-mode SaaS marketing with surgical typography and minimal chrome">
+      <figcaption><strong>Linear ↗</strong> — the dark-mode SaaS benchmark. Surgical type, near-zero chrome, and live interactive product replicas built from real DOM rather than screenshots.</figcaption>
+    </figure>
+
+    <h2 id="hardware">6 · Hardware &amp; Product</h2>
+    <p>Product-as-hero art direction. The photograph <em>is</em> the interface; motion stays out of the way.</p>
+    <table>
+      <thead><tr><th>Site</th><th>URL</th><th>Why world-class</th><th>Signature technique</th><th>Teardown</th></tr></thead>
+      <tbody>
+        <tr><td>Apple</td><td><a href="https://www.apple.com/">apple.com</a></td><td>The definitive restrained, product-first reference</td><td>Scroll-driven canvas frame-sequence / scroll-scrubbed video</td><td><a href="../workings/apple.md">apple.md</a></td></tr>
+        <tr><td>Teenage Engineering</td><td><a href="https://teenage.engineering/">teenage.engineering</a></td><td>Product-as-hero art direction at its purest</td><td>Custom pictographic nav system + Swiss grid + cinematic photography</td><td><a href="../workings/teenage-engineering.md">teenage-engineering.md</a></td></tr>
+        <tr><td>Nothing</td><td><a href="https://nothing.tech/">nothing.tech</a></td><td>Turns a Shopify store into a brand experience</td><td>Dot-matrix type + parenthetical letter-spaced naming <code>phone ( 3 )</code></td><td><a href="../workings/nothing.md">nothing.md</a></td></tr>
+        <tr><td>Opal Tadpole</td><td><a href="https://opalcamera.com/opal-tadpole">opalcamera.com/opal-tadpole</a></td><td>Restraint and art direction replace heavy motion</td><td>One cinematic top-down photo field + a slim parallax manifesto column</td><td><a href="../workings/opal-tadpole.md">opal-tadpole.md</a></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="fashion">7 · Fashion &amp; Luxury</h2>
+    <p>Restraint-as-luxury. Near-invisible chrome, full-bleed editorial imagery, and tracking-heavy wordmarks.</p>
+    <table>
+      <thead><tr><th>Site</th><th>URL</th><th>Why world-class</th><th>Signature technique</th><th>Teardown</th></tr></thead>
+      <tbody>
+        <tr><td>Bottega Veneta</td><td><a href="https://www.bottegaveneta.com/">bottegaveneta.com</a></td><td>Product photography carries the entire experience, zero flourish</td><td>Wide evenly-tracked capital wordmark; near-zero chrome</td><td><a href="../workings/bottega-veneta.md">bottega-veneta.md</a></td></tr>
+        <tr><td>Gucci</td><td><a href="https://www.gucci.com/">gucci.com</a></td><td>Negative space + brand mythology + a hardened luxury commerce stack</td><td>Generous whitespace, full-bleed editorial, invisible UI chrome</td><td><a href="../workings/gucci.md">gucci.md</a></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="ecommerce">8 · Ecommerce</h2>
+    <p>DTC and retail done with editorial-minimalist restraint — art direction and merchandising systems, not bespoke engineering.</p>
+    <table>
+      <thead><tr><th>Site</th><th>URL</th><th>Why world-class</th><th>Signature technique</th><th>Teardown</th></tr></thead>
+      <tbody>
+        <tr><td>Allbirds</td><td><a href="https://www.allbirds.com/">allbirds.com</a></td><td>95.4 SUS score — among the highest ecommerce usability on record</td><td>Custom typeface + gender-toggled merchandising system</td><td><a href="../workings/allbirds.md">allbirds.md</a></td></tr>
+        <tr><td>Glossier</td><td><a href="https://www.glossier.com/">glossier.com</a></td><td>Turns a generic Shopify theme into an instantly recognizable brand world</td><td>Millennial-pink, oversized photography, A–Z product index footer</td><td><a href="../workings/glossier.md">glossier.md</a></td></tr>
+        <tr><td>Nike</td><td><a href="https://www.nike.com/">nike.com</a></td><td>Confident editorial commerce — the storefront as a shoppable billboard</td><td>Full-bleed autoplay video heroes + single hot accent (volt/red)</td><td><a href="../workings/nike.md">nike.md</a></td></tr>
+        <tr><td>Aēsop</td><td><a href="https://www.aesop.com/">aesop.com</a></td><td>Apothecary minimalism — whitespace and type do the selling</td><td>Calm editorial, type-led, near-zero gimmickry</td><td><a href="../workings/a-sop.md">a-sop.md</a></td></tr>
+        <tr><td>SSENSE</td><td><a href="https://www.ssense.com/">ssense.com</a></td><td>Treats luxury commerce like an editorial magazine</td><td>Extreme whitespace, tiny precise type, 4-link global nav</td><td><a href="../workings/ssense.md">ssense.md</a></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="fintech">9 · Fintech</h2>
+    <p>Making "boring" finance feel premium, fast, and trustworthy through type, palette, and live data.</p>
+    <table>
+      <thead><tr><th>Site</th><th>URL</th><th>Why world-class</th><th>Signature technique</th><th>Teardown</th></tr></thead>
+      <tbody>
+        <tr><td>Stripe</td><td><a href="https://stripe.com/">stripe.com</a></td><td>The reference implementation for fintech marketing</td><td>Real-time WebGL/Canvas animated hero gradient (minigl)</td><td><a href="../workings/stripe.md">stripe.md</a></td></tr>
+        <tr><td>Mercury</td><td><a href="https://mercury.com/">mercury.com</a></td><td>Treats a business bank like a luxury brand; the new copy-target</td><td>Variable typeface (Arcadia) + cinematic near-black + levitating metal card</td><td><a href="../workings/mercury.md">mercury.md</a></td></tr>
+        <tr><td>Ramp</td><td><a href="https://ramp.com/">ramp.com</a></td><td>Weaponizes restraint to make finance feel fast and modern</td><td>Acid-lime accent on near-brutalist B&amp;W + live incrementing odometers</td><td><a href="../workings/ramp.md">ramp.md</a></td></tr>
+        <tr><td>Family</td><td><a href="https://family.co/">family.co</a></td><td>Disarms a scary category (self-custody crypto) with friendliness</td><td>Neutral interface + hand-drawn bouncy mascots + crafted micro-interactions</td><td><a href="../workings/family.md">family.md</a></td></tr>
+      </tbody>
+    </table>
+
+    <figure class="figure">
+      <img src="../workings/shots/mercury/01-hero.png" alt="Mercury homepage hero: cinematic near-black fintech with a levitating metal card and variable typeface">
+      <figcaption><strong>Mercury ↗</strong> — treats a business bank like a luxury brand. Variable typeface (Arcadia), cinematic near-black, a levitating metal card: the new fintech copy-target.</figcaption>
+    </figure>
+
+    <h2 id="webgl">10 · 3D / WebGL Showcase</h2>
+    <p>Maximum technical craft — entire homepages rendered in real-time WebGL, where the scene <em>is</em> the site.</p>
+    <table>
+      <thead><tr><th>Site</th><th>URL</th><th>Why world-class</th><th>Signature technique</th><th>Teardown</th></tr></thead>
+      <tbody>
+        <tr><td>Igloo Inc</td><td><a href="https://www.igloo.inc/">igloo.inc</a></td><td>Awwwards SOTD + Webby — scroll-scrubbed 3D storytelling</td><td>Procedural ice/igloo structure assembling and lighting on scroll</td><td><a href="../workings/igloo-inc.md">igloo-inc.md</a></td></tr>
+        <tr><td>Lusion</td><td><a href="https://lusion.co/">lusion.co</a></td><td>One of the most technically advanced studio portfolios on the web</td><td>Custom renderer, physics-driven 3D, scroll-as-camera storytelling</td><td><a href="../workings/lusion.md">lusion.md</a></td></tr>
+        <tr><td>Active Theory</td><td><a href="https://activetheory.net/">activetheory.net</a></td><td>The homepage itself is the portfolio piece</td><td>Full-screen 3D particle cosmos via in-house Hydra engine + bloom</td><td><a href="../workings/active-theory.md">active-theory.md</a></td></tr>
+        <tr><td>Resn</td><td><a href="https://resn.co.nz/">resn.co.nz</a></td><td>Proves studio craft by being the demo reel</td><td>Click-and-hold to grab/deform a real-time 3D crystalline "drop"</td><td><a href="../workings/resn.md">resn.md</a></td></tr>
+        <tr><td>Unseen Studio</td><td><a href="https://unseen.co/">unseen.co</a></td><td>Awwwards Studio of the Year — a navigable WebGL "world"</td><td>A surreal interactive 3D environment you explore instead of scroll</td><td><a href="../workings/unseen-studio.md">unseen-studio.md</a></td></tr>
+        <tr><td>Stripe Press</td><td><a href="https://press.stripe.com/">press.stripe.com</a></td><td>Turns a publisher's catalog into a tactile browsing experience</td><td>Scroll-linked camera dolly up a stack of rotating 3D books</td><td><a href="../workings/stripe-press.md">stripe-press.md</a></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="portfolios">11 · Dev &amp; Designer Portfolios</h2>
+    <p>The personal-brand frontier — where one creative developer's site doubles as their single best case study. See the dedicated <a href="PORTFOLIO.html">Portfolio Field Guide</a> for the ranked deep-dive.</p>
+    <table>
+      <thead><tr><th>Site</th><th>URL</th><th>Why world-class</th><th>Signature technique</th><th>Teardown</th></tr></thead>
+      <tbody>
+        <tr><td>Bruno Simon</td><td><a href="https://bruno-simon.com/">bruno-simon.com</a></td><td>The single most-referenced 3D web portfolio in the industry</td><td>A fully drivable open-world WebGL/WebGPU physics playground</td><td><a href="../workings/bruno-simon.md">bruno-simon.md</a></td></tr>
+        <tr><td>Robin Noguier</td><td><a href="https://robin-noguier.com/">robin-noguier.com</a></td><td>Awwwards SOTD + Developer Award; a one-pager that feels immersive</td><td>Whole project showcase in one WebGL canvas + spring-physics scroll</td><td><a href="../workings/robin-noguier.md">robin-noguier.md</a></td></tr>
+        <tr><td>Minh Pham</td><td><a href="https://www.minhpham.design/">minhpham.design</a></td><td>Awwwards SOTD / FWA — a cinematic interactive showreel, not a CV</td><td>Blender-baked 3D + GSAP motion-path typography</td><td><a href="../workings/minh-pham.md">minh-pham.md</a></td></tr>
+        <tr><td>Aristide Benoist</td><td><a href="https://aristidebenoist.com/">aristidebenoist.com</a></td><td>The whole site <em>is</em> the demo reel</td><td>30 projects as a single fixed-viewport WebGL filmstrip, zero DOM scroll</td><td><a href="../workings/aristide-benoist.md">aristide-benoist.md</a></td></tr>
+        <tr><td>Rauno Freiberg</td><td><a href="https://rauno.me/">rauno.me</a></td><td>Restraint + obsessive detail beats flashy WebGL (Vercel / cmdk)</td><td>Horizontal filmstrip of typographic-poster cards; tuned micro-interactions</td><td><a href="../workings/rauno-freiberg.md">rauno-freiberg.md</a></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="editorial">12 · Editorial &amp; Curation</h2>
+    <p>Sites where the curated work is the entire UI — the chrome disappears so the content performs.</p>
+    <table>
+      <thead><tr><th>Site</th><th>URL</th><th>Why world-class</th><th>Signature technique</th><th>Teardown</th></tr></thead>
+      <tbody>
+        <tr><td>Godly</td><td><a href="https://godly.website/">godly.website</a></td><td>The curated work <em>is</em> the UI; chrome disappears</td><td>Full-bleed masonry of 1,000+ sites with live hover-playing previews</td><td><a href="../workings/godly.md">godly.md</a></td></tr>
+        <tr><td>Awwwards</td><td><a href="https://www.awwwards.com/">awwwards.com</a></td><td>The awards authority practices what it preaches</td><td>Floating pill nav + GSAP micro-motion; hover-to-play gallery previews</td><td><a href="../workings/awwwards.md">awwwards.md</a></td></tr>
+        <tr><td>Linticular / Don't Board Me</td><td><a href="https://dontboardme.com/">dontboardme.com</a></td><td>Awwwards SOTD — treats a local pet-sitter like a fashion brand</td><td>A physics "bounce a tennis ball to enter" splash game as a loading gate</td><td><a href="../workings/linticular-don-t-board-me.md">linticular-don-t-board-me.md</a></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="signatures">13 · Cross-cutting signatures of elite sites</h2>
+    <p>The moves that recur across the best — the meta-pattern worth internalizing:</p>
+    <div class="callout steal">
+      <ol>
+        <li><strong>Preloaders-as-craft.</strong> The loading state is a brand moment, not a spinner. Don't Board Me gates entry behind a physics game; Active Theory and Igloo boot a WebGL scene with intent. The first second sets the bar.</li>
+        <li><strong>Scroll-driven narrative.</strong> Scroll is the storytelling axis, not just a scrollbar. Apple scrubs canvas/video frame sequences; Stripe Press dollies a camera up a 3D bookshelf; Igloo assembles an igloo; Framer pins feature "theaters." Lenis + GSAP ScrollTrigger is the near-universal toolkit.</li>
+        <li><strong>Restraint over maximalism.</strong> Almost every elite site is near-monochrome with <strong>one</strong> accent, starved for impact (Dept's orange, Ramp's lime, Nike's volt, Apple's blue). Things and Aēsop go further — knowing <em>when not to animate</em> is itself a world-class skill.</li>
+        <li><strong>Bespoke type as the brand.</strong> Custom or carefully-chosen display faces carry identity: Mercury's Arcadia, Vercel/Basement's Geist, Robin Noguier's Eksell Display, Allbirds' and Stripe's custom faces, Nothing's dot-matrix. Aggressive negative tracking on oversized headlines is a recurring tell.</li>
+        <li><strong>The site proves the pitch.</strong> Dev studios render real-time WebGL (Basement, Lusion, Resn); design tools dogfood themselves (Figma, Spline, Rive, Framer); SaaS embeds live interactive product (Linear, Vercel). Show the thing; don't screenshot it.</li>
+        <li><strong>One signature move, not ten.</strong> Bruno Simon's drivable car, Cuberto's <code>mouse-follower</code> cursor, Stripe's gradient, Hello Monday's curved nav rail. A single memorable mechanic becomes the brand's memory hook — and beats a busy page of competing effects.</li>
+        <li><strong>Motion budget + perf discipline.</strong> The polish is jank-free on purpose: Basement renders 3D on an OffscreenCanvas worker; Apple moved frame-sequences to scroll-scrubbed compressed video; WebGL is lazy-loaded and framed. Beauty that respects the main thread.</li>
+      </ol>
+    </div>
+  </main>
+
+  <footer class="ftr">
+    <div class="wide">
+      <p><a href="../PLAN.html">◆ Craft Atlas — Build Plan →</a></p>
+      <p style="margin-top:var(--s-3);color:var(--ink-dim);">Reference · <strong>World-Class Frontend / UI-UX Top List</strong>. Craft Atlas — synthesized from 80 live site teardowns.</p>
+    </div>
+  </footer>
+</body>
+</html>

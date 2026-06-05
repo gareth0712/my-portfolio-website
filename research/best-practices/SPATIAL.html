@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D &amp; Spatial Design — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* ---- page-local live-demo styles only ---- */
+
+    /* §2 — CSS 3D depth-card (perspective + translateZ z-layering) */
+    .stage3d { perspective: 800px; display:grid; place-items:center; padding:2rem 0; }
+    .depth-card {
+      position:relative; width:240px; height:300px; transform-style:preserve-3d;
+      transition: transform .15s linear; will-change: transform;
+      transform: rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+    }
+    .depth-card .plane {
+      position:absolute; inset:0; border-radius:var(--r-2);
+      border:1px solid var(--line); background:var(--bg-2);
+      display:grid; place-items:center; font-family:var(--font-mono);
+      font-size:.74rem; color:var(--ink-soft); letter-spacing:.04em;
+    }
+    .depth-card .p-back  { transform: translateZ(-40px); background:#0c0e12; color:var(--ink-dim); }
+    .depth-card .p-mid   { transform: translateZ(20px); }
+    .depth-card .p-front {
+      transform: translateZ(70px); inset:auto; left:50%; top:50%;
+      width:120px; height:120px; margin:-60px 0 0 -60px;
+      background:var(--accent); color:var(--accent-ink); border:0;
+      box-shadow:0 0 34px var(--accent-glow), 0 0 12px var(--accent-glow);
+      font-weight:600;
+    }
+    .depth-card .p-label { position:absolute; bottom:14px; left:0; right:0; text-align:center; transform: translateZ(72px); background:none; border:0; }
+
+    /* §6 — fake-bloom comparison (no WebGL, just layered blur) */
+    .bloom-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .bloom-cell { position:relative; height:140px; border:1px solid var(--line); border-radius:var(--r-2); background:#06070a; display:grid; place-items:center; overflow:hidden; }
+    .bloom-cell .label { position:absolute; top:8px; left:10px; font-family:var(--font-mono); font-size:.68rem; color:var(--ink-dim); z-index:3; }
+    .orb { width:64px; height:64px; border-radius:50%; background:radial-gradient(circle at 38% 34%, #ffe3ad, var(--accent) 55%, #c47e10); }
+    .bloom-cell.on .orb { box-shadow:0 0 22px 6px var(--accent), 0 0 60px 22px var(--accent-glow), 0 0 120px 50px rgba(245,166,35,.10); }
+
+    .demo-btn {
+      font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em; text-transform:uppercase;
+      color:var(--accent-ink); background:var(--accent); border:0; border-radius:var(--r-pill);
+      padding:.45rem 1rem; cursor:pointer;
+    }
+    .demo-btn:hover { background:var(--accent-soft); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .depth-card { transition:none; transform:none; }
+    }
+  </style>
+</head>
+<body>
+<header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="UI-DESIGN.html">UI Design</a>
+      <a href="UX.html">UX</a>
+      <a href="TYPOGRAPHY.html">Typography</a>
+      <a href="COLOR.html">Color</a>
+      <a href="STYLING.html">Styling</a>
+      <a href="MOTIONS.html">Motion</a>
+      <a href="ANIMATIONS.html">Animation</a>
+      <a href="INTERACTIONS.html">Interaction</a>
+      <a href="SPATIAL.html">3D / Spatial</a>
+      <a href="MINI-GAMES.html">Mini-Games</a>
+      <a href="STATE-MANAGEMENT.html">State</a>
+      <a href="NEXTJS.html">Meta-Framework</a>
+      <a href="../references/PORTFOLIO.html">Portfolio</a>
+      <a href="../references/TOP-LIST.html">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+<main class="wrap">
+  <span class="kicker">Craft Atlas · 10</span>
+  <h1>3D &amp; Spatial Design</h1>
+  <p class="lede">3D is the loudest tool in the box. Spent well it produces the most-shared, most-awarded work on the web — a drivable car résumé, a procedural igloo that builds as you scroll, a publisher's catalog rendered as a floating bookshelf. Spent badly it ships a 4&nbsp;MB bundle that strands phones on a black screen with no fallback. This page is the line between the two: how the elite use WebGL/Three.js, depth, cameras, lighting and shaders — and the hard discipline (capability gates, semantic skeletons, reduced-motion) that keeps the spectacle from becoming a liability.</p>
+
+  <nav class="toc" aria-label="On this page">
+    <ul>
+      <li><a href="#when">1 · When 3D helps vs. hurts</a></li>
+      <li><a href="#depth">2 · Depth &amp; z-layering (without WebGL)</a></li>
+      <li><a href="#stack">3 · The WebGL stack — Three.js &amp; R3F</a></li>
+      <li><a href="#camera">4 · Cameras &amp; scroll-as-driver</a></li>
+      <li><a href="#composition">5 · Spatial composition &amp; the stage</a></li>
+      <li><a href="#lighting">6 · Lighting, bloom &amp; shaders</a></li>
+      <li><a href="#perf">7 · Performance, fallbacks &amp; load-gating</a></li>
+      <li><a href="#a11y">8 · The semantic skeleton (a11y &amp; SEO)</a></li>
+      <li><a href="#budget">9 · The spatial budget — checklist</a></li>
+    </ul>
+  </nav>
+
+  <h2 id="when">1 · When 3D helps vs. hurts</h2>
+  <p>The first decision is not <em>how</em> but <em>whether</em>. Every site in the corpus that ships heavy 3D earns it one of two ways: the studio <strong>sells</strong> 3D (so the site must <em>be</em> the demo reel), or the 3D <strong>is the content</strong> (the catalog, the world, the product). When neither is true, the corpus reaches for stillness.</p>
+  <p><span class="ref">Resn ↗</span> states the thesis bluntly: "the interface <em>is</em> the portfolio" — a creative studio proves craft by making the hero a playable 3D object, not by describing it. <span class="ref">Active Theory ↗</span> renders its <em>entire</em> interface — logo, nav, type — inside one particle cosmos so the homepage reads as "we build things the rest of the web can't." <span class="ref">Bruno Simon ↗</span> turns a dev résumé into a drivable open-world game — the single most-referenced 3D portfolio on the web. In all three the 3D is the argument.</p>
+  <p>The counter-discipline matters just as much. <span class="ref">Things · Cultured Code ↗</span> is "anti-motion" by design — no parallax, no gradient meshes — because their product is calm, and "world-class can mean knowing when NOT to animate." <span class="ref">14islands ↗</span>, who literally <em>author</em> the WebGL tooling the industry copies, keep motion "CSS-first wherever possible; WebGL only where it earns its weight." That is the bar: 3D is a cost you pay for a reason, not a default.</p>
+
+  <div class="callout steal">
+    <p>Ship 3D when the 3D <em>is</em> the message — you sell interactive craft, or the content is genuinely spatial (a product, a world, a catalog). Otherwise lead with one scroll-driven hero moment and keep the rest flat. A single signature interaction (Resn's click-and-hold, Igloo's scroll-assembly) outperforms a page full of scattered effects, and costs a fraction of the budget.</p>
+  </div>
+
+  <h2 id="depth">2 · Depth &amp; z-layering — most "3D" needs no WebGL</h2>
+  <p>Before you reach for a renderer: a huge share of perceived depth on premium sites is plain CSS. <code>perspective</code> + <code>transform-style: preserve-3d</code> + <code>translateZ()</code> give you real z-layering on the compositor — no canvas, no shader, no bundle. The browser composites the layers in true 3D space and you get parallax, tilt, and pop-out for the price of a transform.</p>
+  <p>This is the cheap tier of the depth ladder the corpus climbs: <span class="ref">14islands ↗</span> describe it as a three-step progressive enhancement — <strong>no-JS → CSS hover/depth → WebGL cinema</strong> — reaching for the GPU only at the top. <span class="ref">Family ↗</span> floats illustration layers with gentle parallax and idle-bob to make a hero feel alive with zero WebGL. <span class="ref">Igloo Inc ↗</span> reserves a single warm emissive "doorway" as the one element that reads as nearest — depth used to direct the eye, not to show off.</p>
+
+  <div class="example">
+    <p style="font-family:var(--font-mono);font-size:.8rem;color:var(--ink-dim);margin-bottom:.75rem;">Real 3D z-layering, pure CSS — move your pointer over the card (it tilts; the amber node sits 70px in front of the back plane):</p>
+    <div class="stage3d">
+      <div class="depth-card" id="depthCard">
+        <div class="plane p-back">z&nbsp;=&nbsp;−40px · backdrop</div>
+        <div class="plane p-mid">z&nbsp;=&nbsp;20px · card</div>
+        <div class="plane p-front">z = 70px</div>
+        <div class="plane p-label">translateZ on one perspective</div>
+      </div>
+    </div>
+    <figcaption>Three planes, one <code>perspective: 800px</code> parent. Pointer position maps to <code>rotateX/rotateY</code>; each plane's <code>translateZ</code> sets its depth. This is compositor-only — no layout, no paint, no WebGL. Reduced-motion users get a flat, static card.</figcaption>
+  </div>
+
+  <pre><code>/* True z-layering, zero WebGL. Parent owns the perspective. */
+.stage   { perspective: 800px; }
+.card    { transform-style: preserve-3d; transition: transform .15s linear; }
+.card .back  { transform: translateZ(-40px); }  /* recedes */
+.card .front { transform: translateZ(70px);  }  /* pops toward viewer */</code></pre>
+<pre><code>// Pointer -> tilt. Map cursor offset to rotation, clamp it.
+stage.addEventListener('pointermove', (e) =&gt; {
+  const r = card.getBoundingClientRect();
+  const ry = ((e.clientX - r.left) / r.width  - 0.5) *  18; // deg
+  const rx = ((e.clientY - r.top)  / r.height - 0.5) * -18;
+  card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+});</code></pre>
+
+  <div class="callout tip">
+    <p>Decide depth with the cheapest tool that reads as depth. Layered <code>translateZ</code> covers tilt-cards, parallax heroes, and pop-out badges. Reach for WebGL only when you need real lighting, reflections, custom geometry, or thousands of GPU-driven particles — things CSS physically cannot composite.</p>
+  </div>
+
+  <h2 id="stack">3 · The WebGL stack — Three.js, R3F &amp; the in-house engines</h2>
+  <p>Once you genuinely need a renderer, the corpus converges on a clear stack. <strong>Three.js</strong> is the near-universal base. <span class="ref">Igloo Inc ↗</span> (Three.js + <code>three-mesh-bvh</code> for fast raycasting on dense geometry), <span class="ref">Resn ↗</span>, <span class="ref">Stripe Press ↗</span> (photoreal book meshes), and <span class="ref">Henry Heffernan ↗</span> (Three.js r137) all build on it. The React ecosystem wraps it in <strong>React Three Fiber (R3F)</strong> + <strong>drei</strong>: <span class="ref">Henry Heffernan ↗</span> and <span class="ref">14islands ↗</span> both run R3F, the latter through their own open-source <code>@14islands/r3f-scroll-rig</code>.</p>
+  <p>At the very top end, studios outgrow the library and write their own. <span class="ref">Lusion ↗</span> wrote a <strong>custom WebGL renderer</strong> (not Three.js) for cloth sim, fluid shaders and real-time GI approximation. <span class="ref">Active Theory ↗</span> built <strong>Hydra</strong>, a proprietary engine with a node-based GUI and a WebGL UI layer (GLUI) that draws nav and type as GL geometry. <span class="ref">Bruno Simon ↗</span>'s 2025 rebuild pushes further still — Three.js on <strong>WebGPU</strong>, shaders authored in TSL (Three.js Shading Language), physics on <strong>Rapier</strong>. You do not start here; you start at R3F.</p>
+
+  <pre><code>// React Three Fiber + drei — the pragmatic elite baseline (Henry Heffernan, 14islands).
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Environment, Float } from '@react-three/drei';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
+
+export default function Hero() {
+  return (
+    &lt;Canvas
+      dpr={[1, 2]}                 // cap devicePixelRatio — never render at 3x on a phone
+      camera={{ position: [0, 0, 5], fov: 45 }}
+      gl={{ antialias: true, powerPreference: 'high-performance' }}
+    &gt;
+      &lt;color attach="background" args={['#06070a']} /&gt;
+      &lt;ambientLight intensity={0.4} /&gt;
+      &lt;directionalLight position={[3, 5, 2]} intensity={1.2} /&gt;
+      &lt;Environment preset="studio" /&gt;            {/* image-based lighting */}
+      &lt;Float rotationIntensity={0.6} floatIntensity={0.8}&gt;
+        &lt;mesh&gt;
+          &lt;icosahedronGeometry args={[1, 0]} /&gt;
+          &lt;meshStandardMaterial color="#f5a623" roughness={0.25} metalness={0.6} /&gt;
+        &lt;/mesh&gt;
+      &lt;/Float&gt;
+      &lt;EffectComposer&gt;
+        &lt;Bloom intensity={0.9} luminanceThreshold={0.6} mipmapBlur /&gt;
+      &lt;/EffectComposer&gt;
+      &lt;OrbitControls enableZoom={false} enablePan={false} /&gt;
+    &lt;/Canvas&gt;
+  );
+}</code></pre>
+
+  <p>The Vue/Nuxt path is <strong>TresJS</strong> — a declarative Three.js wrapper with the same scene-graph-as-components mental model:</p>
+  <pre><code>&lt;!-- Vue / Nuxt with TresJS — same idea, Vue components. --&gt;
+&lt;script setup&gt;
+import { TresCanvas } from '@tresjs/core';
+import { OrbitControls, Environment } from '@tresjs/cientos';
+&lt;/script&gt;
+&lt;template&gt;
+  &lt;TresCanvas clear-color="#06070a" :dpr="[1, 2]"&gt;
+    &lt;TresPerspectiveCamera :position="[0, 0, 5]" :fov="45" /&gt;
+    &lt;TresAmbientLight :intensity="0.4" /&gt;
+    &lt;TresDirectionalLight :position="[3, 5, 2]" :intensity="1.2" /&gt;
+    &lt;Environment preset="studio" /&gt;
+    &lt;TresMesh&gt;
+      &lt;TresIcosahedronGeometry :args="[1, 0]" /&gt;
+      &lt;TresMeshStandardMaterial color="#f5a623" :roughness="0.25" :metalness="0.6" /&gt;
+    &lt;/TresMesh&gt;
+    &lt;OrbitControls :enable-zoom="false" /&gt;
+  &lt;/TresCanvas&gt;
+&lt;/template&gt;</code></pre>
+
+  <h2 id="camera">4 · Cameras &amp; scroll-as-driver</h2>
+  <p>The single most repeated technique in the corpus: <strong>bind the camera (or an assembly animation) to scroll progress.</strong> Scroll stops being "move the document down" and becomes a scrubbable playhead driving a 3D timeline — forward <em>and</em> backward.</p>
+  <p><span class="ref">Lusion ↗</span> uses scroll as a "camera/timeline driver" so "each scroll feels like a continuation of a bigger story" — the hero is pinned while the scene evolves. <span class="ref">Stripe Press ↗</span> hooks a camera dolly to scroll position, gliding up a vertical stack of 3D books that rotate to reveal spine → cover → back as they enter frame. <span class="ref">Igloo Inc ↗</span> binds scroll to a procedural assembly — blocks grow and brighten into a domed igloo. The other camera idiom is the <strong>scripted cinematic transition</strong>: <span class="ref">Henry Heffernan ↗</span>'s click-to-begin dollies the camera from an isometric establishing shot into the CRT — "the signature move everyone copies."</p>
+
+  <figure class="figure">
+    <img src="../workings/shots/igloo-inc/02-mid.png" alt="Igloo Inc — a crystalline igloo half-assembled from glowing ice blocks on a foggy lunar landscape, mid-scroll">
+    <figcaption><strong>Igloo Inc</strong> — scroll position drives a procedural-growth animation: the igloo grows from a pile of ice blocks into a glowing dome. The camera stage is pinned; scrolling <em>is</em> the build sequence. GSAP-timeline-driven, not CSS.</figcaption>
+  </figure>
+
+  <pre><code>// Scroll -> camera. One normalized 0..1 playhead drives camera.position.
+// (Pin the canvas, then scrub. Lenis feeds GSAP a single rAF clock — see MOTIONS.)
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+gsap.registerPlugin(ScrollTrigger);
+
+ScrollTrigger.create({
+  trigger: '#stage', start: 'top top', end: '+=300%',
+  pin: true, scrub: 1,
+  onUpdate: ({ progress }) =&gt; {
+    camera.position.z = 8 - progress * 6;      // dolly in
+    camera.position.y = progress * 2;          // rise up the stack
+    camera.lookAt(0, progress * 2, 0);
+    igloo.assemble(progress);                  // bind your own 0..1 anim
+  },
+});</code></pre>
+
+  <div class="callout warn">
+    <p><strong>Scroll-as-camera hijacks the scroll thread.</strong> It can break <code>position: sticky</code>, anchor jumps, keyboard <kbd>PageDown</kbd>/<kbd>Home</kbd>/<kbd>End</kbd>, and assistive-tech scrolling, and it adds input latency. Always keep keyboard scroll working, never scrub a content/reading page, and collapse the whole mechanism under <code>prefers-reduced-motion</code> (jump straight to the resting frame).</p>
+  </div>
+
+  <h2 id="composition">5 · Spatial composition &amp; the stage</h2>
+  <p>Elite 3D scenes are composed like photography, not crammed like a demo. The recurring grammar: <strong>one focal object, a deep void around it, chrome pushed to the edges.</strong></p>
+  <p><span class="ref">Active Theory ↗</span> calls its negative space "blackspace" — a pure-black void around one luminous orb that "creates a premium, cinematic, low-density feel; nothing competes with the centerpiece." <span class="ref">Resn ↗</span> centers a single revolving crystalline form in maximum negative space — "the dark void <em>is</em> the layout." <span class="ref">Igloo Inc ↗</span> anchors UI to four corners (wordmark top-left, credits top-right) so the structure owns the center. <span class="ref">Lusion ↗</span> frames its canvas with viewfinder "+" corner marks and rules so it reads as a curated stage / technical drawing, and inverts the genre default with a <em>light</em> lavender shell against a dark framed viewport for maximum figure/ground contrast.</p>
+  <p>Idle motion keeps the stage alive: Resn's form slowly revolves, Active Theory's particle field drifts continuously — "the site is never static." A dead-still 3D scene reads as a frozen screenshot; a slow ambient drift reads as a living world.</p>
+
+  <figure class="figure">
+    <img src="../workings/shots/active-theory/01-hero.png" alt="Active Theory — a glowing circular brand orb suspended in a yellow-to-orange particle stream against pure black">
+    <figcaption><strong>Active Theory</strong> — "blackspace" composition: one luminous focal orb, an additive-blended GPU particle ribbon, and a pure-black void. Bloom post-processing makes the emissive particles glow. The entire UI — including nav and type — is rendered inside this single canvas via their GLUI layer.</figcaption>
+  </figure>
+
+  <div class="callout steal">
+    <p>Compose 3D like a studio photographer: one hero subject, deep negative space, chrome at the corners, and a slow idle drift so it breathes. Tie color to place if you have multiple scenes — <span class="ref">Bruno Simon ↗</span> gives each district its own accent palette so users always know <em>where</em> they are without a label.</p>
+  </div>
+
+  <h2 id="lighting">6 · Lighting, bloom &amp; shaders</h2>
+  <p>In a dark 3D scene, <strong>light is the accent color.</strong> <span class="ref">Igloo Inc ↗</span> uses "light itself" as the accent — emissive ice blocks whose warm-white inner glow intensifies on scroll, with the lit doorway as "the single warm focal accent against the cold field" and chromatic aberration applied globally as a lens treatment. <span class="ref">Active Theory ↗</span> runs a <strong>HydraBloom</strong> post-process so emissive particles and the orb glow like an energy field. <span class="ref">Bruno Simon ↗</span> leans on emissive/glow materials + bloom for a "synthwave-meets-toybox" look. The common thread: <strong>bloom</strong> (a post-processing pass that bleeds bright pixels into their neighbours) is what turns flat emissive materials into something that reads as <em>luminous</em>.</p>
+  <p>For materials and lighting, the corpus splits two ways. <strong>Image-based lighting (IBL / environment maps)</strong> gives realistic reflections cheaply — Lusion's "premium toy / product-render" matte plastics and Stripe Press's photoreal book covers rely on studio HDRIs. <strong>Hand-written GLSL shaders</strong> are reserved for effects no standard material can do: Igloo's ice + atmosphere, Lusion's cloth/fluid sim, Resn's deformation-on-click. Bruno Simon now authors these in TSL so the same shader runs on WebGPU and WebGL.</p>
+
+  <div class="example">
+    <p style="font-family:var(--font-mono);font-size:.8rem;color:var(--ink-dim);margin-bottom:.75rem;">What bloom actually buys you — same emissive orb, with and without a glow pass (faked here in CSS):</p>
+    <div class="bloom-row" id="bloomRow">
+      <div class="bloom-cell"><span class="label">no bloom — flat</span><div class="orb"></div></div>
+      <div class="bloom-cell on"><span class="label">bloom — luminous</span><div class="orb"></div></div>
+    </div>
+    <button class="demo-btn" id="bloomBtn" type="button" style="margin-top:1rem;">Toggle bloom on left</button>
+    <figcaption>Both orbs are the same color. The right one bleeds bright pixels outward (layered glows here; a real <code>UnrealBloomPass</code> samples a blurred bright-pass and adds it back). Bloom is the cheapest way to make a dark scene feel like it emits light — the Active Theory / Bruno Simon signature.</figcaption>
+  </div>
+
+  <pre><code>// R3F bloom that targets only the bright stuff (luminanceThreshold).
+// Push a material's emissiveIntensity &gt; 1 to make it "selected" by the pass.
+&lt;mesh&gt;
+  &lt;sphereGeometry args={[1, 64, 64]} /&gt;
+  &lt;meshStandardMaterial
+    color="#f5a623" emissive="#f5a623" emissiveIntensity={2.4} toneMapped={false} /&gt;
+&lt;/mesh&gt;
+&lt;EffectComposer&gt;
+  &lt;Bloom
+    intensity={1.1}
+    luminanceThreshold={0.6}   /* only pixels brighter than this bloom */
+    luminanceSmoothing={0.3}
+    mipmapBlur                 /* cheap, high-quality blur */
+  /&gt;
+&lt;/EffectComposer&gt;</code></pre>
+
+  <h2 id="perf">7 · Performance, fallbacks &amp; load-gating</h2>
+  <p>This is where most 3D ships broken. The corpus is unanimous that the spectacle is <strong>conditional</strong> on the device being able to afford it.</p>
+
+  <h3>Gate the experience behind a capability check</h3>
+  <p><span class="ref">Lusion ↗</span>'s explicit guardrail: "gate the heavy WebGL behind a capability / <code>prefers-reduced-motion</code> check and ship a static fallback." <span class="ref">14islands ↗</span> make progressive enhancement a design system: <strong>no-JS → CSS hover → WebGL cinema</strong>, with the site fully usable at every tier. <span class="ref">Bruno Simon ↗</span> exposes a "WebGPU / High effects" toggle that "falls back as needed," scaling from phones to high-end desktops. <span class="ref">Resn ↗</span> ships an entirely separate <code>index_mobile.html</code> build rather than push the desktop scene onto phones.</p>
+
+  <pre><code>// Don't even instantiate the renderer on a device that can't pay for it.
+const canWebGL = (() =&gt; {
+  try { return !!document.createElement('canvas').getContext('webgl2'); }
+  catch { return false; }
+})();
+const reduce  = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const lowMem  = (navigator.deviceMemory ?? 8) &lt; 4;   // heuristic, not gospel
+const coarse  = matchMedia('(pointer: coarse)').matches; // phone/tablet
+
+if (canWebGL &amp;&amp; !reduce &amp;&amp; !lowMem) {
+  import('./scene.js').then((m) =&gt; m.start());   // lazy-load the heavy bundle
+} else {
+  document.querySelector('#hero').classList.add('static-fallback'); // poster image
+}</code></pre>
+
+  <h3>Load-gate the heavy boot behind a gesture</h3>
+  <p>A numeric preloader or boot screen turns an unavoidable wait into on-brand theater <em>and</em> satisfies autoplay/WebGL gesture requirements. <span class="ref">Lusion ↗</span> uses a "100" counter that "masks shader compile / asset load, then transitions into the live scene." <span class="ref">Henry Heffernan ↗</span> gates the heavy load behind an intentional <strong>START button</strong> — "converts a forced load wait into on-brand theater and a required user gesture." <span class="ref">Igloo Inc ↗</span> makes "the intro animation the load, not a spinner."</p>
+
+  <h3>Keep the asset budget honest</h3>
+  <ul>
+    <li><strong>Compress geometry.</strong> <span class="ref">Bruno Simon ↗</span> ships GLTF + Draco, original build "all models under ~2&nbsp;MB combined." <span class="ref">Igloo Inc ↗</span> authors in Houdini/Blender but bakes/optimizes before shipping.</li>
+    <li><strong>Cap <code>devicePixelRatio</code>.</strong> Rendering a full WebGL scene at 3× on a phone is the fastest way to drop frames — clamp <code>dpr</code> to <code>[1, 2]</code>.</li>
+    <li><strong>Pause off-screen and in background tabs.</strong> Stop the render loop when the canvas isn't visible (the Obys/Apple discipline carried into 3D).</li>
+    <li><strong>One canvas, not many.</strong> <span class="ref">14islands ↗</span>'s <code>r3f-scroll-rig</code> renders <em>one</em> global WebGL context that tracks DOM elements, instead of a canvas per image — a large perf win.</li>
+  </ul>
+
+  <h2 id="a11y">8 · The semantic skeleton — a11y &amp; SEO under the canvas</h2>
+  <p>The sharpest dividing line in the corpus is whether a WebGL site keeps a real DOM underneath. The ones that don't pay a real cost; the disciplined ones get the spectacle <em>and</em> the accessibility.</p>
+  <p><span class="ref">Active Theory ↗</span> renders type and nav as GL geometry and has "zero semantic headings — an a11y/SEO cost you may not want to pay." By contrast <span class="ref">Stripe Press ↗</span> mirrors every 3D book with a real <code>&lt;button&gt;</code> + <code>&lt;a&gt;</code> + heading beneath the canvas. <span class="ref">Henry Heffernan ↗</span> exposes fallback links (ABOUT / EXPERIENCE / PROJECTS / CONTACT) as headings in the accessibility tree, "so there <em>is</em> a real semantic skeleton behind the canvas for SEO/a11y/no-JS." <span class="ref">Bruno Simon ↗</span>'s drivable world still surfaces buttons in the accessibility snapshot. That is the pattern to copy: <strong>the canvas is the experience, the DOM is the contract.</strong></p>
+
+  <pre><code>&lt;!-- WebGL is decorative; the real content lives in the DOM beneath it.
+     Screen readers, crawlers, and no-JS visitors get a complete page. --&gt;
+&lt;section class="hero"&gt;
+  &lt;canvas aria-hidden="true"&gt;&lt;/canvas&gt;          &lt;!-- spectacle, hidden from AT --&gt;
+  &lt;div class="hero-content"&gt;                      &lt;!-- the contract --&gt;
+    &lt;h1&gt;Jordan Lee — Creative Developer&lt;/h1&gt;
+    &lt;nav aria-label="Primary"&gt;
+      &lt;a href="/work"&gt;Work&lt;/a&gt; &lt;a href="/about"&gt;About&lt;/a&gt; &lt;a href="/contact"&gt;Contact&lt;/a&gt;
+    &lt;/nav&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+
+  <div class="callout warn">
+    <p><strong>UI-in-WebGL erases the accessibility tree.</strong> Text rendered as GL glyphs is invisible to screen readers, unselectable, untranslatable, and uncrawlable. Active Theory and Resn accept that trade for a studio flex; a portfolio that wants to be <em>found</em> and <em>read</em> should not. Keep headings, links, and copy as real DOM and let the canvas be <code>aria-hidden</code> decoration.</p>
+  </div>
+
+  <h2 id="budget">9 · The spatial budget — checklist</h2>
+  <p>3D is the highest-cost, highest-variance tool on this whole atlas. Spend it like a budget:</p>
+  <ul>
+    <li><strong>Have a reason.</strong> The 3D is the message (you sell craft) or the content is spatial — otherwise stay flat. (Resn / Things, the two poles.)</li>
+    <li><strong>Cheapest depth that reads as depth.</strong> CSS <code>translateZ</code> before WebGL; one global canvas before many. (14islands.)</li>
+    <li><strong>One focal subject, deep void, idle drift.</strong> Compose like photography; never let the scene go dead-still. (Active Theory / Resn.)</li>
+    <li><strong>Bind one camera to scroll.</strong> A single scrubbable hero beats scattered effects, forward and back. (Lusion / Stripe Press / Igloo.)</li>
+    <li><strong>Light is the accent; bloom sells emission.</strong> Threshold the bloom pass; reserve hand-GLSL for effects materials can't do. (Igloo / Active Theory.)</li>
+    <li><strong>Gate on capability + reduced-motion; ship a static fallback.</strong> Lazy-load the heavy bundle only when the device can pay. (Lusion / Bruno Simon / Resn.)</li>
+    <li><strong>Load-gate behind a gesture.</strong> A counter or START button covers boot and satisfies autoplay rules. (Lusion / Henry Heffernan.)</li>
+    <li><strong>Cap dpr, compress geometry (Draco), pause off-screen.</strong> Keep the frame budget honest.</li>
+    <li><strong>Keep the semantic skeleton.</strong> Canvas <code>aria-hidden</code>; real headings/links/copy in the DOM. (Stripe Press / Henry Heffernan.)</li>
+  </ul>
+
+  <div class="callout steal">
+    <p>The pragmatic elite stack, distilled: <strong>R3F + drei + postprocessing</strong> for the scene → <strong>scroll-bound camera</strong> (GSAP/ScrollTrigger on Lenis' single clock) for the one signature move → <strong>thresholded bloom</strong> + IBL for the look → a hard <strong>capability/reduced-motion gate</strong> with a static poster fallback → a complete <strong>semantic DOM</strong> under an <code>aria-hidden</code> canvas. You get the Igloo/Lusion feel at a fraction of the cost — and nobody lands on a black screen.</p>
+  </div>
+</main>
+
+<footer class="ftr">
+  <div class="wrap">
+    <p><a href="../PLAN.html">← Back to the Build Plan</a></p>
+    <p style="margin-top:1rem;"><span class="brand">Craft Atlas</span> — synthesized from 80 live site teardowns.</p>
+  </div>
+</footer>
+
+<script>
+  // ---- §2 CSS 3D depth-card: pointer -> tilt ----
+  (function () {
+    const card = document.getElementById('depthCard');
+    const stage = card.parentElement;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+    stage.addEventListener('pointermove', (e) => {
+      const r = stage.getBoundingClientRect();
+      const ry = ((e.clientX - r.left) / r.width  - 0.5) *  20;
+      const rx = ((e.clientY - r.top)  / r.height - 0.5) * -20;
+      card.style.setProperty('--ry', ry.toFixed(2) + 'deg');
+      card.style.setProperty('--rx', rx.toFixed(2) + 'deg');
+    });
+    stage.addEventListener('pointerleave', () => {
+      card.style.setProperty('--ry', '0deg');
+      card.style.setProperty('--rx', '0deg');
+    });
+  })();
+
+  // ---- §6 bloom toggle on the left cell ----
+  document.getElementById('bloomBtn').addEventListener('click', () => {
+    document.querySelector('#bloomRow .bloom-cell').classList.toggle('on');
+  });
+</script>
+</body>
+</html>

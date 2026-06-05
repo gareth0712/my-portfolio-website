@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini-Games &amp; Playful UI — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* page-local: demos only */
+    .konami-demo{display:flex;flex-direction:column;align-items:center;gap:var(--s-3);text-align:center}
+    .konami-keys{display:flex;gap:var(--s-2);flex-wrap:wrap;justify-content:center;font-family:var(--font-mono);font-size:0.8rem}
+    .konami-keys kbd{background:var(--bg-2);border:1px solid var(--line);border-bottom-width:2px;border-radius:var(--r-1);padding:0.2em 0.55em;color:var(--ink-soft);transition:all .12s var(--ease);cursor:pointer}
+    .konami-keys kbd.lit{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);transform:translateY(1px)}
+    #konami-stage{font-family:var(--font-serif);font-size:var(--step-2);min-height:1.4em;transition:transform .4s var(--ease)}
+    #konami-stage.win{animation:pop .5s var(--ease)}
+    @keyframes pop{0%{transform:scale(.4) rotate(-8deg);opacity:0}60%{transform:scale(1.15) rotate(3deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+
+    /* squishy toy button demo */
+    .toy-row{display:flex;gap:var(--s-4);flex-wrap:wrap;align-items:center;justify-content:center}
+    .toy-btn{font-family:var(--font-sans);font-weight:600;font-size:1rem;color:var(--accent-ink);background:var(--accent);border:none;border-radius:var(--r-pill);padding:0.7em 1.5em;cursor:pointer;transition:transform .12s cubic-bezier(.34,1.56,.64,1),box-shadow .12s var(--ease);box-shadow:0 6px 0 #b9791a}
+    .toy-btn:hover{transform:translateY(-2px);box-shadow:0 8px 0 #b9791a}
+    .toy-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b9791a}
+    .toy-btn.linear{border-radius:var(--r-2);box-shadow:none;background:var(--bg-2);color:var(--ink-soft);border:1px solid var(--line);transition:transform .12s linear}
+    .toy-btn.linear:active{transform:scale(.96)}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="UI-DESIGN.html">UI Design</a>
+      <a href="UX.html">UX</a>
+      <a href="TYPOGRAPHY.html">Typography</a>
+      <a href="COLOR.html">Color</a>
+      <a href="STYLING.html">Styling</a>
+      <a href="MOTIONS.html">Motion</a>
+      <a href="ANIMATIONS.html">Animation</a>
+      <a href="INTERACTIONS.html">Interaction</a>
+      <a href="SPATIAL.html">3D / Spatial</a>
+      <a href="MINI-GAMES.html" aria-current="page">Mini-Games</a>
+      <a href="STATE-MANAGEMENT.html">State</a>
+      <a href="NEXTJS.html">Meta-Framework</a>
+      <a href="../references/PORTFOLIO.html">Portfolio</a>
+      <a href="../references/TOP-LIST.html">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="hero">
+      <span class="kicker">Craft Atlas · 11 / 13</span>
+      <h1>Mini-Games &amp; Playful Interaction</h1>
+      <p class="lede">When a portfolio stops being a page you read and becomes a thing you <em>play</em>. The mechanics behind drivable 3D worlds, Konami eggs, squishy toy buttons — and the hard discipline of knowing when to switch the toys off.</p>
+    </div>
+
+    <nav class="toc" aria-label="Table of contents">
+      <ol>
+        <li><a href="#thesis">1 · The thesis: one mechanic beats ten effects</a></li>
+        <li><a href="#games-as-portfolio">2 · Games-as-portfolio: the drivable résumé</a></li>
+        <li><a href="#diegetic">3 · Diegetic navigation &amp; the toybox room</a></li>
+        <li><a href="#eggs">4 · Easter eggs &amp; the Konami code</a></li>
+        <li><a href="#replayability">5 · Replayability: achievements, sound, re-rolls</a></li>
+        <li><a href="#microtoys">6 · Micro-toys: playful without WebGL</a></li>
+        <li><a href="#perf-a11y">7 · Performance &amp; accessibility of playful UI</a></li>
+        <li><a href="#when-not">8 · Knowing when NOT to</a></li>
+        <li><a href="#steal">9 · Steal-this checklist</a></li>
+      </ol>
+    </nav>
+
+    <section id="thesis">
+      <h2>1 · The thesis: one mechanic beats ten effects</h2>
+      <p>Every site in this teardown set that people <em>remember by name</em> made one bet: a single signature interaction, executed to obsession, outperforms a confetti of small animations. <span class="ref">Bruno Simon ↗</span> turns a CV into a car you drive. <span class="ref">Henry Heffernan ↗</span> boots a 90s OS inside a CRT. <span class="ref">Lusion ↗</span> hands you a cluster of 3D plumbing joints to shove around with your cursor. None of them are "a page with effects" — they are one toy, fully committed.</p>
+
+      <p>The lesson recurs verbatim in our notes. Bruno Simon's teardown spells it out: <em>"one signature mechanic beats ten generic scroll animations."</em> Henry Heffernan's: <em>"a single, well-choreographed camera/scroll move at first interaction does more for wow than dozens of small effects."</em> Playful UI is not additive — it is <strong>focal</strong>. Pick the one thing, make it physical, make it the whole identity.</p>
+
+      <div class="callout steal">
+        <p><strong>The playful-UI altitude rule.</strong> Decide your tier before you build: <strong>(A)</strong> the site <em>is</em> the game (Bruno, Henry) — diegetic IA, WebGL, weeks of work; <strong>(B)</strong> the site is a serious page with one signature toy (Lusion's hero, Josh Comeau's generative art); <strong>(C)</strong> the site is calm and ships micro-delight (a Konami egg, a squishy button, a UI sound). Most portfolios should aim for B or C. Tier A is a career-defining flex, not a Tuesday.</p>
+      </div>
+    </section>
+
+    <section id="games-as-portfolio">
+      <h2>2 · Games-as-portfolio: the drivable résumé</h2>
+      <p>The reference implementation is <span class="ref">Bruno Simon ↗</span> — the single most-copied 3D web portfolio in the industry. There is essentially <strong>no DOM layout</strong>: the entire experience is one full-viewport <code>&lt;canvas&gt;</code>, the accessibility tree returns just two buttons, and everything visual is rendered in WebGL. You don't scroll sections — you <strong>drive a physics car</strong> (now on Rapier, up from the 2019 Cannon.js) through 13 explorable districts: a landing area, a projects zone, a lab, race tracks, a bowling alley, an altar.</p>
+
+      <figure class="figure">
+        <img src="../workings/shots/bruno-simon/01-hero.png" alt="Bruno Simon landing area — a glowing blue ring on a neon cross-hatch grid, rendered entirely in WebGL">
+        <figcaption><strong>Bruno Simon</strong> — the landing area. A glowing ring on a neon grid; no nav bar, no hero copy. The "page" is an open-world physics playground you drive a low-poly car through.</figcaption>
+      </figure>
+
+      <p>What makes this a <em>portfolio</em> and not just a tech demo is the discipline layered on top. The 2025 rebuild ships an <strong>achievement system</strong> — 38 achievements with a session timer and reward tiers that unlock at 8 / 15 / 23 / 30 / 38 — turning a résumé into a completionist loop that massively extends dwell time. And crucially, it ships <strong>anti-soft-lock safety rails</strong>: Unstuck / Respawn / Reset buttons guarantee you can never get trapped when navigation is freeform. The whole build is even MIT-licensed and open-sourced (repo + Blender files), converting a portfolio into ongoing credibility and inbound links.</p>
+
+      <p>The other archetype is the <strong>diorama metaphor</strong>: <span class="ref">Henry Heffernan ↗</span> recreates a 90s desk where the whole portfolio lives <em>inside</em> a working retro OS rendered onto the CRT mesh. The signature move everyone copies is the <strong>scripted camera transition</strong>: click-to-begin dollies the camera from an establishing isometric shot into a docked CRT framing.</p>
+
+      <figure class="figure">
+        <img src="../workings/shots/henry-heffernan/02-mid.png" alt="Henry Heffernan isometric 3D desk floating on a flat grey void with a 'Click anywhere to begin' caption">
+        <figcaption><strong>Henry Heffernan</strong> — the establishing shot. Negative space, one centered object, a single "click to begin" caption. The whole hook is the one scripted camera move that follows.</figcaption>
+      </figure>
+
+      <div class="callout tip">
+        <p><strong>The shell/content split.</strong> Henry renders a <em>real</em> HTML/React UI onto the 3D screen mesh — the "monitor" runs an actual interactive OS app served from a separate origin (<code>os.henryheffernan.com</code>), embedded and textured onto the mesh. Build your immersive 3D shell and your real content as two independent apps. The wrapper can be rebuilt without touching the content, and the content stays testable on its own.</p>
+      </div>
+    </section>
+
+    <section id="diegetic">
+      <h2>3 · Diegetic navigation &amp; the toybox room</h2>
+      <p>"Diegetic" means the navigation exists <em>inside the fiction</em> — you don't click a nav link labelled "Projects," you drive up to a project or open a window on a desktop. <span class="ref">Bruno Simon ↗</span>'s IA is spatial: sections are physical districts. <span class="ref">Henry Heffernan ↗</span>'s is window-based: About / Experience / Projects / Contact are OS "apps," not links. <span class="ref">Active Theory ↗</span> doesn't even load a new page when you pick Work — it transitions the WebGL scene to an animated category list (<code>-&gt; games</code>, <code>-&gt; multiplayer</code>, <code>-&gt; XR / VR / AI</code>), so wayfinding is diegetic rather than route-based.</p>
+
+      <p>The non-negotiable discipline underneath: <strong>keep a real semantic DOM skeleton</strong>. Henry exposes hidden <code>&lt;a&gt;</code> links and headings (ABOUT / EXPERIENCE / PROJECTS / CONTACT) in the accessibility tree so the experience still works for screen readers, SEO, and no-JS. Copy that discipline religiously — diegetic navigation is a layer <em>over</em> a working document, never a replacement for one.</p>
+
+<pre><code>&lt;!-- The fiction lives in canvas; the truth lives in the DOM. --&gt;
+&lt;canvas id="scene" aria-hidden="true"&gt;&lt;/canvas&gt;
+
+&lt;!-- Visually hidden, but real: screen readers, crawlers, no-JS all win --&gt;
+&lt;nav class="sr-only" aria-label="Site sections"&gt;
+  &lt;a href="/about"&gt;About&lt;/a&gt;
+  &lt;a href="/projects"&gt;Projects&lt;/a&gt;
+  &lt;a href="/contact"&gt;Contact&lt;/a&gt;
+&lt;/nav&gt;</code></pre>
+
+<pre><code>/* The canonical visually-hidden utility — never display:none a nav link */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}</code></pre>
+
+      <div class="callout warn">
+        <p><strong>Anti-pattern: navigation with no escape hatch.</strong> Freeform spatial navigation has a failure mode — the soft-lock. Bruno Simon answers it with Unstuck / Respawn / Reset, his teardown's exact phrasing: <em>"always ship escape hatches for any unconventional UX (a reset / skip / 'take me home' control) so novelty never traps the user."</em> If your toy can strand a user, it is broken, no matter how beautiful.</p>
+      </div>
+    </section>
+
+    <section id="eggs">
+      <h2>4 · Easter eggs &amp; the Konami code</h2>
+      <p>An easter egg is the cheapest high-memorability interaction on the web: a hidden reward for the curious that costs a few lines and buys word-of-mouth. <span class="ref">Bruno Simon ↗</span> packs the canonical set — a cookie-clicker mini-game (1 → 1000 cookies), a hidden debug-UI achievement, a sacrifice altar with a cataclysm, and the <strong>Konami code</strong> ("Up up down down… you know the rest"). <span class="ref">Gianmarco Cavallo ↗</span> ships an explicit <code>easter egg btn</code> in the DOM. <span class="ref">Cassidy Williams ↗</span>'s teardown distills the principle: <em>"one tiny interaction makes the site feel human."</em></p>
+
+      <p>The Konami code is the genre's mascot. Here is a correct, copy-pasteable listener — case-insensitive, resettable, and forgiving of a mistyped key:</p>
+
+<pre><code>// konami.js — fires once the full sequence is entered in order
+const KONAMI = [
+  'ArrowUp','ArrowUp','ArrowDown','ArrowDown',
+  'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'
+];
+let progress = 0;
+
+window.addEventListener('keydown', (e) =&gt; {
+  // Normalise: arrows keep their names, letters compare lowercase
+  const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+
+  // advance on match; on a miss, fall back to 1 if it restarts the chain, else 0
+  progress = key === KONAMI[progress]
+    ? progress + 1
+    : (key === KONAMI[0] ? 1 : 0);
+
+  if (progress === KONAMI.length) {
+    progress = 0;
+    document.documentElement.classList.add('konami-active'); // your reward
+  }
+});</code></pre>
+
+      <div class="example">
+        <div class="konami-demo">
+          <p style="color:var(--ink-dim);font-size:var(--step--1);margin:0">Tap the keys in order (or use your arrow keys + B + A):</p>
+          <div class="konami-keys" id="konami-keys" role="group" aria-label="Konami code demo">
+            <kbd data-k="ArrowUp">↑</kbd><kbd data-k="ArrowUp">↑</kbd>
+            <kbd data-k="ArrowDown">↓</kbd><kbd data-k="ArrowDown">↓</kbd>
+            <kbd data-k="ArrowLeft">←</kbd><kbd data-k="ArrowRight">→</kbd>
+            <kbd data-k="ArrowLeft">←</kbd><kbd data-k="ArrowRight">→</kbd>
+            <kbd data-k="b">B</kbd><kbd data-k="a">A</kbd>
+          </div>
+          <div id="konami-stage" aria-live="polite">🎮 try the sequence</div>
+        </div>
+        <figcaption>A live Konami listener — the same logic as the snippet above. Each correct key lights up; complete the chain to trigger the reward. Keys are clickable for touch.</figcaption>
+      </div>
+      <script>
+        (function(){
+          var seq=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+          var i=0;
+          var kbds=document.querySelectorAll('#konami-keys kbd');
+          var stage=document.getElementById('konami-stage');
+          function paint(){kbds.forEach(function(k,idx){k.classList.toggle('lit',idx<i);});}
+          function step(key){
+            var norm=key.length===1?key.toLowerCase():key;
+            i = norm===seq[i] ? i+1 : (norm===seq[0]?1:0);
+            paint();
+            if(i===seq.length){i=0;stage.textContent='⭐ UNLOCKED — you found the secret!';stage.classList.remove('win');void stage.offsetWidth;stage.classList.add('win');setTimeout(paint,400);}
+          }
+          window.addEventListener('keydown',function(e){step(e.key);});
+          kbds.forEach(function(k){k.addEventListener('click',function(){step(k.dataset.k);});});
+        })();
+      </script>
+
+      <div class="callout tip">
+        <p><strong>Eggs as living signals.</strong> <span class="ref">Josh Comeau ↗</span> hangs his claymation avatar <em>upside-down off a wave</em> in the footer and drops seasonal copy ("Happy Pride month!"). <span class="ref">Rauno Freiberg ↗</span> keeps his old portfolios alive at <code>2023.rauno.me</code> as discoverable archives. An egg is a heartbeat — it proves a human still tends the site.</p>
+      </div>
+    </section>
+
+    <section id="replayability">
+      <h2>5 · Replayability: achievements, sound, re-rolls</h2>
+      <p>A toy you play once is a gimmick; a toy you come back to is an engine. Three mechanics drive replay in our teardowns:</p>
+
+      <h3>Achievements &amp; completion loops</h3>
+      <p><span class="ref">Bruno Simon ↗</span>'s 38 achievements + session timer + tiered rewards turn passive viewing into an active hunt — flips, barrel rolls, a bowling strike, driving 100km. The teardown's takeaway for mortals: <em>"add a lightweight completion hook — a visited-all-sections badge, a hidden egg, a Konami code — to reward exploration and create word-of-mouth."</em> You don't need 38; you need one visible counter.</p>
+
+      <h3>Sound as an opt-in delight layer</h3>
+      <p>UI audio is rare on the web, which is exactly why it lands. <span class="ref">Josh Comeau ↗</span> ships a global "Disable sounds" toggle — the mere presence of it signals interactions emit audio feedback. <span class="ref">Gianmarco Cavallo ↗</span> has a "Toggle sound" button; <span class="ref">Active Theory ↗</span> puts a "Toggle Audio" control plus a full music player (prev/next song) top-left; <span class="ref">Rauno Freiberg ↗</span>'s archived 2023 site is remembered for its interface sounds on a dock metaphor. The rule is universal: <strong>sound is opt-in, never autoplay, and always toggleable.</strong></p>
+
+<pre><code>// Lazy, gesture-gated UI sound — respects autoplay policy + user choice
+let ctx;                          // AudioContext created on first gesture
+const enabled = () =&gt; localStorage.getItem('sfx') !== 'off';
+
+function blip(freq = 660) {
+  if (!enabled()) return;
+  ctx ??= new AudioContext();     // browsers require a user gesture first
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.06, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(); osc.stop(ctx.currentTime + 0.12);
+}</code></pre>
+
+      <h3>Re-rolls &amp; generative state</h3>
+      <p><span class="ref">Josh Comeau ↗</span>'s hero is a procedural dashed-stroke rainbow with an <strong>"Edit the generative art"</strong> button — the visitor re-rolls it, so the page is never the same twice. <span class="ref">Lusion ↗</span>'s physics hero (a cluster of connector primitives reacting to your cursor with momentum) is replayable because it is <em>responsive</em>, not scripted — every visit produces a different shove.</p>
+
+      <figure class="figure">
+        <img src="../workings/shots/lusion/01-hero.png" alt="Lusion hero — a cluster of white and blue 3D pipe connector primitives on a bright stage, reacting to cursor movement">
+        <figcaption><strong>Lusion</strong> — a "premium toy" hero. The connector cluster reacts to pointer movement with spring physics and real-time shadows, so the interaction is different every time you touch it. Replayability through responsiveness, not scripting.</figcaption>
+      </figure>
+    </section>
+
+    <section id="microtoys">
+      <h2>6 · Micro-toys: playful without WebGL</h2>
+      <p>You don't need Three.js to be playful. The cheapest, highest-ROI delight is physical-feeling motion on ordinary elements. <span class="ref">Josh Comeau ↗</span>'s entire brand is "delight engineering" — spring-based motion, squash-and-stretch, physical easing rather than linear transitions, applied to plain hover states. <span class="ref">Cassidy Williams ↗</span> gets personality from <strong>individually rainbow-colored inline links</strong> — zero JS, pure CSS, instantly memorable. <span class="ref">Gianmarco Cavallo ↗</span> ships a <strong>live world-clock</strong> that computes the visitor's offset ("7h behind you") — a tiny real-time toy on a static Astro site.</p>
+
+      <p>Here is the difference a spring easing makes versus a linear one — the single most impactful "toy" upgrade you can ship:</p>
+
+      <div class="example">
+        <div class="toy-row">
+          <button class="toy-btn" type="button">Squishy (spring)</button>
+          <button class="toy-btn linear" type="button">Flat (linear)</button>
+        </div>
+        <figcaption>Press and hold each. The spring button uses <code>cubic-bezier(.34, 1.56, .64, 1)</code> (overshoot) and a faux-3D shadow that compresses on <code>:active</code> — it feels like a physical key. The flat one is correct but lifeless. Same markup; the easing curve is the entire personality.</figcaption>
+      </div>
+
+<pre><code>/* The squishy toy button — physicality from one bezier + a moving shadow */
+.toy-btn {
+  border-radius: 999px;
+  box-shadow: 0 6px 0 #b9791a;        /* the "depth" the key presses into */
+  transition: transform .12s cubic-bezier(.34, 1.56, .64, 1),
+              box-shadow .12s ease;
+}
+.toy-btn:active {
+  transform: translateY(4px);          /* push the key down */
+  box-shadow: 0 2px 0 #b9791a;         /* shrink the depth as it bottoms out */
+}</code></pre>
+
+      <div class="callout steal">
+        <p><strong>Sprinkle, don't drown.</strong> <span class="ref">Gianmarco Cavallo ↗</span>'s teardown nails the micro-toy budget: <em>"sprinkle micro-delight (UI sounds, an easter egg, real-time clock) — cheap to build, high memorability payoff."</em> One live clock, one swappable visual style, one sound toggle, one egg. Four small toys on a calm dashboard read as <em>meticulous</em>; forty read as a circus.</p>
+      </div>
+    </section>
+
+    <section id="perf-a11y">
+      <h2>7 · Performance &amp; accessibility of playful UI</h2>
+      <p>Playful UI is where performance and accessibility go to die if you're careless. The teardowns show the fixes.</p>
+
+      <h3>Mask the load — don't spin</h3>
+      <p>Heavy WebGL means shader compile + asset download. <span class="ref">Lusion ↗</span> gates the experience behind a <strong>numeric preloader</strong> ("100" counter on black) that doubles as a progress mask — it buys time without feeling like a dead spinner. <span class="ref">Henry Heffernan ↗</span> uses an <strong>intentional boot gate</strong> ("Click start to begin"): a themed intro that hides the load <em>and</em> provides the user gesture autoplay/WebGL contexts require. The teardown framing: <em>"converts a forced load wait into on-brand theater and a required user gesture."</em></p>
+
+      <h3>Scale to the GPU</h3>
+      <p><span class="ref">Bruno Simon ↗</span> ships a "WebGPU / High effects" toggle with graceful fallback so the same world runs on phones and high-end desktops. Assets are GLTF + Draco-compressed (the original kept all models under ~2MB combined). Progressive enhancement on the GPU is non-optional for a public toy.</p>
+
+      <h3>Honour <code>prefers-reduced-motion</code> — including JS animation</h3>
+      <p>CSS reduced-motion is table stakes (<code>shared.css</code> already neutralises transitions). But playful UI is often JS/canvas-driven, which the media query does <em>not</em> stop. Gate your rAF loops and physics in script too:</p>
+
+<pre><code>const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+function tick() {
+  if (reduce.matches) {
+    renderStaticFrame();   // one settled frame, no animation loop
+    return;                // do NOT requestAnimationFrame
+  }
+  stepPhysics();
+  render();
+  requestAnimationFrame(tick);
+}
+// React live to the user toggling the OS setting mid-session
+reduce.addEventListener('change', () =&gt; { /* pause / resume */ });</code></pre>
+
+      <div class="callout warn">
+        <p><strong>Anti-pattern: canvas with an empty accessibility tree.</strong> Bruno Simon's a11y snapshot returns "just two buttons" — defensible for an art piece, fatal for a product. The fix is Henry's: every diegetic element gets a real DOM counterpart (<code>aria-label</code>, focusable controls, the visually-hidden nav from §3). If a keyboard or screen-reader user cannot reach your content at all, the toy has locked them out — the exact failure the Unstuck button exists to prevent, generalised.</p>
+      </div>
+    </section>
+
+    <section id="when-not">
+      <h2>8 · Knowing when NOT to</h2>
+      <p>The most senior signal in this whole topic is restraint. The same teardown set that celebrates Bruno also celebrates the sites that <em>turned the toys off</em> — and they did it on purpose.</p>
+
+      <p><span class="ref">Rauno Freiberg ↗</span> is the clearest case: a Vercel design engineer who shipped two flashier versions (a 2023 OS/dock metaphor with interface sounds, a 2022 build) and then <strong>downshifted</strong> to a near-monochrome filmstrip of white cards. His teardown: <em>"a confident downshift: the work speaks, the chrome disappears."</em> The old toys aren't deleted — they're preserved as live easter-egg archives at <code>2023.rauno.me</code>, "versioning your portfolio as a museum." That's the move: graduate from the toy, keep it as a footnote.</p>
+
+      <p><span class="ref">Hello Monday ↗</span> — a studio that builds WebGL for Google and Netflix and absolutely <em>could</em> show off — chose a "deliberately quiet and confident" near-empty white stage. The teardown's insight: <em>"the few motion moments land harder"</em> precisely because the page is otherwise calm. <span class="ref">Cassidy Williams ↗</span> hand-codes a deliberately simple README-like hub and is explicit that the restraint is the point.</p>
+
+      <table>
+        <thead>
+          <tr><th>Reach for a toy when…</th><th>Hold back when…</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Your audience is devs/designers who reward craft (Bruno, Josh, Lusion)</td><td>Your audience needs to transact or find info fast (e-commerce, docs, dashboards)</td></tr>
+          <tr><td>The toy <em>is</em> the proof of skill you're selling</td><td>The toy competes with the content you're actually selling (Hello Monday's restraint)</td></tr>
+          <tr><td>You can ship escape hatches + a11y fallbacks + reduced-motion paths</td><td>You can't budget the perf/a11y work — half-built playful UI is worse than none</td></tr>
+          <tr><td>One signature mechanic, fully committed</td><td>You're stacking ten small effects hoping volume = wow</td></tr>
+        </tbody>
+        <caption>The decision is altitude, not taste. Match the toy to the audience and the job — and ship the safety work or don't ship the toy.</caption>
+      </table>
+
+      <div class="callout tip">
+        <p><strong>The graduation pattern.</strong> Rauno's archive-as-museum is the healthiest long-term play for a personal site: be maximalist while you're proving yourself, then downshift to calm confidence — and keep the old versions reachable as eggs. Your portfolio's history becomes the easter egg.</p>
+      </div>
+    </section>
+
+    <section id="steal">
+      <h2>9 · Steal-this checklist</h2>
+      <div class="callout steal">
+        <ul>
+          <li><strong>Pick ONE mechanic.</strong> A single signature interaction (Bruno's car, Henry's CRT) beats ten scroll effects. Commit fully or don't bother.</li>
+          <li><strong>Diegetic IA over a real DOM.</strong> Frame sections as places/windows/objects — but keep visually-hidden semantic links underneath for a11y + SEO (Henry's discipline).</li>
+          <li><strong>Always ship an escape hatch.</strong> Unstuck / Respawn / "take me home." Freeform UX must never soft-lock the user (Bruno's rule, generalised).</li>
+          <li><strong>One completion hook.</strong> A visited-all badge, a Konami code, a hidden egg — reward exploration, manufacture word-of-mouth.</li>
+          <li><strong>Sound is opt-in, toggleable, gesture-gated.</strong> Never autoplay (Josh, Gianmarco, Active Theory all toggle).</li>
+          <li><strong>Mask the load as theater.</strong> A numeric preloader (Lusion) or boot gate (Henry) beats a spinner and supplies the autoplay gesture.</li>
+          <li><strong>Spring easing &gt; linear.</strong> The cheapest physicality upgrade — <code>cubic-bezier(.34,1.56,.64,1)</code> on plain buttons (Josh's "delight engineering").</li>
+          <li><strong>Gate JS/canvas animation on <code>prefers-reduced-motion</code>.</strong> The CSS query does not stop your rAF loop — check <code>matchMedia</code> in script.</li>
+          <li><strong>Know when to stop.</strong> Downshift to calm confidence when you've outgrown the flex; archive the old toys as live eggs (Rauno's museum).</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ftr">
+    <div class="wrap">
+      <p><a class="brand" href="../PLAN.html">◆ Craft Atlas</a></p>
+      <p>Mini-games, easter eggs, and the discipline of playful UI — next up: <a href="STATE-MANAGEMENT.html">State Management →</a></p>
+      <p style="margin-top:var(--s-4)"><a href="../PLAN.html">← Back to the Build Plan</a></p>
+      <p style="color:var(--ink-faint);margin-top:var(--s-3)">Craft Atlas — synthesized from 80 live site teardowns.</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UI Design — Layout, Grids &amp; Hierarchy · Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* Page-local: live demos only */
+    .demo-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 64px;
+    }
+    .demo-grid .cell {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: var(--r-2);
+      display: grid;
+      place-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--ink-dim);
+      letter-spacing: 0.06em;
+    }
+    .demo-grid .a { grid-column: span 2; grid-row: span 2; background: var(--accent-glow); border-color: rgba(245,166,35,0.3); color: var(--accent-soft); }
+    .demo-grid .b { grid-column: span 2; }
+    .demo-grid .c { grid-row: span 2; }
+    @media (max-width: 560px) {
+      .demo-grid { grid-template-columns: repeat(2, 1fr); }
+      .demo-grid .a { grid-column: span 2; }
+      .demo-grid .b { grid-column: span 2; }
+    }
+
+    .density-demo { --pad: 18px; --gap: 14px; }
+    .density-demo.tight { --pad: 8px; --gap: 6px; }
+    .density-rows { display: grid; gap: var(--gap); }
+    .density-rows .row {
+      display: flex; align-items: center; gap: 12px;
+      padding: var(--pad);
+      background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r-2);
+      font-size: var(--step--1);
+      transition: padding 0.25s var(--ease);
+    }
+    .density-rows .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+    .density-rows .grow { flex: 1; color: var(--ink-soft); }
+    .density-rows .meta { font-family: var(--font-mono); color: var(--ink-dim); font-size: 0.72rem; }
+    .seg {
+      display: inline-flex; border: 1px solid var(--line); border-radius: var(--r-pill);
+      overflow: hidden; margin-bottom: var(--s-4);
+    }
+    .seg button {
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em;
+      padding: 6px 14px; background: transparent; color: var(--ink-dim);
+      border: 0; cursor: pointer; transition: background 0.18s var(--ease), color 0.18s var(--ease);
+    }
+    .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+    .rhythm { position: relative; padding: 4px 0; }
+    .rhythm.show {
+      background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 7px, rgba(245,166,35,0.18) 7px, rgba(245,166,35,0.18) 8px);
+    }
+    .rhythm p { margin: 0 0 8px; line-height: 24px; }
+    .rhythm h4 { margin: 0 0 8px; line-height: 24px; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="UI-DESIGN.html">UI Design</a>
+      <a href="UX.html">UX</a>
+      <a href="TYPOGRAPHY.html">Typography</a>
+      <a href="COLOR.html">Color</a>
+      <a href="STYLING.html">Styling</a>
+      <a href="MOTIONS.html">Motion</a>
+      <a href="ANIMATIONS.html">Animation</a>
+      <a href="INTERACTIONS.html">Interaction</a>
+      <a href="SPATIAL.html">3D / Spatial</a>
+      <a href="MINI-GAMES.html">Mini-Games</a>
+      <a href="STATE-MANAGEMENT.html">State</a>
+      <a href="NEXTJS.html">Meta-Framework</a>
+      <a href="../references/PORTFOLIO.html">Portfolio</a>
+      <a href="../references/TOP-LIST.html">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+<main class="wrap">
+  <p class="kicker">Visual UI Design</p>
+  <h1>Layout is the argument. Everything else is decoration.</h1>
+  <p class="lede">Where things sit, how big they are, and how much air surrounds them decides what a visitor understands before they read a word. This page distills how 80 elite sites build grids, bento mosaics, hierarchy, rhythm and density — with the exact techniques, lifted from teardowns.</p>
+
+  <nav class="toc" aria-label="On this page">
+    <ol>
+      <li><a href="#systems">1 · Pick a layout system (and commit)</a></li>
+      <li><a href="#grids">2 · The modular grid &amp; the 8pt rhythm</a></li>
+      <li><a href="#bento">3 · Bento: density variety in a single mosaic</a></li>
+      <li><a href="#hierarchy">4 · Hierarchy: size, weight, position</a></li>
+      <li><a href="#whitespace">5 · Whitespace &amp; density as a dial</a></li>
+      <li><a href="#composition">6 · Component composition &amp; repeated grammar</a></li>
+      <li><a href="#alignment">7 · Alignment, asymmetry &amp; the optical edge</a></li>
+      <li><a href="#footer-ia">8 · The mega-footer: where density is allowed</a></li>
+      <li><a href="#checklist">9 · Steal-this checklist</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="systems">1 · Pick a layout system (and commit)</h2>
+  <p>Almost every elite site resolves to one of four spatial skeletons. The craft is not inventing a fifth — it is picking one and executing it ruthlessly.</p>
+  <ul>
+    <li><strong>Centered reading column.</strong> A constrained max-width on a quiet canvas with deep gutters. <span class="ref">Stripe</span> runs a ~1080px column on white; <span class="ref">Linear</span> ~1100–1200px on near-black; <span class="ref">Family</span> ~1160px with very wide side gutters that keep everything in a relaxed reading lane.</li>
+    <li><strong>Hard modular grid.</strong> Visible 1px rules form literal cells. <span class="ref">Vercel</span>'s "Your product, delivered." section is a literal 3-column × 2-row ruled grid — the blueprint metaphor <em>is</em> the design.</li>
+    <li><strong>Bento mosaic.</strong> Rounded cards of varying span on one field. <span class="ref">Ramp</span>, <span class="ref">Gianmarco Cavallo</span> and <span class="ref">Framer</span> (its "Bento" shipping card) all lean on this.</li>
+    <li><strong>Split / asymmetric.</strong> A fixed identity rail beside scrolling content. <span class="ref">Brittany Chiang</span> pins name + nav on the left while the right column scrolls; <span class="ref">14islands</span> deliberately imbalances a giant left headline against a tiny right intro paragraph.</li>
+  </ul>
+
+  <div class="callout steal">
+    <p><strong>The decision rule.</strong> Marketing narrative that must be <em>read top-to-bottom</em> → centered column (Stripe, Linear, Family). Capability matrix where blocks are <em>peers</em>, scanned not read → modular grid or bento (Vercel, Ramp). A personal identity that must stay present → split-screen (Brittany Chiang). Don't mix two skeletons in one viewport.</p>
+  </div>
+
+  <figure class="figure">
+    <img src="../workings/shots/vercel/02-mid.png" alt="Vercel's capability section rendered as a literal 3-column by 2-row grid with visible hairline rules forming cells.">
+    <figcaption><strong>Vercel</strong> — a literal hard-ruled modular grid. Each cell is a self-contained capability: heading + one-line description + circular arrow button + a tiny product artifact. The visible 1px rules sell a "precision engineering" promise the copy never has to state.</figcaption>
+  </figure>
+
+  <h2 id="grids">2 · The modular grid &amp; the 8pt rhythm</h2>
+  <p>A grid is two things: a set of <strong>columns</strong> (horizontal alignment) and a <strong>spacing scale</strong> (vertical and gutter rhythm). The sites that feel "tight" share one trait — every gap is a multiple of a base unit, usually 4 or 8px. shared.css itself ships an 8pt-ish scale (<code>--s-1: .25rem</code> → <code>--s-9: 6rem</code>); this is not decoration, it is the load-bearing system.</p>
+
+  <p>Modern CSS gives you the whole grid in a few declarations. The pattern below is the responsive "cells without media queries" technique — the same one <span class="ref">Vercel</span> and <span class="ref">Stripe</span> use for solution-card rows:</p>
+
+  <pre><code>/* Responsive card grid — no media queries needed.
+   Cells auto-flow; each is at least 260px, sharing leftover space. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: var(--s-5);            /* 1.5rem — on the 8pt scale */
+}
+
+/* A *hard-ruled* modular grid à la Vercel:
+   draw the cell lines with a single background, no per-cell borders. */
+.ruled {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;                   /* the gap *is* the rule */
+  background: var(--line);    /* shows through the gap */
+}
+.ruled > * { background: var(--bg); padding: var(--s-6); }</code></pre>
+
+  <div class="example density-demo">
+    <p style="margin-top:0; color: var(--ink-soft); font-size: var(--step--1);">A 4-column grid where three cells <strong>span</strong> to break the monotony — the seed of a bento. Resize the window: it reflows to 2 columns under 560px.</p>
+    <div class="demo-grid" aria-hidden="true">
+      <div class="cell a">SPAN 2×2</div>
+      <div class="cell b">SPAN 2 WIDE</div>
+      <div class="cell">1×1</div>
+      <div class="cell">1×1</div>
+      <div class="cell c">TALL</div>
+      <div class="cell">1×1</div>
+      <div class="cell">1×1</div>
+      <div class="cell">1×1</div>
+    </div>
+    <figcaption>One grid, varied spans — <code>grid-column: span 2</code> / <code>grid-row: span 2</code> on selected children. This is the entire mechanical trick behind a bento.</figcaption>
+  </div>
+
+  <h3>Vertical rhythm: snap text to a baseline</h3>
+  <p>The reason <span class="ref">Josh Comeau</span> and <span class="ref">Stripe Press</span> feel "magazine-spaced" is that vertical gaps are quantised. Set line-heights and margins to multiples of one unit so successive lines land on an invisible baseline.</p>
+
+  <div class="example">
+    <button class="seg" type="button" aria-pressed="false" onclick="var r=document.getElementById('rh');var on=r.classList.toggle('show');this.setAttribute('aria-pressed',String(on));this.querySelector('span').textContent=on?'GRID ON':'GRID OFF';">
+      <span style="font-family:var(--font-mono);font-size:.72rem;letter-spacing:.06em;color:var(--ink);padding:6px 14px;display:inline-block;">GRID OFF</span>
+    </button>
+    <div id="rh" class="rhythm">
+      <h4>Lovable products, from vision to launch</h4>
+      <p>Every line of text here sits on an 8px baseline. The heading, the paragraph, and the gaps between them are all multiples of the same unit.</p>
+      <p>When the baseline overlay is on, you can see each line snap to a rule. This is why disciplined pages feel calm — nothing floats off-grid.</p>
+    </div>
+    <figcaption>Toggle the baseline overlay. Text snaps to an 8px rhythm — the discipline behind editorial calm.</figcaption>
+  </div>
+
+  <div class="callout tip">
+    <p>Use exactly one spacing scale per project and reference it by token, never by raw pixels in components. shared.css does this: a card pads with <code>var(--s-5)</code>, a callout with <code>var(--s-4) var(--s-5)</code>. When every gap is a token, "off-by-3px" drift becomes impossible.</p>
+  </div>
+
+  <h2 id="bento">3 · Bento: density variety in a single mosaic</h2>
+  <p>The bento grid is the dominant 2024–2026 layout for "show many capabilities at once." Its power is <strong>density variety</strong> — big calm cards next to small dense ones inside one tidy frame. The teardowns are explicit about this:</p>
+  <ul>
+    <li><span class="ref">Ramp</span> — a bento grid the studio (Bakken &amp; Baeck) literally nicknamed "the Bento box," deliberately <em>mixing low-density abstract cards with high-density UI screenshots</em>. The variety is the point.</li>
+    <li><span class="ref">Stripe</span> — bento-style card grids for solutions: gradient-tinted product mockup cards (checkout UI, card issuing, agentic-commerce chat) sitting above descriptive cards.</li>
+    <li><span class="ref">Arc Browser</span> — a single bento mockup grid used as the "densest moment" on an otherwise airy page, deployed deliberately as the product reveal.</li>
+    <li><span class="ref">Gianmarco Cavallo</span> — the <em>whole page</em> is a bento: bio card, dual world-clock card, gallery, "Now", "Guestbook", each with a small ↗ corner arrow signalling "this is a link."</li>
+    <li><span class="ref">Framer</span> — even ships a feature literally named "Bento," and its shipping-log grid is a dense bento of "Live" cards (Shaders, CMS 3.0, Auto Translate).</li>
+  </ul>
+
+  <figure class="figure">
+    <img src="../workings/shots/gianmarco-cavallo/01-hero.png" alt="Gianmarco Cavallo's homepage built entirely as a bento grid of bordered, rounded cards of varying sizes on a dark canvas.">
+    <figcaption><strong>Gianmarco Cavallo</strong> — a full-page bento. A wide intro card, a tall stack/tools card, a dual world-clock module, a gallery thumbnail card. High information density stays legible because every card shares the same generous internal padding and gutter.</figcaption>
+  </figure>
+
+  <pre><code>/* A robust dense-but-legible bento.
+   auto-flow: dense backfills holes left by spanning cards. */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(120px, auto);
+  grid-auto-flow: dense;
+  gap: var(--s-4);
+}
+.bento .feature { grid-column: span 2; grid-row: span 2; }  /* hero card  */
+.bento .wide    { grid-column: span 2; }                    /* banner     */
+.bento .tall    { grid-row: span 2; }                       /* sidebar    */
+
+/* Every card: identical padding + radius = the "tidy" feeling */
+.bento > * {
+  padding: var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  background: var(--bg-3);
+}</code></pre>
+
+  <div class="callout warn">
+    <p><strong>Bento pitfalls.</strong> (1) <em>Uniform density</em> — if every card holds the same amount, it's just a boring grid; the variety is the value. (2) <em>Reading order chaos</em> — <code>grid-auto-flow: dense</code> can make visual order diverge from DOM order, which hurts screen-reader and keyboard users. Keep the DOM in logical reading order and only let dense backfill <em>small</em> holes. (3) <em>Span soup at mobile</em> — collapse most spans to full-width below ~560px (see the live demo above) or the mosaic shatters.</p>
+  </div>
+
+  <h2 id="hierarchy">4 · Hierarchy: size, weight, position</h2>
+  <p>Hierarchy is how a layout tells the eye "this first, that second." The elite sites build it with three levers — <strong>size</strong>, <strong>weight/contrast</strong>, and <strong>position</strong> — and a clean semantic heading map underneath.</p>
+
+  <ul>
+    <li><strong>Semantic map = visual map.</strong> <span class="ref">Apple</span>'s homepage is a textbook: <code>h1</code> "Apple" (visually-hidden brand anchor), <code>h2</code> for marquee products (iPhone 17 Pro), <code>h3</code> for secondary tiles (MacBook Air, Apple Watch). The DOM outline reads like the page looks.</li>
+    <li><strong>Size as tiering.</strong> <span class="ref">14islands</span> tiers projects purely by heading level + thumbnail size — a featured 2-column case-study grid (large thumbs) over a denser overflow list (<code>h3</code> rows). No badges, no "featured" labels; scale alone does the work.</li>
+    <li><strong>Weight contrast inside one phrase.</strong> <span class="ref">14islands</span> again: "Lovable Products" rendered half light-grey, half near-black to emphasise within a single line. <span class="ref">Ramp</span> lets full-width statement lines carry the page ("Systems that never spoke") — copy as the heaviest element.</li>
+    <li><strong>Position = importance.</strong> <span class="ref">Ramp</span>'s hero is left-aligned with a tiny eyebrow stat above a giant H1; <span class="ref">Rauno Freiberg</span> goes loud-per-panel: one giant word per card in a horizontal filmstrip, sparse overall.</li>
+  </ul>
+
+  <div class="callout steal">
+    <p><strong>Steal: the eyebrow → headline → subhead → single CTA unit.</strong> <span class="ref">Vercel</span> repeats exactly this grammar in every grid cell, and <span class="ref">Josh Comeau</span> introduces every homepage section with a small uppercase eyebrow label (ARTICLES AND TUTORIALS, POPULAR CONTENT). One repeated 4-part unit gives a whole page rhythm for free.</p>
+  </div>
+
+  <h2 id="whitespace">5 · Whitespace &amp; density as a dial</h2>
+  <p>The most repeated phrase across the teardowns is "<em>density is deliberately low</em>." But the masters don't keep it low — they <strong>modulate</strong> it. Whitespace is a dial you turn down to create a deliberate spike where it matters.</p>
+
+  <ul>
+    <li><span class="ref">Family</span> — each feature is its own full "act" separated by hairline dividers and large vertical padding, then "Friends of Family" is a <em>dense masonry/marquee wall of real tweets</em>: a deliberate density spike after all the air, which makes social proof feel <em>abundant</em>.</li>
+    <li><span class="ref">Linear</span> — sparse marketing copy, but the embedded app mockups are <em>intentionally dense</em> to signal product depth. Air around the words, density inside the product.</li>
+    <li><span class="ref">Framer</span> — "alternating breathing room and dense proof": one headline owns the viewport up top; the shipping-log grid packs in downward.</li>
+    <li><span class="ref">Arc Browser</span> — low-to-medium overall, with the bento mockup grid as the single densest, most deliberate moment.</li>
+  </ul>
+
+  <div class="example density-demo" id="dens">
+    <div class="seg" role="group" aria-label="Density">
+      <button type="button" aria-pressed="true" onclick="setDensity(this,false)">COMFORTABLE</button>
+      <button type="button" aria-pressed="false" onclick="setDensity(this,true)">COMPACT</button>
+    </div>
+    <div class="density-rows">
+      <div class="row"><span class="dot"></span><span class="grow">Invoice #4471 — Acme Co.</span><span class="meta">$12,400</span></div>
+      <div class="row"><span class="dot"></span><span class="grow">Invoice #4472 — Globex</span><span class="meta">$3,210</span></div>
+      <div class="row"><span class="dot"></span><span class="grow">Invoice #4473 — Soylent</span><span class="meta">$880</span></div>
+      <div class="row"><span class="dot"></span><span class="grow">Invoice #4474 — Initech</span><span class="meta">$45,900</span></div>
+    </div>
+    <figcaption>Same list, two densities — driven by one CSS variable (<code>--pad</code>) on the container. Comfortable for marketing/scan; compact for power-user data (a Linear/Mercury dashboard move).</figcaption>
+  </div>
+
+  <div class="callout tip">
+    <p>Drive density from a single custom property, not by editing each row. One <code>--pad</code> / <code>--gap</code> on a parent lets a whole table flip between "marketing comfortable" and "operator compact" — and animates smoothly. <span class="ref">Mercury</span> and <span class="ref">Linear</span> both keep low density per marketing scene but pack their dashboard mockups full.</p>
+  </div>
+
+  <h2 id="composition">6 · Component composition &amp; repeated grammar</h2>
+  <p>Pages that feel "designed" reuse a small vocabulary of blocks. The teardowns call this out as <strong>repeated component grammar</strong>:</p>
+  <ul>
+    <li><span class="ref">Vercel</span> — "Repeated component grammar: heading → short subhead → single CTA/arrow → embedded mini product demo. This template repeats down the page." One block, instantiated many times.</li>
+    <li><span class="ref">Family</span> — alternating left-text / right-phone-mockup for deep features: a predictable scan pattern that still breaks monotony by flipping sides.</li>
+    <li><span class="ref">Mercury</span> — a sticky/pinned accordion of product pillars paired with a live dashboard mockup on the right that <em>swaps</em> as you expand each item: one composition, four contents.</li>
+    <li><span class="ref">Linear</span> — each capability section pairs a large H2 with an interactive demo panel; numbered chapters (1.0–5.0) give the repetition a spine.</li>
+  </ul>
+
+  <pre><code>&lt;!-- One "capability block" component, reused down the page.
+     Same grammar as Vercel: title -&gt; subhead -&gt; CTA -&gt; artifact. --&gt;
+&lt;section class="cap"&gt;
+  &lt;div class="cap__copy"&gt;
+    &lt;h2&gt;{{ title }}&lt;/h2&gt;
+    &lt;p class="lede"&gt;{{ subhead }}&lt;/p&gt;
+    &lt;a class="cta" href="{{ href }}"&gt;Learn more →&lt;/a&gt;
+  &lt;/div&gt;
+  &lt;figure class="cap__demo"&gt;{{ productMockup }}&lt;/figure&gt;
+&lt;/section&gt;
+
+&lt;style&gt;
+  .cap { display: grid; gap: var(--s-6); align-items: center; }
+  /* flip sides on alternate instances — the Family move */
+  .cap:nth-of-type(even) .cap__demo { order: -1; }
+  @media (min-width: 760px) { .cap { grid-template-columns: 1fr 1fr; } }
+&lt;/style&gt;</code></pre>
+
+  <div class="callout steal">
+    <p><strong>Steal: define 3–5 block types, then compose the whole page from them.</strong> A capability block, a logo wall, a stat band, a quote carousel, a CTA scene. <span class="ref">Stripe</span> and <span class="ref">Linear</span> both build entire long-scroll narratives from roughly this set. Fewer block types → stronger rhythm and far cheaper maintenance.</p>
+  </div>
+
+  <h2 id="alignment">7 · Alignment, asymmetry &amp; the optical edge</h2>
+  <p>Alignment is the cheapest way to look intentional — a shared left edge does more for perceived quality than any gradient. But the best sites also know <em>when to break it</em>.</p>
+  <ul>
+    <li><strong>Asymmetry as signature.</strong> <span class="ref">14islands</span> splits the hero into a giant left headline vs. a small right intro paragraph — "this deliberate imbalance is a signature." Tension, on purpose.</li>
+    <li><strong>A fixed alignment anchor.</strong> <span class="ref">Brittany Chiang</span> keeps a sticky left identity column while content scrolls past; the pinned edge is the page's backbone. <span class="ref">Framer</span> uses sticky left-rail labels (AI / Design / CMS) against right-side visuals.</li>
+    <li><strong>Two-sub-column rows.</strong> <span class="ref">Brittany Chiang</span>'s Experience/Writing entries: muted date range on the left, title + description + tech pills on the right — a tiny internal grid repeated per row reads as effortless order.</li>
+    <li><strong>Negative space as the layout.</strong> <span class="ref">Rauno Freiberg</span> — "the negative space is the layout": generous grey gutters between cards in a horizontal filmstrip, loud per-panel but sparse overall.</li>
+  </ul>
+
+  <div class="callout warn">
+    <p><strong>Centered-everything is the amateur tell.</strong> Centering a whole column of left-to-right text creates ragged left edges the eye can't anchor to. Center hero headlines and CTAs (Apple, Arc, Mercury all do); left-align body copy, lists, and any multi-line content. And remember <em>optical</em> alignment beats mathematical: a circular arrow button or a piece of punctuation often needs a 1–2px nudge to <em>look</em> aligned even when the box is centered.</p>
+  </div>
+
+  <h2 id="footer-ia">8 · The mega-footer: where density is allowed</h2>
+  <p>One striking pattern: airy pages end in dense footers, and that's correct. The footer is the one zone where high link-density signals <em>depth and trust</em> rather than clutter — users arrive there deliberately, ready to hunt.</p>
+  <ul>
+    <li><span class="ref">Stripe</span> — a dense multi-column sitemap (Products / Solutions / Use cases / Developers / Resources / Company): "classic enterprise breadth, but visually quiet."</li>
+    <li><span class="ref">Linear</span> — a 5-column sitemap + legal row, explicitly "the densest block on the page."</li>
+    <li><span class="ref">Framer</span> — a "fat sitemap, 77 links," organised Product / Resources / Community / Company.</li>
+    <li><span class="ref">Mercury</span> — an unusually long, link-rich legal/footnotes block (every yield/cashback claim superscript-footnoted) — density driven by regulation, anchored at the bottom on purpose.</li>
+  </ul>
+  <p>The lesson: don't spread that link density up the page to "fill space." Concentrate it where intent is highest — the footer — and keep the body breathing. shared.css's own <code>.ftr</code> follows this: quiet styling, multi-column tolerance, anchored at the very bottom.</p>
+
+  <h2 id="checklist">9 · Steal-this checklist</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>System</h3>
+      <p>Pick ONE skeleton per viewport: centered column, hard grid, bento, or split. Never blend two. (Stripe / Vercel / Ramp / Brittany Chiang.)</p>
+    </div>
+    <div class="card">
+      <h3>Scale</h3>
+      <p>One 4/8pt spacing scale, referenced by token everywhere. Every gap a multiple. Off-grid drift becomes impossible.</p>
+    </div>
+    <div class="card">
+      <h3>Bento</h3>
+      <p>Vary density across cards (the point), keep DOM in reading order, collapse spans to full-width on mobile. (Ramp / Gianmarco.)</p>
+    </div>
+    <div class="card">
+      <h3>Hierarchy</h3>
+      <p>Semantic heading map = visual map. Tier with size + weight + position, not badges. (Apple / 14islands.)</p>
+    </div>
+    <div class="card">
+      <h3>Density dial</h3>
+      <p>Low overall, one deliberate spike where proof lives. Drive it from a single CSS variable. (Family / Linear / Mercury.)</p>
+    </div>
+    <div class="card">
+      <h3>Grammar</h3>
+      <p>Define 3–5 block types; compose the whole page from them. Repetition = rhythm + cheap maintenance. (Vercel / Stripe.)</p>
+    </div>
+  </div>
+
+  <hr>
+  <p>Layout is invisible when it works. If a visitor never notices the grid, the rhythm, or the spacing scale — only that the page felt calm, clear, and easy to scan — every principle above did its job.</p>
+</main>
+
+<footer class="ftr">
+  <div class="wrap">
+    <p class="brand">◆ Craft Atlas</p>
+    <p>Synthesized from 80 live site teardowns. Layout techniques cited from Stripe, Vercel, Linear, Ramp, Apple, Family, Framer, Mercury, 14islands, Arc Browser, Gianmarco Cavallo, Brittany Chiang, Rauno Freiberg, Josh Comeau and more.</p>
+    <p><a href="../PLAN.html">← Back to the Build Plan</a></p>
+  </div>
+</footer>
+
+<script>
+  function setDensity(btn, compact) {
+    var box = document.getElementById('dens');
+    box.classList.toggle('tight', compact);
+    btn.parentElement.querySelectorAll('button').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b === btn));
+    });
+  }
+</script>
+</body>
+</html>

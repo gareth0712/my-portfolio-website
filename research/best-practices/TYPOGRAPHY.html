@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Typography — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,560;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* --- page-local live-demo styles only --- */
+    .fluid-demo h3.fluid-target {
+      font-family: var(--font-serif);
+      /* the whole point: resize the window and watch it scale */
+      font-size: clamp(1.5rem, 1rem + 5vw, 4.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin: 0;
+      text-wrap: balance;
+    }
+    .fluid-demo .readout {
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      color: var(--ink-dim);
+      margin-top: var(--s-3);
+    }
+    .fluid-demo .readout b { color: var(--accent-soft); }
+
+    /* measure / leading demo */
+    .measure-grid { display: grid; gap: var(--s-5); grid-template-columns: 1fr; }
+    @media (min-width: 720px) { .measure-grid { grid-template-columns: 1fr 1fr; } }
+    .measure-card { border: 1px solid var(--line); border-radius: var(--r-2); padding: var(--s-4); background: var(--bg-2); }
+    .measure-card p { font-family: var(--font-serif); color: var(--ink-soft); margin: 0; }
+    .measure-card .label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-dim); margin: 0 0 var(--s-2); }
+    .m-bad p  { max-width: none;   line-height: 1.3; }   /* too wide, too tight */
+    .m-good p { max-width: 62ch;   line-height: 1.7; }   /* comfortable */
+
+    /* variable-font weight slider demo */
+    .vf-demo label { font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink-dim); display: block; margin-bottom: var(--s-2); }
+    .vf-demo input[type=range] { width: 100%; accent-color: var(--accent); }
+    .vf-demo .specimen {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: clamp(2rem, 1rem + 4vw, 3.4rem);
+      line-height: 1.1;
+      margin-top: var(--s-4);
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    /* two-tone hierarchy demo (Linear / 14islands trick) */
+    .twotone { font-family: var(--font-serif); font-size: clamp(1.6rem, 1rem + 3vw, 2.6rem); line-height: 1.2; letter-spacing: -0.015em; margin: 0; }
+    .twotone .dim { color: var(--ink-faint); }
+    .twotone .lit { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="UI-DESIGN.html">UI Design</a>
+      <a href="UX.html">UX</a>
+      <a href="TYPOGRAPHY.html">Typography</a>
+      <a href="COLOR.html">Color</a>
+      <a href="STYLING.html">Styling</a>
+      <a href="MOTIONS.html">Motion</a>
+      <a href="ANIMATIONS.html">Animation</a>
+      <a href="INTERACTIONS.html">Interaction</a>
+      <a href="SPATIAL.html">3D / Spatial</a>
+      <a href="MINI-GAMES.html">Mini-Games</a>
+      <a href="STATE-MANAGEMENT.html">State</a>
+      <a href="NEXTJS.html">Meta-Framework</a>
+      <a href="../references/PORTFOLIO.html">Portfolio</a>
+      <a href="../references/TOP-LIST.html">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <p class="kicker">Craft Atlas · 03</p>
+    <h1>Typography</h1>
+    <p class="lede">Type is the cheapest way to look expensive. Across 80 teardowns the pattern is brutally consistent: the most memorable sites pick one strong voice, push scale to the extreme, and let size do what most designers waste color and weight on.</p>
+
+    <nav class="toc" aria-label="On this page">
+      <ol>
+        <li><a href="#scale">1 · The type scale &amp; the extreme-contrast move</a></li>
+        <li><a href="#fluid">2 · Fluid type with clamp()</a></li>
+        <li><a href="#one-face">3 · One typeface, no pairing</a></li>
+        <li><a href="#pairing">4 · When you do pair: display × text</a></li>
+        <li><a href="#variable">5 · Variable fonts &amp; loading</a></li>
+        <li><a href="#measure">6 · Measure, leading &amp; rhythm</a></li>
+        <li><a href="#hierarchy">7 · Hierarchy without a second font</a></li>
+        <li><a href="#expressive">8 · Expressive &amp; bespoke display type</a></li>
+      </ol>
+    </nav>
+
+    <!-- ============================================================= -->
+    <section id="scale">
+      <h2>1 · The type scale &amp; the extreme-contrast move</h2>
+      <p>The single most repeated finding in the teardowns is not a font choice — it is a <strong>scale strategy</strong>. The best sites are bimodal: one enormous display tier and one tiny label tier, with almost nothing in between. The gap itself <em>is</em> the hierarchy.</p>
+      <ul>
+        <li><span class="ref">Dennis Snellenberg ↗</span> — hero <code>H1</code> computes to <strong>~189px</strong> at a light-ish ~450 weight, while section eyebrows drop to ~12px uppercase tracked labels (NAVIGATION, SOCIALS, LOCAL TIME). Hierarchy is "driven almost entirely by the size jump," not weight or color.</li>
+        <li><span class="ref">Obys Agency ↗</span> — the <code>OBYS®</code> wordmark is set at 200px+ optical, then drops straight to small tightly-tracked captions. A "deliberate dramatic scale jump (hero/caption, almost nothing in between)."</li>
+        <li><span class="ref">Minh Pham ↗</span> — house-sized client names against tiny letter-spaced eyebrows ("WHAT THEY SAID", "CONNECT"). One typeface; the contrast does all the work.</li>
+        <li><span class="ref">Apple ↗</span> — a "strong size jump between headline and supporting text creates instant hierarchy with zero ornament." Copy is terse; type does the heavy lifting.</li>
+        <li><span class="ref">Basement Studio ↗</span> — hero <code>H1</code> ~87px tight leading, then capabilities pushed to near-viewport-width statements, with mid-grey eyebrow labels above.</li>
+      </ul>
+
+      <p>A modular scale gives you that structure for free. Pick a ratio (1.25 "major third" for editorial calm, 1.333+ for drama) and generate steps from a single base. Our <code>shared.css</code> ships a 6-step fluid scale on exactly this principle:</p>
+<pre><code>/* A modular scale as custom properties — one source of truth.
+   Ratio widens from ~1.25 at the small end toward display. */
+:root {
+  --step--1: clamp(0.80rem, 0.76rem + 0.18vw, 0.875rem); /* labels  */
+  --step-0:  clamp(1.00rem, 0.95rem + 0.22vw, 1.125rem); /* body    */
+  --step-1:  clamp(1.20rem, 1.10rem + 0.50vw, 1.45rem);
+  --step-2:  clamp(1.45rem, 1.25rem + 0.95vw, 2.05rem);
+  --step-3:  clamp(1.80rem, 1.45rem + 1.70vw, 3.05rem);
+  --step-4:  clamp(2.30rem, 1.70rem + 2.90vw, 4.40rem);  /* hero h1 */
+}
+h1 { font-size: var(--step-4); }
+.label { font-size: var(--step--1); }</code></pre>
+
+      <div class="callout steal">
+        <p><strong>Push the contrast ratio, not the number of sizes.</strong> Amateur type systems use 7 sizes that all look similar. Elite sites use 2 tiers an octave apart. Make your display tier <em>uncomfortably</em> big and your label tier genuinely small — the drama lives in the gap, and you make fewer decisions.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="fluid">
+      <h2>2 · Fluid type with <code>clamp()</code></h2>
+      <p>Those giant display sizes can't be fixed pixels — a 189px headline destroys a phone. The modern answer is <code>clamp(MIN, PREFERRED, MAX)</code>: type scales smoothly with the viewport between two hard bounds, with <strong>zero media queries</strong>. <span class="ref">Antinomy Studio ↗</span> drives its 40–80px+ statement headlines exactly this way — the teardown notes "~clamp-driven" statement type as the primary hierarchy signal.</p>
+
+      <div class="example fluid-demo">
+        <h3 class="fluid-target">Resize the window →</h3>
+        <p class="readout">font-size: <b>clamp(1.5rem, 1rem + 5vw, 4.5rem)</b> · live: <b id="px">—</b></p>
+        <figcaption>The heading grows with the viewport, then clamps flat at the 4.5rem ceiling so it never overflows on desktop, and never shrinks below 1.5rem on mobile. No breakpoints.</figcaption>
+      </div>
+
+      <p>Read the formula as <code>clamp(floor, slope, ceiling)</code>. The middle term mixes a fixed <code>rem</code> base with a <code>vw</code> slope. A bare <code>vw</code> would scale linearly and feel wrong at the extremes; the <code>rem</code> term flattens the curve so small screens stay readable.</p>
+<pre><code>/* Anatomy of a fluid step */
+h1 {
+  /*       MIN floor   base + viewport slope   MAX ceiling */
+  font-size: clamp(2.3rem, 1.7rem + 2.9vw, 4.4rem);
+  line-height: 1.04;        /* tighten as size grows            */
+  letter-spacing: -0.025em; /* optical: big type needs negative */
+  text-wrap: balance;       /* even line lengths on multi-line  */
+}</code></pre>
+
+      <div class="callout warn">
+        <p><strong>Accessibility pitfall:</strong> a slope built only from <code>vw</code> ignores zoom and the user's root font-size, breaking WCAG 1.4.4 (text must scale to 200%). Always include a <code>rem</code> term in the preferred value (as above) so zoom still works — and never set the MIN below ~1rem for body copy.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="one-face">
+      <h2>3 · One typeface, no pairing</h2>
+      <p>The most common system in the teardowns is the simplest: <strong>a single family for everything</strong>, with hierarchy coming from scale, weight and case. No pairing means nothing to clash, one font file to optimize, and a coherent voice.</p>
+      <ul>
+        <li><span class="ref">Linear ↗</span> — <strong>Inter Variable</strong> across the entire site, falling back to SF Pro Display. "Single typeface across the whole site — no pairing." A 64px tight-leading heavy <code>H1</code> does the display work.</li>
+        <li><span class="ref">Basement Studio ↗</span> — <strong>Geist</strong> (Vercel's grotesk) for both headings and body, "so hierarchy comes from scale/weight, not family pairing."</li>
+        <li><span class="ref">Brittany Chiang ↗</span> — <strong>Inter</strong> for everything, credited in the footer, loaded via <code>next/font</code>. Clear three-tier hierarchy: display name / section labels / body, all one family.</li>
+        <li><span class="ref">Dennis Snellenberg ↗</span> — a single custom "Dennis Sans" neo-grotesque "doing all the work."</li>
+        <li><span class="ref">Minh Pham ↗</span> — "disciplined single-typeface system" (ITC Avant Garde Gothic): hierarchy "driven almost entirely by size + weight + spacing, not by color or many type families."</li>
+      </ul>
+
+      <div class="callout tip">
+        <p><strong>Inter is the default for a reason.</strong> Multiple teardowns (Linear, Brittany Chiang) reach for Inter; others reach for a Geist-style grotesk. It's a variable font with excellent hinting, tabular figures, and a huge weight range — one file covers labels through display. If you're unsure, start here and spend your creativity on scale and spacing instead.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="pairing">
+      <h2>4 · When you do pair: display × text</h2>
+      <p>If you pair, make the two voices <em>maximally different</em> so the contrast reads as intentional, not accidental. The teardowns show the classic pairing is a loud display face over a quiet, readable text face.</p>
+
+      <figure class="figure">
+        <img src="../workings/shots/mike-hall-mikemai-net/01-hero.png" alt="mikemai.net hero: a giant all-caps condensed display headline over an old-style serif body.">
+        <figcaption><strong>mikemai.net</strong> — an ultra-heavy condensed grotesk (<em>Boldonse</em>, ~92px ALL-CAPS) paired with a 17th-century old-style serif (<em>IM Fell English</em>) for body. The teardown calls the pairing "the signature move: high contrast, editorial, memorable." Note the manual soft-hyphenation (<code>WICK&shy;ED</code>) so the giant type wraps gracefully at any width.</figcaption>
+      </figure>
+
+      <p>This document itself uses the same strategy via <code>shared.css</code>: <strong>Newsreader</strong> (serif) for headings and the lede, <strong>Inter</strong> (sans) for body and labels, <strong>JetBrains Mono</strong> for code and eyebrows. Three families, three jobs.</p>
+      <ul>
+        <li><span class="ref">Nothing ↗</span> — an unusual but deliberate pairing: a <strong>dot-matrix / LED-segment</strong> display cut (NType82) for labels and wordmark, over a <strong>serif</strong> for card headlines ("Five days of back-to-back tracks") — giving an editorial, almost-print feel against the technical labels.</li>
+        <li><span class="ref">Gucci ↗</span> — a two-axis system: a classical Granjon-style <strong>serif</strong> for the masthead lineage paired with a clean <strong>"Gucci Sans"</strong> for UI and body.</li>
+        <li><span class="ref">Josh Comeau ↗</span> — body in a humanist sans (<em>Wotfard</em>) but code blocks in <strong>Cartograph CF</strong>, a "whimsical" mono — pairing a reading face with a distinct code face that matches the playful tone.</li>
+        <li><span class="ref">Stripe Press ↗</span> — a single high-contrast literary serif (<em>Ivar Headline</em> for titles, <em>Ivar Text</em> for body) — "it reads like a book, reinforcing the editorial identity."</li>
+      </ul>
+
+<pre><code>/* The three-role system used by this very page */
+:root {
+  --font-serif: 'Newsreader', Georgia, serif;             /* display + lede */
+  --font-sans:  'Inter', system-ui, sans-serif;           /* body + labels  */
+  --font-mono:  'JetBrains Mono', ui-monospace, monospace;/* code / eyebrow  */
+}
+h1, h2, h3 { font-family: var(--font-serif); }
+body, p    { font-family: var(--font-sans); }
+.kicker, code, pre { font-family: var(--font-mono); }</code></pre>
+
+      <div class="callout steal">
+        <p><strong>Pair by contrast of category, not by "matching."</strong> Serif display + sans body, or sans display + serif body — opposite categories read as a designed decision. Two sans-serifs that look <em>almost</em> the same just look like a mistake. The mikemai.net move (brutalist condensed sans over a centuries-old serif) is extreme on purpose.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="variable">
+      <h2>5 · Variable fonts &amp; loading</h2>
+      <p>A variable font ships every weight (and often width / optical-size) in <em>one file</em> with a continuous axis. That's why Linear and Brittany Chiang both use Inter <em>Variable</em>: a single download covers labels at 400 through display at 800, instead of loading five static cuts.</p>
+
+      <div class="example vf-demo">
+        <label for="wght">font-weight (Inter variable axis): <span id="wghtval" style="color:var(--accent-soft)">650</span></label>
+        <input id="wght" type="range" min="400" max="700" value="650" step="50" aria-label="Font weight">
+        <div class="specimen" id="vf-specimen" style="font-weight:650">Variable fonts scale on one axis.</div>
+        <figcaption>One font family, multiple weights from a single import. Drag the slider — the browser swaps weight live with no extra downloads. (Demo steps through the loaded weights; a true variable file gives every value in between.)</figcaption>
+      </div>
+
+<pre><code>/* Load a variable font with the full weight range, swap to avoid FOIT */
+@font-face {
+  font-family: 'Inter var';
+  src: url('/fonts/Inter.var.woff2') format('woff2-variations');
+  font-weight: 100 900;        /* declare the axis range          */
+  font-display: swap;          /* show fallback now, swap when ready */
+}
+h1 { font-family: 'Inter var'; font-weight: 760; }
+
+/* Fine-grained axes when you need them */
+.optical-display { font-variation-settings: 'opsz' 32, 'wght' 600; }</code></pre>
+
+      <p>Loading discipline matters as much as the file. <span class="ref">Josh Comeau ↗</span> ships a self-hosted <code>Wotfard-fallback</code> "to avoid layout shift" (CLS) — a fallback metric-matched to the real face so text doesn't reflow on swap. In React/Next, <span class="ref">Brittany Chiang ↗</span> and <span class="ref">Linear ↗</span> load Inter via <code>next/font</code>, which self-hosts the file, inlines the <code>@font-face</code>, and auto-generates a size-adjusted fallback:</p>
+<pre><code>// Next.js — next/font self-hosts + zero layout shift
+import { Inter } from 'next/font/google';
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',   // expose as a CSS custom property
+});
+// &lt;html className={inter.variable}&gt; … then use var(--font-inter)</code></pre>
+
+      <div class="callout warn">
+        <p><strong>Web-font pitfalls:</strong> (1) <code>font-display: swap</code> without a metric-matched fallback causes a visible reflow (CLS) — pair it with <code>size-adjust</code>/<code>ascent-override</code> or let <code>next/font</code> do it. (2) Subset to the glyphs you use; a full CJK face like <span class="ref">Bottega Veneta ↗</span>'s Source Han Sans is multi-megabyte. (3) <code>preconnect</code> to the font host (we do, in <code>&lt;head&gt;</code>) to shave the handshake.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="measure">
+      <h2>6 · Measure, leading &amp; rhythm</h2>
+      <p>Display type gets the glory, but body copy is where readability is won or lost. Two numbers govern it: <strong>measure</strong> (line length, ideally 45–75 characters) and <strong>leading</strong> (line-height). <span class="ref">Obys Agency ↗</span> sets its blurb left-aligned, ragged-right, with "generous leading" — pure Swiss/International Typographic Style. <span class="ref">Gucci ↗</span> keeps body "small, generously leaded, low-contrast — reinforcing the magazine feel."</p>
+
+      <div class="example">
+        <div class="measure-grid">
+          <div class="measure-card m-bad">
+            <p class="label">Too wide · line-height 1.3</p>
+            <p>Without a max-width the line runs the full container, and the eye loses its place returning to the start of each line. Tight leading makes the wall of text feel dense and airless, and long-form reading becomes a chore the moment a paragraph gets going.</p>
+          </div>
+          <div class="measure-card m-good">
+            <p class="label">62ch · line-height 1.7</p>
+            <p>Capped at a comfortable measure, the eye finds the next line easily and reading rhythm holds. Open leading gives each line room to breathe, which is exactly why long-form sites set body copy at a controlled width with generous line-height.</p>
+          </div>
+        </div>
+        <figcaption>Same paragraph, two settings. The <code>ch</code> unit ties measure to the font's own character width, so the constraint survives a font change.</figcaption>
+      </div>
+
+<pre><code>/* The reading-comfort defaults this page uses */
+.prose {
+  max-width: 65ch;     /* measure: ~45–75 chars per line     */
+  line-height: 1.7;    /* leading: 1.5–1.8 for body          */
+  text-wrap: pretty;   /* avoids orphans / ragged last lines */
+}
+h1, h2 {
+  line-height: 1.12;   /* big type wants tighter leading     */
+  text-wrap: balance;  /* even line lengths in headlines      */
+}
+/* Vertical rhythm: space siblings consistently, not ad-hoc */
+.flow > * + * { margin-top: 1.5rem; }</code></pre>
+
+      <p><span class="ref">Josh Comeau ↗</span>'s body is explicitly "comfortable, high-line-height, long-form-reading optimized" — the inverse of the giant display tier. The lesson: tighten leading as type grows, loosen it as type shrinks.</p>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="hierarchy">
+      <h2>7 · Hierarchy without a second font</h2>
+      <p>Single-typeface sites still need emphasis. The teardowns reveal a clever, font-free trick: <strong>two-tone hierarchy</strong> — render part of a heading bright and part dimmed, within the same element, same font.</p>
+
+      <div class="example">
+        <p class="twotone"><span class="lit">A new species of product tool.</span> <span class="dim">It brings issues, projects, and roadmaps into one system.</span></p>
+        <figcaption>The "Linear two-tone" move: thesis bright (<code>--ink</code>), continuation dimmed (<code>--ink-faint</code>). Emphasis with no second font and no second hue.</figcaption>
+      </div>
+
+      <ul>
+        <li><span class="ref">Linear ↗</span> — "renders the first sentence in bright white and the continuation in muted gray within the same heading… creates emphasis without a second font or color hue."</li>
+        <li><span class="ref">14islands ↗</span> — a statement block ("Lovable Products — from vision to launch") uses "a duotone two-weight treatment: half the words light grey, half near-black, as emphasis within one phrase."</li>
+        <li><span class="ref">Minh Pham ↗</span> — testimonials use a two-tone pull-quote (active line cream, upcoming line ghosted grey) to telegraph a typewriter reveal.</li>
+      </ul>
+
+<pre><code>&lt;h2 class="thesis"&gt;
+  &lt;span class="lit"&gt;A new species of product tool.&lt;/span&gt;
+  &lt;span class="dim"&gt;It brings issues, projects, and roadmaps into one.&lt;/span&gt;
+&lt;/h2&gt;
+
+.thesis .lit { color: var(--ink); }       /* bright thesis    */
+.thesis .dim { color: var(--ink-faint); } /* dimmed remainder */</code></pre>
+
+      <p>The other font-free lever is <strong>case + tracking</strong> for labels. Nearly every teardown sets eyebrows/labels in small ALL-CAPS with positive letter-spacing — <span class="ref">Dennis Snellenberg ↗</span>, <span class="ref">Brittany Chiang ↗</span>, <span class="ref">Bottega Veneta ↗</span> (whose "wide, evenly-tracked capitals" are its single strongest signature). It instantly reads as "metadata" and never competes with the display tier.</p>
+
+      <div class="callout tip">
+        <p><strong>Letter-spacing rules of thumb:</strong> tighten (negative tracking, e.g. <code>-0.02em</code>) as type gets <em>bigger</em> — large type looks loose by default. Widen (positive, <code>0.08–0.18em</code>) for small UPPERCASE labels — caps look cramped by default. Never letter-space lowercase body text.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="expressive">
+      <h2>8 · Expressive &amp; bespoke display type</h2>
+      <p>At the top end, brands commission their own typeface so the type itself <em>is</em> the brand. This is the move that separates a template from an identity.</p>
+
+      <figure class="figure">
+        <img src="../workings/shots/dennis-snellenberg/01-hero.png" alt="Dennis Snellenberg hero: an enormous light-weight display H1 dominating the viewport.">
+        <figcaption><strong>Dennis Snellenberg</strong> — a custom "Dennis Sans" set as a ~189px display <code>H1</code>. A bespoke single family plus extreme scale is the entire identity; the duplicated stacked headings are an animation rig for a marquee/parallax reveal.</figcaption>
+      </figure>
+
+      <ul>
+        <li><span class="ref">Teenage Engineering ↗</span> — one custom face, <strong>te-20</strong> (a tight monospaced-leaning grotesque matching the silkscreen on their hardware), plus a family of house cuts and <em>per-product display faces</em> (<code>riddim</code>, <code>franxurter</code>, <code>swingus</code>) so each product spotlight carries its own typographic voice while te-20 keeps the system coherent.</li>
+        <li><span class="ref">Nothing ↗</span> — bespoke <strong>NType82</strong> with a dot-matrix / LED-segment display cut. Signature treatment: parenthetical naming with letter-spaced parens — <code>phone ( 3 )</code>, <code>ear ( 3 )</code>.</li>
+        <li><span class="ref">Obys Agency ↗</span> — in-house <strong>OTF Obys NG</strong>, treated as a "living system" defining rhythm / spacing / hierarchy, working as both display and text.</li>
+        <li><span class="ref">Stripe Press ↗</span> — the literary <strong>Ivar</strong> family is so central the typography "defers to the 3D objects rather than shouting," and spine text becomes part of the rendered 3D book texture.</li>
+        <li><span class="ref">Apple ↗</span> — <strong>SF Pro</strong> (their own system face): "big, tight, bold headlines" with a strong size jump and almost no paragraphs.</li>
+      </ul>
+
+      <p>Expressive type also leans on <strong>OpenType features</strong> a stock setup ignores: ligatures, tabular figures for numbers in tables, fractions, and stylistic sets. Turn them on deliberately:</p>
+<pre><code>/* Production-grade OpenType defaults */
+body { font-feature-settings: 'kern', 'liga', 'calt'; }  /* this page's base */
+
+.data-table td { font-variant-numeric: tabular-nums; }    /* aligned columns */
+.price         { font-variant-numeric: tabular-nums lining-nums; }
+.brand-display { font-feature-settings: 'ss01' 1, 'dlig' 1; } /* stylistic set */</code></pre>
+
+      <div class="callout warn">
+        <p><strong>Overuse / a11y caution.</strong> Teenage Engineering ships <em>no semantic <code>&lt;h1&gt;</code></em> — hierarchy is "purely scale, weight, position, photography" (an explicit accessibility trade-off the teardown flags). Expressive type is no excuse to drop semantic headings: keep a real <code>&lt;h1&gt;</code>–<code>&lt;h3&gt;</code> outline for screen readers and SEO, then style it however bold you like. Per-product display faces (TE's <code>riddim</code> et al.) also multiply font payload — budget it.</p>
+      </div>
+
+      <div class="callout steal">
+        <p><strong>The whole atlas in one rule:</strong> pick one strong voice, set the display tier <em>uncomfortably</em> large with tight tracking, set labels small and tracked-out, cap your measure at ~65ch, and let the scale contrast carry the hierarchy. Bespoke fonts are a bonus — the discipline is free.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ftr">
+    <div class="wrap">
+      <p><a class="brand" href="../PLAN.html">◆ Craft Atlas</a></p>
+      <p>Page 03 of 13 · <a href="../PLAN.html">← Back to the Build Plan</a></p>
+      <p>Craft Atlas — synthesized from 80 live site teardowns.</p>
+    </div>
+  </footer>
+
+  <script>
+    // --- demo 1: live px readout for the clamp() heading ---
+    (function () {
+      var t = document.querySelector('.fluid-target');
+      var px = document.getElementById('px');
+      function tick() { if (t && px) px.textContent = Math.round(parseFloat(getComputedStyle(t).fontSize)) + 'px'; }
+      addEventListener('resize', tick, { passive: true });
+      tick();
+    })();
+
+    // --- demo 2: variable-font weight slider ---
+    (function () {
+      var s = document.getElementById('wght');
+      var out = document.getElementById('wghtval');
+      var spec = document.getElementById('vf-specimen');
+      if (!s) return;
+      s.addEventListener('input', function () {
+        spec.style.fontWeight = s.value;
+        out.textContent = s.value;
+      });
+    })();
+  </script>
+</body>
+</html>

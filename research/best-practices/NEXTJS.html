@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meta-Framework — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,560;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* --- page-local live-demo styles only --- */
+    /* side-by-side Next ↔ Nuxt code columns */
+    .twoup { display: grid; gap: var(--s-3); grid-template-columns: 1fr; }
+    @media (min-width: 880px) { .twoup { grid-template-columns: 1fr 1fr; } }
+    .twoup figure { margin: 0; }
+    .twoup .stack-label {
+      font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-dim); margin: 0 0 var(--s-2);
+      display: flex; align-items: center; gap: var(--s-2);
+    }
+    .twoup .stack-label .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .twoup .next .dot { background: #e6e6e6; }
+    .twoup .nuxt .dot { background: #00dc82; }
+    .twoup .nuxt .stack-label { color: #69e6ad; }
+    .twoup pre { margin: 0; height: 100%; }
+
+    /* render-strategy decision demo */
+    .render-demo .modes { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-bottom: var(--s-3); }
+    .render-demo button {
+      font-family: var(--font-mono); font-size: var(--step--1);
+      background: var(--bg-2); border: 1px solid var(--line); color: var(--ink-soft);
+      padding: var(--s-2) var(--s-3); border-radius: var(--r-1); cursor: pointer;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .render-demo button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-soft); background: color-mix(in srgb, var(--accent) 12%, var(--bg-2)); }
+    .render-demo .panel { border: 1px solid var(--line); border-radius: var(--r-2); padding: var(--s-4); background: var(--bg-2); }
+    .render-demo .panel h4 { margin: 0 0 var(--s-2); font-family: var(--font-mono); color: var(--accent-soft); font-size: var(--step-0); }
+    .render-demo .panel p { margin: 0 0 var(--s-2); color: var(--ink-soft); }
+    .render-demo .panel .meta { font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink-dim); margin: 0; }
+    .render-demo .panel .meta b { color: var(--ink-soft); }
+
+    /* RSC boundary diagram */
+    .boundary { display: grid; gap: 0; border: 1px solid var(--line); border-radius: var(--r-2); overflow: hidden; font-family: var(--font-mono); font-size: var(--step--1); }
+    .boundary .row { display: grid; grid-template-columns: 92px 1fr; }
+    .boundary .row + .row { border-top: 1px solid var(--line); }
+    .boundary .tag { padding: var(--s-3); display: flex; align-items: center; justify-content: center; text-align: center; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.62rem; }
+    .boundary .server .tag { background: color-mix(in srgb, var(--accent) 16%, var(--bg-2)); color: var(--accent-soft); }
+    .boundary .client .tag { background: var(--bg-3, #1a1a1a); color: var(--ink-soft); }
+    .boundary .body { padding: var(--s-3); color: var(--ink-soft); display: flex; align-items: center; }
+    .boundary .body code { background: none; padding: 0; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="UI-DESIGN.html">UI Design</a>
+      <a href="UX.html">UX</a>
+      <a href="TYPOGRAPHY.html">Typography</a>
+      <a href="COLOR.html">Color</a>
+      <a href="STYLING.html">Styling</a>
+      <a href="MOTIONS.html">Motion</a>
+      <a href="ANIMATIONS.html">Animation</a>
+      <a href="INTERACTIONS.html">Interaction</a>
+      <a href="SPATIAL.html">3D / Spatial</a>
+      <a href="MINI-GAMES.html">Mini-Games</a>
+      <a href="STATE-MANAGEMENT.html">State</a>
+      <a href="NEXTJS.html">Meta-Framework</a>
+      <a href="../references/PORTFOLIO.html">Portfolio</a>
+      <a href="../references/TOP-LIST.html">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <p class="kicker">Craft Atlas · 13</p>
+    <h1>Meta-Frameworks</h1>
+    <p class="lede">Next.js App Router and Nuxt 4 solve the same problem from opposite syntax: ship HTML fast, hydrate the minimum, optimise images and fonts at the framework layer, and pick a render strategy per route. Of our 80 teardowns the production-grade ones cluster hard on this stack — Next.js App Router on Vercel, with <code>next/font</code>, RSC output, and ISR. Our own site is Nuxt 4 / Vue, so every pattern here is shown side-by-side: learn the principle from the React leaders, apply it in Nuxt.</p>
+
+    <nav class="toc" aria-label="On this page">
+      <ol>
+        <li><a href="#stack">1 · The stack the leaders actually ship</a></li>
+        <li><a href="#rsc">2 · Server-first: RSC &amp; Nuxt islands</a></li>
+        <li><a href="#render">3 · Render strategy per route (SSG / SSR / ISR)</a></li>
+        <li><a href="#data">4 · Data fetching &amp; caching</a></li>
+        <li><a href="#image">5 · Image &amp; font optimisation</a></li>
+        <li><a href="#metadata">6 · Metadata, streaming &amp; transitions</a></li>
+        <li><a href="#vitals">7 · Core Web Vitals &amp; bundle discipline</a></li>
+        <li><a href="#checklist">8 · The portfolio-site checklist</a></li>
+      </ol>
+    </nav>
+
+    <!-- ============================================================= -->
+    <section id="stack">
+      <h2>1 · The stack the leaders actually ship</h2>
+      <p>Before any opinion, the evidence. We fingerprinted the stack of every teardown (script paths, <code>_next</code> chunks, <code>meta generator</code>, font class hashes). The signal is overwhelming: <strong>elite developer/SaaS sites are Next.js App Router on Vercel</strong>, with a clear convergence on <code>next/font</code> and RSC output.</p>
+      <ul>
+        <li><span class="ref">Vercel ↗</span> — Next.js with 170+ <code>_next</code> static chunks; <strong>Geist</strong> Sans/Mono self-hosted woff2. The product itself (deploy logs, streaming code editor, live leaderboards) is the hero — "live, interactive surfaces instead of static screenshots."</li>
+        <li><span class="ref">Linear ↗</span> — App Router confirmed (chunks under <code>static.linear.app/web/_next/static/chunks/</code>, <code>main-app-*.js</code>). <em>No</em> legacy <code>__NEXT_DATA__</code> and no generator meta — the RSC-output signature. Inter Variable + Framer Motion.</li>
+        <li><span class="ref">Ramp ↗</span> — App Router on Vercel (<code>?dpl=dpl_…</code> deployment-ID params on chunks), <code>next/font local</code> for the paid Lausanne face with a metric-matched fallback. Migrated <em>off</em> Webflow as it scaled.</li>
+        <li><span class="ref">Brittany Chiang ↗</span> — the current v5 portfolio is a Next.js App Router rebuild (the famous v4 was Gatsby); Inter via <code>next/font</code> with the hashed <code>__inter_*</code> class.</li>
+        <li><span class="ref">Josh Comeau ↗</span> — App Router + React Server Components, with zero-runtime CSS (Linaria) and compile-time syntax highlighting (Shiki) chosen <em>specifically</em> to drop client runtime — "modern stack choices double as portfolio evidence."</li>
+        <li><span class="ref">Paul Stamatiou ↗</span> — 20-year site rebuilt from scratch in Next.js (2024), bundled with <strong>Turbopack</strong>, modern App-router build (no legacy data blob).</li>
+        <li><span class="ref">Off-Menu ↗</span> &amp; <span class="ref">Manu Arora ↗</span> — both App Router + Turbopack on Vercel, RSC signature, fonts via <code>next/font</code>.</li>
+      </ul>
+
+      <p>Counter-evidence keeps it honest: <span class="ref">Cassidy Williams ↗</span> and <span class="ref">Tania Rascia ↗</span> go fully static (Astro / Gatsby) for a "near-zero JS, blazing Lighthouse" story; <span class="ref">14islands ↗</span> and <span class="ref">Family ↗</span> are on the older Next.js <em>Pages</em> Router (SSG via <code>_buildManifest</code>/<code>_ssgManifest</code>); <span class="ref">Mercury ↗</span> shows no Next markers at all (custom React). A meta-framework is a default, not a law — if the site is purely static content, a static generator wins.</p>
+
+      <div class="callout steal">
+        <p><strong>Default to App Router (Next) or Nuxt 4, deploy to a platform that does ISR for free.</strong> The pattern under all the leaders: server-render by default, hydrate islands, optimise fonts/images at the framework layer, and let the host (Vercel / Netlify / Cloudflare) handle the CDN cache. For a Vue/Nuxt site you get the identical capabilities — they just have different names.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="rsc">
+      <h2>2 · Server-first: RSC &amp; Nuxt islands</h2>
+      <p>The defining move of the modern App Router is the <strong>Server Component default</strong>: components render on the server, ship HTML, and send <em>zero</em> JS to the client unless you opt a leaf into interactivity. <span class="ref">Josh Comeau ↗</span>'s blog is the clean example — an RSC stack where the whole page is server-rendered and only the toys (generative art re-roller, sound widgets) are client islands. Nuxt 4's equivalent is <strong>server components</strong> (<code>.server.vue</code>) and the <code>&lt;NuxtIsland&gt;</code> primitive: render a component to HTML on the server and ship no component JS.</p>
+
+      <p>Mental model — the boundary is a one-way door. Server code (DB, secrets, heavy deps) stays on the server; mark a leaf as a client component only where you need state, effects, or event handlers.</p>
+
+      <div class="example">
+        <div class="boundary" aria-label="Server vs client component boundary">
+          <div class="row server"><div class="tag">Server</div><div class="body"><code>page.tsx — fetch, DB, secrets · 0 KB JS shipped</code></div></div>
+          <div class="row server"><div class="tag">Server</div><div class="body"><code>&lt;ArticleBody/&gt; — async, renders to HTML</code></div></div>
+          <div class="row client"><div class="tag">Client</div><div class="body"><code>'use client' &lt;LikeButton/&gt; — state + onClick, hydrated</code></div></div>
+        </div>
+        <figcaption>Keep the <code>'use client'</code> boundary as deep in the tree as possible. Everything above it is HTML-only; only the interactive leaf ships JS. In Nuxt the inverse default applies — components are universal (SSR + hydrate) by default; use <code>.server.vue</code> to make a component HTML-only, or <code>.client.vue</code> for client-only.</figcaption>
+      </div>
+
+      <div class="twoup">
+        <figure class="next">
+          <p class="stack-label"><span class="dot"></span> Next.js — App Router (RSC default)</p>
+<pre><code>// app/posts/[slug]/page.tsx  — Server Component
+// Runs on the server. No 'use client' = 0 KB JS.
+import { db } from '@/lib/db';
+import LikeButton from './like-button';
+
+export default async function Page({ params }) {
+  const post = await db.post.find(params.slug); // secrets safe
+  return (
+    &lt;article&gt;
+      &lt;h1&gt;{post.title}&lt;/h1&gt;
+      &lt;div&gt;{post.body}&lt;/div&gt;
+      {/* only this leaf ships JS */}
+      &lt;LikeButton id={post.id} /&gt;
+    &lt;/article&gt;
+  );
+}
+
+// app/posts/[slug]/like-button.tsx
+'use client';
+import { useState } from 'react';
+export default function LikeButton({ id }) {
+  const [n, set] = useState(0);
+  return &lt;button onClick={() =&gt; set(n + 1)}&gt;♥ {n}&lt;/button&gt;;
+}</code></pre>
+        </figure>
+        <figure class="nuxt">
+          <p class="stack-label"><span class="dot"></span> Nuxt 4 — universal default + islands</p>
+<pre><code>&lt;!-- pages/posts/[slug].vue  — SSR + hydrate (universal) --&gt;
+&lt;script setup lang="ts"&gt;
+const { slug } = useRoute().params
+// runs on server first, payload forwarded to client
+const { data: post } = await useAsyncData(
+  () =&gt; $fetch(`/api/posts/${slug}`)
+)
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;article&gt;
+    &lt;h1&gt;{{ post.title }}&lt;/h1&gt;
+    &lt;div v-html="post.body" /&gt;
+    &lt;!-- interactive leaf, hydrated --&gt;
+    &lt;LikeButton :id="post.id" /&gt;
+  &lt;/article&gt;
+&lt;/template&gt;
+
+&lt;!-- components/Heavy.server.vue --&gt;
+&lt;!-- renders to HTML on the server, ships NO component JS --&gt;
+&lt;template&gt;&lt;MarkdownRender :src="huge" /&gt;&lt;/template&gt;</code></pre>
+        </figure>
+      </div>
+
+      <div class="callout warn">
+        <p><strong>Pitfall — the 'use client' contagion.</strong> Marking a high-up component <code>'use client'</code> forces its whole subtree client-side, blowing up the bundle. Push the directive to the smallest leaf that needs interactivity. In Nuxt the symmetric trap is reaching for <code>.client.vue</code> on a content component — you lose SSR HTML and the content vanishes for crawlers and on first paint. Server-render content; client-only the truly dynamic bits.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="render">
+      <h2>3 · Render strategy per route (SSG / SSR / ISR)</h2>
+      <p>The same app can render different routes different ways. The leaders mix them: a marketing home is static, a dashboard is dynamic, a blog index is incrementally regenerated. <span class="ref">Family ↗</span> and <span class="ref">14islands ↗</span> ship pure SSG (<code>_ssgManifest</code> present); <span class="ref">Stripe ↗</span> is "heavily SSR'd … localizes by geo (<code>/en-jp</code>)"; <span class="ref">Ramp ↗</span> rides Vercel's ISR. Pick per route, not per app.</p>
+
+      <div class="example render-demo">
+        <div class="modes" role="group" aria-label="Render strategy">
+          <button data-mode="ssg" aria-pressed="true">SSG</button>
+          <button data-mode="ssr" aria-pressed="false">SSR</button>
+          <button data-mode="isr" aria-pressed="false">ISR</button>
+          <button data-mode="csr" aria-pressed="false">CSR / SPA</button>
+        </div>
+        <div class="panel" id="render-panel"></div>
+        <figcaption>Click a strategy — it shows when to reach for it and the one-line config in both frameworks. Rule of thumb: static unless you have a reason not to be.</figcaption>
+      </div>
+
+      <p>The configuration is a one-liner in both. Next uses route-segment exports; Nuxt uses <code>routeRules</code> in <code>nuxt.config</code> (powered by Nitro, applied at the host's CDN edge).</p>
+
+      <div class="twoup">
+        <figure class="next">
+          <p class="stack-label"><span class="dot"></span> Next.js — route segment config</p>
+<pre><code>// app/blog/page.tsx
+export const revalidate = 60;       // ISR: regenerate &le; every 60s
+export const dynamic = 'force-static'; // or 'force-dynamic' (SSR)
+
+// per-fetch override wins:
+//   fetch(url, { next: { revalidate: 3600 } })  -&gt; ISR 1h
+//   fetch(url, { cache: 'no-store' })            -&gt; dynamic (SSR)
+// default in App Router: static when possible,
+//   dynamic the moment you touch cookies()/headers()/searchParams</code></pre>
+        </figure>
+        <figure class="nuxt">
+          <p class="stack-label"><span class="dot"></span> Nuxt 4 — routeRules (Nitro)</p>
+<pre><code>// nuxt.config.ts
+export default defineNuxtConfig({
+  routeRules: {
+    '/':         { prerender: true },        // SSG at build
+    '/blog/**':  { isr: 60 },                // ISR: CDN cache 60s
+    '/news/**':  { swr: 3600 },              // stale-while-revalidate
+    '/app/**':   { ssr: true },              // dynamic SSR
+    '/admin/**': { ssr: false },             // client-only SPA island
+  },
+})
+// isr/swr cache on Vercel/Netlify edge; payloads cached too</code></pre>
+        </figure>
+      </div>
+
+      <div class="callout tip">
+        <p><strong>ISR is the highest-ROI setting for content sites.</strong> You get static-CDN speed <em>and</em> fresh content without a redeploy. In Next, multiple fetches with different <code>revalidate</code> times collapse to the lowest for the route. In Nuxt, <code>isr</code> persists in the CDN until the next deploy when set to <code>true</code>, or for N seconds when set to a number — and Nuxt 4 now caches the <em>payload</em> alongside the HTML so client-side navigation to an ISR page skips the API round-trip entirely.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="data">
+      <h2>4 · Data fetching &amp; caching</h2>
+      <p>The App Router's headline change: <strong>fetch on the server, in the component</strong>. It ships HTML fast, keeps secrets server-side, and cuts the client bundle — no <code>getServerSideProps</code>, no client <code>useEffect</code> waterfall. Nuxt's <code>useFetch</code> / <code>useAsyncData</code> do the same job, with the killer feature of <strong>payload forwarding</strong>: data fetched on the server is serialised into the payload so the client never re-fetches it.</p>
+
+      <div class="twoup">
+        <figure class="next">
+          <p class="stack-label"><span class="dot"></span> Next.js — fetch in a Server Component</p>
+<pre><code>// Server Component — runs once, on the server
+export default async function Products() {
+  // Tagged cache: one mutation invalidates many views
+  const res = await fetch('https://api.shop/products', {
+    next: { revalidate: 3600, tags: ['products'] },
+  });
+  const products = await res.json();
+  return &lt;List items={products} /&gt;;
+}
+
+// On write, revalidate by tag (Server Action / route handler):
+'use server';
+import { revalidateTag } from 'next/cache';
+export async function addProduct(data) {
+  await db.product.create(data);
+  revalidateTag('products'); // every view tagged 'products' refreshes
+}</code></pre>
+        </figure>
+        <figure class="nuxt">
+          <p class="stack-label"><span class="dot"></span> Nuxt 4 — useFetch / useAsyncData</p>
+<pre><code>&lt;script setup lang="ts"&gt;
+// SSR-first; payload forwarded to client (no double fetch)
+const { data: products, refresh } = await useFetch(
+  'https://api.shop/products',
+  { key: 'products', getCachedData: (k, nuxt) =&gt; nuxt.payload.data[k] }
+)
+// $fetch for event-driven calls (no SSR caching needed):
+async function addProduct(body) {
+  await $fetch('/api/products', { method: 'POST', body })
+  await refresh()            // re-run the cached fetch
+}
+&lt;/script&gt;
+// data is a shallowRef in Nuxt 4 — cheaper reactivity for big lists</code></pre>
+        </figure>
+      </div>
+
+      <div class="callout warn">
+        <p><strong>Pitfall — the request waterfall.</strong> Awaiting fetches in sequence (each depending on the last) serialises latency. Fire independent fetches in parallel: <code>Promise.all([...])</code> in a Next Server Component, or multiple <code>useAsyncData</code> calls with distinct <code>key</code>s in Nuxt. And never fetch user-specific data with a long <code>revalidate</code> — you'll leak one user's cached page to another. Per-user data is <code>cache: 'no-store'</code> (Next) / <code>ssr: true</code> dynamic (Nuxt).</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="image">
+      <h2>5 · Image &amp; font optimisation</h2>
+      <p>Two framework primitives kill the two biggest Core Web Vitals offenders for free: the <strong>image component</strong> (LCP + CLS) and the <strong>font loader</strong> (CLS + render-blocking). Every Next leader uses both.</p>
+
+      <h3>Fonts — self-host, inline, zero layout shift</h3>
+      <p><span class="ref">Brittany Chiang ↗</span> loads Inter via <code>next/font</code> (the hashed <code>__inter_*</code> class proves it self-hosts and inlines the <code>@font-face</code>). <span class="ref">Ramp ↗</span> uses <code>next/font local</code> for its paid Lausanne face <em>with a metric-matched fallback</em> to kill layout shift — the same trick <span class="ref">Lee Robinson ↗</span> and <span class="ref">Josh Comeau ↗</span> use with self-hosted fallback faces. The principle: never hit a third-party font CDN on the critical path, and always ship a size-adjusted fallback so swap causes no reflow. Nuxt's <code>@nuxt/fonts</code> module does the identical optimisation (self-host, preload, woff2, fallback metrics) with zero config.</p>
+
+      <div class="twoup">
+        <figure class="next">
+          <p class="stack-label"><span class="dot"></span> Next.js — next/font</p>
+<pre><code>// app/layout.tsx — self-hosted, inlined, CLS-safe
+import { Inter } from 'next/font/google';
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',  // expose as CSS var
+});
+export default function Root({ children }) {
+  return (
+    &lt;html className={inter.variable}&gt;
+      &lt;body&gt;{children}&lt;/body&gt;
+    &lt;/html&gt;
+  );
+}
+// auto size-adjusted fallback -&gt; 0 CLS, no font CDN hit</code></pre>
+        </figure>
+        <figure class="nuxt">
+          <p class="stack-label"><span class="dot"></span> Nuxt 4 — @nuxt/fonts</p>
+<pre><code>// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['@nuxt/fonts'],
+  fonts: {
+    families: [
+      { name: 'Inter', provider: 'google', weights: [400, 600] },
+    ],
+    // auto: self-hosts woff2, preloads, generates
+    // metric-matched fallback -&gt; 0 CLS, no Google CDN hit
+  },
+})
+/* then just use it in CSS — no &lt;link&gt; needed: */
+/* body { font-family: 'Inter', sans-serif; } */</code></pre>
+        </figure>
+      </div>
+
+      <h3>Images — modern formats, sized, lazy</h3>
+      <p><code>next/image</code> and <code>&lt;NuxtImg&gt;</code> auto-serve AVIF/WebP, set explicit <code>width</code>/<code>height</code> (reserving space → no CLS), lazy-load below the fold, and generate responsive <code>srcset</code>. <span class="ref">Godly ↗</span> shows the manual version of the same discipline — lazy <code>background-image</code> from an R2 object store at a <em>fixed render width</em> (<code>/images/480/&lt;uuid&gt;.jpg</code>), so the initial DOM has near-zero <code>&lt;img&gt;</code> tags and zero layout shift. Let the framework do this for you.</p>
+
+      <div class="twoup">
+        <figure class="next">
+          <p class="stack-label"><span class="dot"></span> Next.js — next/image</p>
+<pre><code>import Image from 'next/image';
+
+// LCP hero: priority = preload, no lazy
+&lt;Image src="/hero.jpg" alt="" width={1600} height={900}
+       priority sizes="100vw" /&gt;
+
+// Below the fold: lazy by default, AVIF/WebP auto
+&lt;Image src={thumb} alt="" width={480} height={300}
+       sizes="(max-width:768px) 100vw, 480px" /&gt;</code></pre>
+        </figure>
+        <figure class="nuxt">
+          <p class="stack-label"><span class="dot"></span> Nuxt 4 — &lt;NuxtImg&gt;</p>
+<pre><code>&lt;!-- LCP hero: preload, eager --&gt;
+&lt;NuxtImg src="/hero.jpg" alt="" width="1600" height="900"
+  preload loading="eager" format="avif,webp" sizes="100vw" /&gt;
+
+&lt;!-- Below the fold: lazy, responsive srcset --&gt;
+&lt;NuxtImg :src="thumb" alt="" width="480" height="300"
+  loading="lazy" format="avif,webp"
+  sizes="100vw md:480px" /&gt;</code></pre>
+        </figure>
+      </div>
+
+      <div class="callout steal">
+        <p><strong>Two lines of framework config buy you a green Lighthouse.</strong> <code>next/font</code> + <code>next/image</code> (or <code>@nuxt/fonts</code> + <code>&lt;NuxtImg&gt;</code>) eliminate the two CLS killers and the largest LCP cost without you writing a single byte of optimisation logic. Set <code>priority</code>/<code>preload</code> on the one LCP image, give every image explicit dimensions, and you're done.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="metadata">
+      <h2>6 · Metadata, streaming &amp; transitions</h2>
+      <p>Three more framework features the leaders lean on: typed metadata for SEO/OG, streaming for perceived speed, and native route transitions.</p>
+
+      <h3>Metadata &amp; OG</h3>
+      <p>App Router replaces hand-rolled <code>&lt;head&gt;</code> tags with a typed <code>metadata</code> export (static) or <code>generateMetadata</code> (async, per-page). Nuxt uses <code>useSeoMeta</code> / <code>useHead</code>. Both generate correct OG/Twitter cards and canonical tags.</p>
+
+      <div class="twoup">
+        <figure class="next">
+          <p class="stack-label"><span class="dot"></span> Next.js — metadata API</p>
+<pre><code>// static
+export const metadata = {
+  title: 'Posts', description: '…',
+  openGraph: { images: ['/og.png'] },
+};
+// or dynamic, per-route, data-driven:
+export async function generateMetadata({ params }) {
+  const post = await getPost(params.slug);
+  return { title: post.title,
+           openGraph: { images: [post.cover] } };
+}</code></pre>
+        </figure>
+        <figure class="nuxt">
+          <p class="stack-label"><span class="dot"></span> Nuxt 4 — useSeoMeta</p>
+<pre><code>&lt;script setup lang="ts"&gt;
+const { data: post } = await useFetch(`/api/post/${slug}`)
+useSeoMeta({
+  title: () =&gt; post.value.title,
+  description: () =&gt; post.value.excerpt,
+  ogImage: () =&gt; post.value.cover,
+  twitterCard: 'summary_large_image',
+})
+&lt;/script&gt;</code></pre>
+        </figure>
+      </div>
+
+      <h3>Streaming &amp; transitions</h3>
+      <p>Streaming sends the shell immediately and flushes slow parts as they resolve — wrap a slow subtree in <code>&lt;Suspense&gt;</code> (or drop a <code>loading.tsx</code> at a route boundary) in Next; Nuxt streams server-rendered components and supports <code>&lt;Suspense&gt;</code> + the View Transitions API. <span class="ref">Lee Robinson ↗</span> wires the <strong>View Transitions API</strong> into App Router navigation so essays "morph rather than hard-cut" — an app-like feel on a static content site. Nuxt 4 ships this as a one-line config.</p>
+
+<pre><code>// Next.js — instant shell, stream the slow part
+import { Suspense } from 'react';
+export default function Page() {
+  return (
+    &lt;&gt;
+      &lt;Hero /&gt;                         {/* flushes immediately */}
+      &lt;Suspense fallback={&lt;Skeleton/&gt;}&gt;
+        &lt;SlowFeed /&gt;                   {/* streams in when ready */}
+      &lt;/Suspense&gt;
+    &lt;/&gt;
+  );
+}
+
+// Nuxt 4 — native page transitions (View Transitions API)
+// nuxt.config.ts
+export default defineNuxtConfig({
+  experimental: { viewTransition: true },
+  app: { pageTransition: { name: 'page' } },
+})</code></pre>
+
+      <div class="callout tip">
+        <p><strong>Stream at meaningful boundaries, not everywhere.</strong> A <code>loading.tsx</code> at a route boundary gives instant navigation feedback; a <code>&lt;Suspense&gt;</code> around one genuinely slow widget keeps the rest interactive. Don't wrap the whole page — you just reintroduce a single blocking spinner with extra steps.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="vitals">
+      <h2>7 · Core Web Vitals &amp; bundle discipline</h2>
+      <p>The frameworks hand you fast defaults; you still have to not break them. The three Core Web Vitals map cleanly to the levers above:</p>
+      <ul>
+        <li><strong>LCP</strong> (largest paint &lt; 2.5s) — server-render the hero (RSC / SSR), <code>priority</code>/<code>preload</code> the LCP image, self-host fonts. <span class="ref">Cassidy Williams ↗</span> (Astro) and <span class="ref">Tania Rascia ↗</span> (system-font body, zero webfont cost) optimise LCP by shipping almost no JS at all.</li>
+        <li><strong>CLS</strong> (layout shift &lt; 0.1) — explicit image dimensions + metric-matched font fallback. This is exactly <span class="ref">Ramp ↗</span>'s and <span class="ref">Josh Comeau ↗</span>'s fallback-face discipline, and what <span class="ref">Godly ↗</span> buys with fixed-width object-store thumbnails.</li>
+        <li><strong>INP</strong> (interaction &lt; 200ms) — ship less JS so the main thread is free. The RSC default and the deep <code>'use client'</code> boundary are your primary tools.</li>
+      </ul>
+
+      <p>Bundle discipline is the through-line. <span class="ref">Josh Comeau ↗</span> chose Linaria (zero-runtime CSS) and Shiki (compile-time highlighting) <em>to remove client runtime</em>. <span class="ref">Tania Rascia ↗</span> uses a system body stack for "zero webfont cost, instant render." <span class="ref">Manu Arora ↗</span> keeps exactly one fixed interactive element and "makes everything else static — near-zero JS." The discipline: every kilobyte of JS is a tax on INP and LCP; ship HTML, hydrate islands.</p>
+
+<pre><code>// Both frameworks: lazy-load heavy client-only widgets so they
+// stay out of the initial bundle (no SSR, loaded on demand).
+
+// Next.js
+import dynamic from 'next/dynamic';
+const Map = dynamic(() =&gt; import('./HeavyMap'), { ssr: false });
+
+// Nuxt 4 — built-in Lazy prefix, or defineAsyncComponent
+&lt;LazyHeavyMap v-if="show" /&gt;   &lt;!-- code-split, loads when rendered --&gt;</code></pre>
+
+      <div class="callout warn">
+        <p><strong>Pitfall — shipping a SPA by accident.</strong> A <code>'use client'</code> at the layout root, a third-party widget that drags in 200KB, or fetching everything client-side turns your "fast framework" into a slow SPA with worse SEO than a plain HTML file. Audit your client bundle (<code>next build</code> output / <code>nuxi analyze</code>). If your "static" blog post ships 300KB of JS, something is wrong — the leaders' content pages ship almost none.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="checklist">
+      <h2>8 · The portfolio-site checklist (Nuxt 4)</h2>
+      <p>Our project is Nuxt 4 / Vue. Distilled from the teardowns, here is the build sheet — every item has a Next equivalent in the sections above, but these are the Nuxt levers to pull:</p>
+      <ul>
+        <li><strong>Render</strong> — <code>routeRules</code>: <code>prerender: true</code> for the home/about, <code>isr: N</code> for the blog. Static unless a route truly needs per-request data.</li>
+        <li><strong>Fonts</strong> — <code>@nuxt/fonts</code> for self-hosted, CLS-safe loading (the <span class="ref">Brittany Chiang ↗</span> / <span class="ref">Ramp ↗</span> pattern, zero-config).</li>
+        <li><strong>Images</strong> — <code>&lt;NuxtImg&gt;</code> everywhere, explicit dimensions, <code>preload</code> on the one LCP image, <code>loading="lazy"</code> below the fold, AVIF/WebP.</li>
+        <li><strong>Data</strong> — <code>useFetch</code>/<code>useAsyncData</code> on the server with payload forwarding; <code>$fetch</code> for event-driven calls; never long-cache per-user data.</li>
+        <li><strong>SEO</strong> — <code>useSeoMeta</code> per page with a real OG image. Keep a semantic <code>&lt;h1&gt;</code>–<code>&lt;h3&gt;</code> outline (the <span class="ref">Teenage Engineering ↗</span> warning: don't drop headings for visual flair).</li>
+        <li><strong>Motion</strong> — native View Transitions (<code>experimental.viewTransition</code>) for the <span class="ref">Lee Robinson ↗</span> cross-fade feel; <code>&lt;Lazy*&gt;</code> any heavy animation lib so it stays out of the initial bundle.</li>
+        <li><strong>Bundle</strong> — server-render content, client-island only the interactive leaves; run <code>nuxi analyze</code> before shipping. Target: a content page that ships almost no JS.</li>
+      </ul>
+
+      <figure class="figure">
+        <img src="../workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang portfolio hero: calm near-black canvas, Inter type, one teal accent, no hero gimmickry.">
+        <figcaption><strong>Brittany Chiang</strong> — a Next.js App Router rebuild with Inter via <code>next/font</code>: server-rendered HTML, self-hosted CLS-safe font, minimal client JS. "Calm engineering" — the stack <em>is</em> the portfolio piece. The Nuxt 4 equivalent (universal render + <code>@nuxt/fonts</code> + <code>&lt;NuxtImg&gt;</code>) ships the same green Lighthouse with the same discipline.</figcaption>
+      </figure>
+
+      <figure class="figure">
+        <img src="../workings/shots/vercel/02-mid.png" alt="Vercel marketing site: streaming code editor and live deploy logs rendered as the page's hero content.">
+        <figcaption><strong>Vercel</strong> — Next.js with 170+ <code>_next</code> chunks and self-hosted Geist. The lesson that transcends framework: make the <em>product</em> the hero — live, streaming, interactive surfaces (deploy logs, a real code editor, live data) instead of static screenshots. Streaming + RSC make those surfaces cheap to render and fast to paint.</figcaption>
+      </figure>
+
+      <div class="callout steal">
+        <p><strong>The whole page in one rule:</strong> server-render by default, hydrate the minimum, optimise fonts and images at the framework layer, and choose a render strategy per route. Next.js and Nuxt 4 give you identical capabilities under different names — App Router RSC ≈ Nuxt universal + islands, route-segment config ≈ <code>routeRules</code>, <code>next/font</code> ≈ <code>@nuxt/fonts</code>, <code>next/image</code> ≈ <code>&lt;NuxtImg&gt;</code>. Learn the principle once; the syntax is a lookup.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ftr">
+    <div class="wrap">
+      <p><a class="brand" href="../PLAN.html">◆ Craft Atlas</a></p>
+      <p>Page 13 of 13 · <a href="../PLAN.html">← Back to the Build Plan</a></p>
+      <p>Craft Atlas — synthesized from 80 live site teardowns.</p>
+    </div>
+  </footer>
+
+  <script>
+    // --- demo: render-strategy explainer ---
+    (function () {
+      var data = {
+        ssg: {
+          h: 'SSG — Static Site Generation',
+          p: 'Rendered once at build time to plain HTML on the CDN. Fastest possible LCP, cheapest to serve, but content is frozen until the next deploy.',
+          when: 'Marketing home, about, docs — content that changes on your schedule, not the user\'s.',
+          next: "export const dynamic = 'force-static'",
+          nuxt: "{ prerender: true }"
+        },
+        ssr: {
+          h: 'SSR — Server-Side Rendering',
+          p: 'Rendered fresh on every request. Always current, personalisable, but every visit costs a server render and has higher TTFB.',
+          when: 'Dashboards, per-user pages, geo/auth-dependent content (Stripe localizes by geo this way).',
+          next: "export const dynamic = 'force-dynamic'",
+          nuxt: "{ ssr: true }"
+        },
+        isr: {
+          h: 'ISR — Incremental Static Regeneration',
+          p: 'Static-CDN speed, but pages regenerate in the background every N seconds (or on-demand). Fresh content with no redeploy. The best default for content sites.',
+          when: 'Blog index, product listings, anything that updates periodically but not per-request.',
+          next: "export const revalidate = 60",
+          nuxt: "{ isr: 60 }"
+        },
+        csr: {
+          h: 'CSR / SPA — Client-Side Rendering',
+          p: 'Ship an empty shell, render entirely in the browser. Worst LCP/SEO; only sensible for gated app screens behind a login where crawl/first-paint do not matter.',
+          when: 'Internal tools, admin panels — never your marketing or content pages.',
+          next: "dynamic(() => import(x), { ssr: false })",
+          nuxt: "{ ssr: false }"
+        }
+      };
+      var panel = document.getElementById('render-panel');
+      var btns = document.querySelectorAll('.render-demo button');
+      function render(mode) {
+        var d = data[mode];
+        panel.innerHTML =
+          '<h4>' + d.h + '</h4>' +
+          '<p>' + d.p + '</p>' +
+          '<p class="meta"><b>Use it for:</b> ' + d.when + '</p>' +
+          '<p class="meta">Next: <b>' + d.next + '</b></p>' +
+          '<p class="meta">Nuxt: <b>' + d.nuxt + '</b></p>';
+      }
+      btns.forEach(function (b) {
+        b.addEventListener('click', function () {
+          btns.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+          b.setAttribute('aria-pressed', 'true');
+          render(b.dataset.mode);
+        });
+      });
+      render('ssg');
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,wght@0,400;0,560;1,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* ---- page-local LIVE DEMO styling only ---- */
+    .swatch-row { display: flex; flex-wrap: wrap; gap: 0; border-radius: var(--r-2); overflow: hidden; border: 1px solid var(--line); }
+    .swatch { flex: 1 1 0; min-width: 64px; aspect-ratio: 1 / 1; display: flex; align-items: flex-end; padding: 6px; font-family: var(--font-mono); font-size: 0.62rem; }
+    /* OKLCH ramp — fixed hue, lightness steps. Even perceptual steps. */
+    .ramp .s1 { background: oklch(0.22 0.05 265); color: #cdd3ff; }
+    .ramp .s2 { background: oklch(0.34 0.08 265); color: #d7dcff; }
+    .ramp .s3 { background: oklch(0.46 0.11 265); color: #fff; }
+    .ramp .s4 { background: oklch(0.58 0.14 265); color: #fff; }
+    .ramp .s5 { background: oklch(0.70 0.15 265); color: #1a1205; }
+    .ramp .s6 { background: oklch(0.82 0.10 265); color: #1a1205; }
+    .ramp .s7 { background: oklch(0.92 0.05 265); color: #1a1205; }
+
+    /* theme-token live toggle */
+    .theme-card {
+      --t-bg: #0b0c0e; --t-surface: #16191e; --t-ink: #e9eaec; --t-accent: #f5a623; --t-line: #23272e;
+      background: var(--t-bg); color: var(--t-ink);
+      border: 1px solid var(--t-line); border-radius: var(--r-3);
+      padding: var(--s-5); transition: all 0.4s var(--ease);
+    }
+    .theme-card[data-theme="light"] {
+      --t-bg: #fffdf7; --t-surface: #f3efe4; --t-ink: #1a1a1a; --t-accent: #533afd; --t-line: #e3ddcd;
+    }
+    .theme-card[data-theme="dim"] {
+      --t-bg: #201819; --t-surface: #2c2122; --t-ink: #efe6dc; --t-accent: #dfc78e; --t-line: #3a2d2e;
+    }
+    .theme-card .tc-surface { background: var(--t-surface); border: 1px solid var(--t-line); border-radius: var(--r-2); padding: var(--s-4); margin-top: var(--s-3); }
+    .theme-card .tc-cta { display: inline-block; margin-top: var(--s-3); background: var(--t-accent); color: var(--t-bg); font-weight: 600; font-family: var(--font-sans); padding: 0.4em 1em; border-radius: var(--r-pill); font-size: 0.85rem; }
+    .theme-switch { display: flex; gap: var(--s-2); margin-bottom: var(--s-4); flex-wrap: wrap; }
+    .theme-switch button {
+      font-family: var(--font-mono); font-size: 0.72rem; cursor: pointer;
+      background: var(--bg-3); color: var(--ink-soft); border: 1px solid var(--line);
+      border-radius: var(--r-pill); padding: 0.35em 0.9em;
+    }
+    .theme-switch button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+    /* contrast demo */
+    .contrast-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: var(--s-3); }
+    .ct { border-radius: var(--r-2); padding: var(--s-4); font-weight: 600; }
+    .ct small { display: block; font-family: var(--font-mono); font-weight: 500; font-size: 0.66rem; opacity: 0.85; margin-top: 0.3em; }
+    .ct.pass { background: #16191e; color: #e9eaec; border: 1px solid #2c8a5f; }
+    .ct.fail { background: #16191e; color: #5f6671; border: 1px solid #b8503a; }
+    .ct.passlow { background: #f5a623; color: #1a1205; border: 1px solid #2c8a5f; }
+
+    /* accent-as-reward hover demo */
+    .reward-btn {
+      font-family: var(--font-sans); font-weight: 600; cursor: pointer;
+      background: var(--bg-3); color: var(--ink-soft);
+      border: 1px solid var(--line); border-radius: var(--r-pill);
+      padding: 0.6em 1.4em; transition: background 0.25s var(--ease), color 0.25s var(--ease), box-shadow 0.25s var(--ease), transform 0.12s var(--ease);
+    }
+    .reward-btn:hover { background: var(--accent); color: var(--accent-ink); box-shadow: 0 0 0 4px var(--accent-glow), 0 8px 30px rgba(245,166,35,0.25); }
+    .reward-btn:active { transform: translateY(1px); }
+
+    .grad-strip { height: 84px; border-radius: var(--r-2); border: 1px solid var(--line); }
+    .grad-srgb { background: linear-gradient(90deg, #533afd, #f5a623); }
+    .grad-oklch { background: linear-gradient(90deg in oklch, #533afd, #f5a623); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="UI-DESIGN.html">UI Design</a>
+      <a href="UX.html">UX</a>
+      <a href="TYPOGRAPHY.html">Typography</a>
+      <a href="COLOR.html">Color</a>
+      <a href="STYLING.html">Styling</a>
+      <a href="MOTIONS.html">Motion</a>
+      <a href="ANIMATIONS.html">Animation</a>
+      <a href="INTERACTIONS.html">Interaction</a>
+      <a href="SPATIAL.html">3D / Spatial</a>
+      <a href="MINI-GAMES.html">Mini-Games</a>
+      <a href="STATE-MANAGEMENT.html">State</a>
+      <a href="NEXTJS.html">Meta-Framework</a>
+      <a href="../references/PORTFOLIO.html">Portfolio</a>
+      <a href="../references/TOP-LIST.html">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="hero">
+      <span class="kicker">Craft Atlas · 04 / Color</span>
+      <h1>Color is a budget, not a box of crayons.</h1>
+      <p class="lede">The best sites we tore down spend almost nothing on color — one disciplined accent, a deep neutral canvas, and a single saturated reward. Restraint is the technique. Here is how 80 teardowns actually do it.</p>
+    </div>
+
+    <nav class="toc" aria-label="On this page">
+      <ol>
+        <li><a href="#thesis">1 · The one-accent thesis</a></li>
+        <li><a href="#neutral">2 · The neutral canvas: dark vs light</a></li>
+        <li><a href="#palette">3 · Building a palette in OKLCH</a></li>
+        <li><a href="#contrast">4 · Contrast &amp; WCAG, non-negotiable</a></li>
+        <li><a href="#accent">5 · Accent strategy: make color mean something</a></li>
+        <li><a href="#gradients">6 · Gradients done right</a></li>
+        <li><a href="#wayfinding">7 · Color as wayfinding &amp; reward</a></li>
+        <li><a href="#theming">8 · Theming with CSS variables</a></li>
+        <li><a href="#checklist">9 · The steal-this checklist</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="thesis">1 · The one-accent thesis</h2>
+    <p>If there is a single lesson across the teardowns, it is this: <strong>elite sites use one accent color, and they spend it like money.</strong> The discipline of a single hue is the brand.</p>
+    <p><span class="ref">Ramp ↗</span> is the purest case: a pure-white editorial canvas, near-black text, and exactly <em>one</em> color — an acid lime-green (<code>oklch(0.92 0.20 124)</code>, roughly <code>#CDFF00</code>) used <strong>only</strong> on primary CTAs. No gradients, no glass, no secondary hues. <span class="ref">Brittany Chiang ↗</span> runs a two-color system — slate-900 plus a single teal-300 accent that does triple duty as link-hover, tech-pill tint, and the spotlight glow color. <span class="ref">Mercury ↗</span> reserves its indigo <code>#5266EB</code> almost entirely for the "Open account" button, so the accent literally <em>means</em> "convert." <span class="ref">Linear ↗</span> keeps its marketing chrome effectively monochrome and lets color appear only inside product mockups — issue-priority swatches and label chips.</p>
+
+    <div class="callout steal">
+      <p><strong>The accent-as-currency rule.</strong> Pick one accent. Then ask of every colored pixel: "what is this color buying me?" If the answer is "decoration," delete it. Ramp, Mercury, and Brittany Chiang all prove that one color, spent only on the thing that matters, reads as <em>more</em> confident than a five-color palette.</p>
+    </div>
+
+    <figure class="figure">
+      <img src="../workings/shots/ramp/01-hero.png" alt="Ramp homepage hero: black text on white with a single acid-lime CTA button">
+      <figcaption><strong>Ramp ↗</strong> — one accent, spent once. The acid-lime appears <em>only</em> on the primary CTA. Black-on-white everywhere else means the eye snaps straight to the one place color lives.</figcaption>
+    </figure>
+
+    <h2 id="neutral">2 · The neutral canvas: dark vs light</h2>
+    <p>Before the accent comes the canvas, and the canvas is almost never pure <code>#000</code> or pure <code>#fff</code>. The teardowns split into two disciplined camps.</p>
+
+    <h3>Dark canvases tint toward a hue</h3>
+    <p>Nobody serious ships <code>#000000</code> as a body background unless it is doing a specific job. <span class="ref">Linear ↗</span> uses <code>rgb(8,9,10)</code> — a near-black that is fractionally warm. <span class="ref">Stripe Press ↗</span> goes further: a deep brown-maroon <code>rgb(32,24,25)</code> that "feels like a dim library or leather binding," paired with a brass-gold link color. The tint gives the dark theme a <em>temperature</em> instead of a void.</p>
+    <p>The exceptions prove the rule. <span class="ref">Teenage Engineering ↗</span> <em>does</em> use pure <code>rgb(0,0,0)</code> sitewide — deliberately — because the black turns every product photo into a spotlit studio object and supplies the accent <em>from the products themselves</em> (orange lamp glow, a red record button, colored vinyl). The brand restrains its own palette so product color reads as the accent. <span class="ref">Basement Studio ↗</span> does the same with a lit 3D scene as the only warmth.</p>
+
+    <figure class="figure">
+      <img src="../workings/shots/teenage-engineering/01-hero.png" alt="Teenage Engineering homepage: pure black canvas with spotlit product photography">
+      <figcaption><strong>Teenage Engineering ↗</strong> — pure black is a <em>spotlight</em>, not a default. The UI has no chromatic accent; color enters entirely through lit product photography against the void.</figcaption>
+    </figure>
+
+    <h3>Light canvases warm the white</h3>
+    <p>Light sites that feel premium rarely sit on cold <code>#FFFFFF</code>. <span class="ref">Arc Browser ↗</span> bases on a butter-cream <code>rgb(255,252,236)</code> — "this warmth is a key differentiator from cold SaaS sites." <span class="ref">Things ↗</span> uses a pale blue-gray <code>rgb(242,245,247)</code> for an Apple-frosted softness; <span class="ref">Family ↗</span> and <span class="ref">Lusion ↗</span> use warm off-white / pale-lavender shells. The handful that <em>do</em> commit to true white — <span class="ref">Apple ↗</span>, <span class="ref">Ramp ↗</span>, <span class="ref">Vercel ↗</span> — do it for maximum gallery contrast, letting product photography carry all the color.</p>
+
+    <div class="callout tip">
+      <p><strong>Pro tip — never use the absolutes for surfaces.</strong> Reserve <code>#000</code> and <code>#fff</code> for the rare spotlight effect (TE, Apple's black hero tiles). For everyday surfaces, nudge the canvas a few points off the extreme and a few degrees toward a hue. Our own <code>shared.css</code> uses <code>--bg: #0b0c0e</code>, not black.</p>
+    </div>
+
+    <h2 id="palette">3 · Building a palette in OKLCH</h2>
+    <p>Once you have a canvas and an accent, you need <em>steps</em> — surface tiers, hover states, dimmed text. The modern way to generate them is <strong>OKLCH</strong>, a perceptually-uniform color space now supported in every evergreen browser. Notably, <span class="ref">Ramp ↗</span>'s teardown shows its computed colors already in <code>lab()</code> space (<code>lab(92.1 -20.5 84.8)</code> for the lime) — the elite stacks have already moved past hex.</p>
+    <p>Why OKLCH beats HSL: in HSL, holding lightness fixed and rotating hue produces wildly different <em>perceived</em> brightness (yellow looks far lighter than blue at the same <code>L</code>). OKLCH fixes this — equal <code>L</code> means equal perceived lightness. So you can build a ramp by stepping <em>only</em> lightness and get visually even swatches:</p>
+
+    <div class="example ramp">
+      <div class="swatch-row">
+        <div class="swatch s1">.22</div>
+        <div class="swatch s2">.34</div>
+        <div class="swatch s3">.46</div>
+        <div class="swatch s4">.58</div>
+        <div class="swatch s5">.70</div>
+        <div class="swatch s6">.82</div>
+        <div class="swatch s7">.92</div>
+      </div>
+      <figcaption>A single-hue ramp built by stepping only OKLCH lightness (hue 265, chroma tapered at the extremes). Each step is a perceptually even jump — usable as surface tiers, borders, and text tints from one declaration set.</figcaption>
+    </div>
+
+    <pre><code>:root {
+  /* Define the accent ONCE as hue + chroma, derive the ramp by lightness. */
+  --accent-h: 265;          /* indigo */
+  --accent-c: 0.15;
+
+  --accent-900: oklch(0.22 0.05 var(--accent-h));  /* deep surface tint */
+  --accent-700: oklch(0.46 0.11 var(--accent-h));
+  --accent-500: oklch(0.62 var(--accent-c) var(--accent-h)); /* the accent */
+  --accent-300: oklch(0.78 0.10 var(--accent-h));  /* text-on-dark */
+  --accent-100: oklch(0.92 0.04 var(--accent-h));  /* faint wash */
+}
+
+/* Derive states from the SAME hue — never hand-pick a hover color. */
+.btn        { background: var(--accent-500); }
+.btn:hover  { background: oklch(from var(--accent-500) calc(l + 0.06) c h); }
+.btn:active { background: oklch(from var(--accent-500) calc(l - 0.04) c h); }</code></pre>
+
+    <div class="callout tip">
+      <p><strong>relative color syntax</strong> (<code>oklch(from var(--x) calc(l + 0.06) c h)</code>) lets you compute hover/active/disabled states <em>from</em> the base token. One source of truth — change the accent hue and every state follows. No more drifting "almost-the-same" hover colors scattered across a stylesheet.</p>
+    </div>
+
+    <h2 id="contrast">4 · Contrast &amp; WCAG, non-negotiable</h2>
+    <p>WCAG 2.x sets the floor: <strong>4.5:1</strong> for body text, <strong>3:1</strong> for large text (≥24px, or ≥19px bold) and meaningful UI/graphics. The sites that nail this do it on purpose. <span class="ref">Sara Soueidan ↗</span> — an accessibility specialist — keeps links black (differentiated by underline, not hue) <em>"so color is never the sole signifier,"</em> guaranteeing AAA contrast everywhere. <span class="ref">Obys Agency ↗</span> and <span class="ref">Cuberto ↗</span> get AAA-grade legibility for free by going near-monochrome black-on-white.</p>
+    <p>And the cautionary tales are just as instructive. <span class="ref">Arc Browser ↗</span>'s cream canvas plus grey sub-copy is flagged as "the one accessibility soft spot." <span class="ref">Gucci ↗</span> and <span class="ref">Bottega Veneta ↗</span> show the classic luxury risk: text overlaid on campaign photography drops below threshold the moment the image behind it gets bright.</p>
+
+    <div class="example">
+      <div class="contrast-grid">
+        <div class="ct pass">Body on surface<small>#e9eaec / #16191e — 13.4:1 · AAA</small></div>
+        <div class="ct passlow">Ink on accent<small>#1a1205 / #f5a623 — 9.8:1 · AAA</small></div>
+        <div class="ct fail">Dim grey on dark<small>#5f6671 / #16191e — 2.4:1 · FAILS</small></div>
+      </div>
+      <figcaption>The middle tile is why Ramp puts <em>black</em> text on its lime CTA, not white — dark-on-saturated often beats white-on-saturated. The right tile (faint grey) is fine for decorative hairlines, never for text you must read.</figcaption>
+    </div>
+
+    <pre><code>/* Guard text-over-image with a scrim — the Gucci / Bottega fix. */
+.hero-caption {
+  position: relative;
+  color: #fff;
+}
+.hero-caption::before {     /* darken just enough behind the text */
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,0.55), transparent 60%);
+  z-index: -1;
+}
+
+/* Respect users who demand more contrast */
+@media (prefers-contrast: more) {
+  :root { --ink-dim: #b7bcc4; --line: #3a4049; }
+}</code></pre>
+
+    <div class="callout warn">
+      <p><strong>Pitfall — color as the <em>only</em> signal.</strong> ~8% of men have a color-vision deficiency. A red "error" border that looks identical to a grey idle border to them is broken. Pair every color signal with a second channel: an icon, an underline (Sara Soueidan), a label, or a shape. WCAG 1.4.1 requires it.</p>
+    </div>
+
+    <h2 id="accent">5 · Accent strategy: make color mean something</h2>
+    <p>The strongest accent systems assign the color a <em>job</em> so consistent that users learn it. <span class="ref">Family ↗</span> keeps its entire UI neutral and lets the <em>illustrations</em> carry all the color — but green is the one functional hue that escapes the artwork, used for eyebrows and feature checkmarks ("Watch Any Wallet ✓"), signalling "go / positive / safe." <span class="ref">Mercury ↗</span>'s indigo only ever appears on the convert action. <span class="ref">Stripe ↗</span> reserves its electric indigo <code>#533AFD</code> for filled buttons and links — the one interactive color on an otherwise calm page.</p>
+    <p>Contrast this with sites where color is <em>material</em>, not meaning: <span class="ref">Active Theory ↗</span> floods a black canvas with a full prismatic particle spectrum (yellow→orange→red→blue→violet) — color <em>is</em> the motion, the energy field. That works because the whole brand is "luminous energy." For a portfolio or SaaS, pick the Family/Mercury model: one accent, one meaning.</p>
+
+    <h2 id="gradients">6 · Gradients done right</h2>
+    <p>Most teardown sites use <strong>no gradients at all</strong> — Ramp, Rauno, Sara Soueidan, Bottega, Obys all explicitly forgo them. When gradients <em>do</em> appear at this tier, they follow rules.</p>
+    <ul>
+      <li><strong>The gradient is the brand, or it's a whisper — nothing in between.</strong> <span class="ref">Stripe ↗</span> makes its diagonal orange→coral→magenta→violet→blue mesh ribbon the <em>entire</em> hero identity. <span class="ref">Vercel ↗</span> goes the opposite way: a subtle warm-orange→cool-teal spectrum bleeding up behind the hero CTAs as fine line-art rays — "restrained, almost watermark-like, not a hero gradient wash."</li>
+      <li><strong>Confine loud gradients to UI surfaces, never the page.</strong> <span class="ref">Linear ↗</span>'s gradients are "whisper-soft and confined to UI surfaces (timeline bars fade to translucent), never loud hero gradients."</li>
+      <li><strong>Interpolate in OKLCH to kill the grey dead-zone.</strong> A naive sRGB gradient between two saturated hues passes through a muddy desaturated middle. The <code>in oklch</code> keyword keeps chroma up across the blend.</li>
+    </ul>
+
+    <div class="example">
+      <div class="grad-strip grad-srgb"></div>
+      <p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--ink-dim);margin:6px 0 0;">↑ sRGB — note the muddy desaturated middle</p>
+      <div class="grad-strip grad-oklch" style="margin-top:14px;"></div>
+      <p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--ink-dim);margin:6px 0 0;">↑ <code>in oklch</code> — chroma stays high edge to edge</p>
+      <figcaption>Same two stops (<code>#533afd → #f5a623</code>), two interpolation spaces. Modern CSS: <code>linear-gradient(90deg in oklch, ...)</code>.</figcaption>
+    </div>
+
+    <figure class="figure">
+      <img src="../workings/shots/stripe/01-hero.png" alt="Stripe homepage hero with its signature animated multi-hue mesh gradient ribbon">
+      <figcaption><strong>Stripe ↗</strong> — when a gradient <em>is</em> the brand, commit fully: an animated, mesh-blended orange→magenta→violet→blue ribbon on a near-white navy-ink page. Everything else stays calm so the gradient owns the eye.</figcaption>
+    </figure>
+
+    <h2 id="wayfinding">7 · Color as wayfinding &amp; reward</h2>
+    <p>Color does two interaction jobs beyond branding: it tells you <em>where you are</em> (wayfinding) and it pays you for acting (reward).</p>
+    <p><strong>Wayfinding:</strong> <span class="ref">Brittany Chiang ↗</span> uses her teal accent for the active-nav highlight, so the accent both decorates and orients. <span class="ref">Cuberto ↗</span> and <span class="ref">Apple ↗</span> flip whole sections light→dark→light as a <em>pacing</em> device — the theme change tells you "new chapter" before you read a word. Apple even does per-tile inversion: each marquee tile sets its own light/dark context. <span class="ref">Stripe ↗</span> drops a deliberate deep-indigo "backbone of global commerce" band mid-scroll — a tonal break that re-grabs attention.</p>
+    <p><strong>Reward:</strong> the accent's most satisfying job is the hover/press payoff. A neutral control that blooms into the accent on hover gives the click a felt reward — try it:</p>
+
+    <div class="example">
+      <button class="reward-btn" type="button">Hover me — get paid in accent</button>
+      <figcaption>Idle state is quiet neutral; hover spends the accent (fill + glow ring). This is the Mercury/Ramp pattern at the micro scale — color is the reward for engaging.</figcaption>
+    </div>
+
+    <pre><code>.btn {
+  background: var(--bg-3); color: var(--ink-soft);
+  transition: background .25s var(--ease), color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.btn:hover {
+  background: var(--accent); color: var(--accent-ink);
+  box-shadow: 0 0 0 4px var(--accent-glow), 0 8px 30px rgba(245,166,35,.25);
+}</code></pre>
+
+    <h2 id="theming">8 · Theming with CSS variables</h2>
+    <p>Every multi-theme site in the set is <strong>token-driven</strong>. <span class="ref">Josh Comeau ↗</span> — who literally wrote the canonical "Perfect Dark Mode" article — ships a "flicker-free, persisted, theme-token driven" dark mode. The recipe: define semantic tokens once, swap their <em>values</em> per theme via a <code>data-theme</code> attribute on the root, and let every component read the token. <span class="ref">Vercel ↗</span> and <span class="ref">Sara Soueidan ↗</span> both signal their theming layer through a root <code>data-theme</code> attribute.</p>
+
+    <div class="example">
+      <div class="theme-switch" role="group" aria-label="Theme">
+        <button type="button" data-set="dark" aria-pressed="true">dark</button>
+        <button type="button" data-set="light" aria-pressed="false">light (Stripe-ish)</button>
+        <button type="button" data-set="dim" aria-pressed="false">dim (Stripe Press)</button>
+      </div>
+      <div class="theme-card" id="themeCard" data-theme="dark">
+        <strong style="font-family:var(--font-serif);font-size:1.3rem;">Pay invoices in seconds</strong>
+        <div class="tc-surface">Same markup. Only the token <em>values</em> change — the canvas tint, the accent hue, the ink, the hairline all swap from one attribute.</div>
+        <span class="tc-cta">Open account →</span>
+      </div>
+      <figcaption>One component, three themes. Toggling <code>data-theme</code> on the wrapper re-points the CSS variables; nothing in the markup or component CSS changes.</figcaption>
+    </div>
+
+    <h4>Semantic token layer (the right way)</h4>
+    <pre><code>/* 1. PRIMITIVE scale — raw values, never used directly in components. */
+:root {
+  --indigo-500: oklch(0.55 0.22 270);
+  --slate-50:   oklch(0.98 0.01 250);
+  --slate-950:  oklch(0.16 0.02 250);
+}
+
+/* 2. SEMANTIC tokens — what components actually consume. */
+:root, [data-theme="light"] {
+  --color-bg:      var(--slate-50);
+  --color-ink:     var(--slate-950);
+  --color-accent:  var(--indigo-500);
+  color-scheme: light;            /* native form controls + scrollbars follow */
+}
+[data-theme="dark"] {
+  --color-bg:      var(--slate-950);
+  --color-ink:     var(--slate-50);
+  --color-accent:  oklch(0.72 0.16 270);  /* lift the accent for dark legibility */
+  color-scheme: dark;
+}
+
+/* 3. Default to the OS preference, then let the toggle override. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) { color-scheme: dark; /* ...dark semantic values... */ }
+}
+
+/* Components only ever read SEMANTIC tokens — never primitives, never hex. */
+.card { background: var(--color-bg); color: var(--color-ink); }</code></pre>
+
+    <h4>No-flash theme init (the Josh Comeau move)</h4>
+    <p>The flash of wrong theme happens when React/Vue hydrates <em>after</em> first paint. Fix it with a tiny blocking script in <code>&lt;head&gt;</code> that sets the attribute before the body renders:</p>
+    <pre><code>&lt;!-- Inline in &lt;head&gt;, BEFORE your stylesheet/app. Runs synchronously. --&gt;
+&lt;script&gt;
+  (function () {
+    const saved = localStorage.getItem('theme');
+    const sys = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = saved || sys;
+  })();
+&lt;/script&gt;</code></pre>
+
+    <div class="callout warn">
+      <p><strong>Pitfall — theming only the background.</strong> A dark theme is not "invert the canvas." Saturated accents that pass contrast on white often fail on black, and pure-white text on pure-black causes halation (smearing) for astigmatic readers. Lift the accent's lightness for dark mode (see the OKLCH bump above) and use off-white ink, exactly like Linear's <code>rgb(247,248,248)</code> rather than <code>#fff</code>.</p>
+    </div>
+
+    <h2 id="checklist">9 · The steal-this checklist</h2>
+    <div class="callout steal">
+      <p><strong>Color discipline, distilled from 80 teardowns:</strong></p>
+      <ul>
+        <li><strong>One accent, spent like money</strong> — Ramp, Mercury, Brittany Chiang. Every colored pixel must buy you something.</li>
+        <li><strong>Tint your neutrals</strong> — never raw <code>#000</code>/<code>#fff</code> for everyday surfaces. Warm the cream (Arc), warm the dark (Stripe Press), or commit to true white only for gallery contrast (Apple).</li>
+        <li><strong>Generate ramps + states in OKLCH</strong> from a single hue token using relative color syntax — no hand-picked hovers.</li>
+        <li><strong>4.5:1 body / 3:1 large &amp; UI, always</strong>, and never let color be the only signal (Sara Soueidan's underlined links).</li>
+        <li><strong>Give the accent a job</strong> — "convert," "go/safe," "active page" — so users learn its meaning.</li>
+        <li><strong>Gradients: brand-loud or watermark-quiet</strong>, never in between; interpolate <code>in oklch</code>; confine loud ones to UI surfaces (Linear).</li>
+        <li><strong>Theme with semantic tokens + <code>data-theme</code> + <code>color-scheme</code></strong>, lift the accent for dark, and ship a no-flash init script (Josh Comeau).</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer class="ftr">
+    <div class="wrap">
+      <p><a href="../PLAN.html">◆ Craft Atlas — Build Plan →</a></p>
+      <p style="margin-top:var(--s-3);color:var(--ink-dim);">Page 04 of 13 · <strong>Color &amp; Theme</strong>. Craft Atlas — synthesized from 80 live site teardowns.</p>
+    </div>
+  </footer>
+
+  <script>
+    // page-local: theme-token toggle demo only
+    (function () {
+      const card = document.getElementById('themeCard');
+      const btns = document.querySelectorAll('.theme-switch button');
+      btns.forEach(function (b) {
+        b.addEventListener('click', function () {
+          card.setAttribute('data-theme', b.dataset.set);
+          btns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

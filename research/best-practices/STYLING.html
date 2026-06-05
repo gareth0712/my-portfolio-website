@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Styling — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,560;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* --- page-local live-demo styles only --- */
+
+    /* Demo 1: token theming — flip a single custom property, watch the card re-skin */
+    .theme-demo {
+      --t-bg: #14171c;
+      --t-fg: #e9eaec;
+      --t-accent: #f5a623;
+      --t-radius: 14px;
+      display: grid;
+      gap: var(--s-4);
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 620px) { .theme-demo { grid-template-columns: 1fr 220px; align-items: start; } }
+    .skin {
+      background: var(--t-bg);
+      color: var(--t-fg);
+      border: 1px solid color-mix(in srgb, var(--t-accent) 30%, transparent);
+      border-radius: var(--t-radius);
+      padding: var(--s-5);
+      transition: background .35s var(--ease), color .35s var(--ease),
+                  border-radius .35s var(--ease), border-color .35s var(--ease);
+    }
+    .skin .pill {
+      display: inline-block; margin-top: var(--s-3);
+      background: var(--t-accent); color: #1a1205;
+      font-family: var(--font-mono); font-size: .8rem; font-weight: 600;
+      padding: .35em .8em; border-radius: 999px;
+    }
+    .skin h4 { color: var(--t-fg); margin: 0; }
+    .theme-controls { display: grid; gap: var(--s-3); }
+    .theme-controls label { font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink-dim); display: grid; gap: var(--s-1); }
+    .theme-controls input[type="color"] { width: 100%; height: 34px; background: none; border: 1px solid var(--line); border-radius: var(--r-1); cursor: pointer; }
+    .theme-controls input[type="range"] { width: 100%; accent-color: var(--accent); }
+    .swatch-row { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+    .swatch-row button {
+      font-family: var(--font-mono); font-size: .72rem; cursor: pointer;
+      color: var(--ink-soft); background: var(--bg-2); border: 1px solid var(--line);
+      border-radius: 999px; padding: .3em .7em; transition: border-color .15s var(--ease), color .15s var(--ease);
+    }
+    .swatch-row button:hover { color: var(--ink); border-color: var(--accent); }
+
+    /* Demo 2: :has() parent-aware styling — no JS class toggling */
+    .has-demo .field {
+      border: 1px solid var(--line);
+      border-radius: var(--r-2);
+      padding: var(--s-4);
+      background: var(--bg-2);
+      transition: border-color .2s var(--ease), background .2s var(--ease);
+    }
+    .has-demo .field label { font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink-dim); display: block; margin-bottom: var(--s-2); }
+    .has-demo .field input {
+      width: 100%; background: var(--bg); color: var(--ink);
+      border: 1px solid var(--line); border-radius: var(--r-1);
+      padding: .5em .7em; font-family: var(--font-sans); font-size: var(--step-0);
+    }
+    /* the magic: the FIELD reacts to the state of the INPUT inside it */
+    .has-demo .field:has(input:focus) { border-color: var(--accent); background: var(--bg-3); }
+    .has-demo .field:has(input:not(:placeholder-shown):invalid) { border-color: var(--warn); }
+    .has-demo .field:has(input:not(:placeholder-shown):valid) { border-color: var(--tip); }
+    .has-demo .hint { font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink-dim); margin-top: var(--s-3); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="UI-DESIGN.html">UI Design</a>
+      <a href="UX.html">UX</a>
+      <a href="TYPOGRAPHY.html">Typography</a>
+      <a href="COLOR.html">Color</a>
+      <a href="STYLING.html" aria-current="page">Styling</a>
+      <a href="MOTIONS.html">Motion</a>
+      <a href="ANIMATIONS.html">Animation</a>
+      <a href="INTERACTIONS.html">Interaction</a>
+      <a href="SPATIAL.html">3D / Spatial</a>
+      <a href="MINI-GAMES.html">Mini-Games</a>
+      <a href="STATE-MANAGEMENT.html">State</a>
+      <a href="NEXTJS.html">Meta-Framework</a>
+      <a href="../references/PORTFOLIO.html">Portfolio</a>
+      <a href="../references/TOP-LIST.html">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <p class="kicker">Craft Atlas · 06</p>
+    <h1>Styling &amp; CSS Architecture</h1>
+    <p class="lede">Great-looking sites are not built from clever one-off CSS. They are built from a small, ruthlessly consistent token system, then re-skinned with a single variable. Across 80 teardowns the same skeleton recurs: design tokens at the root, fluid <code>clamp()</code> everywhere, and modern selectors (<code>:has()</code>, container queries, subgrid) doing the work JavaScript used to.</p>
+
+    <nav class="toc" aria-label="On this page">
+      <ol>
+        <li><a href="#tokens">1 · Design tokens: one source of truth</a></li>
+        <li><a href="#tailwind-vs-vars">2 · Tailwind v4 vs raw CSS variables</a></li>
+        <li><a href="#fluid">3 · Fluid &amp; responsive without breakpoints</a></li>
+        <li><a href="#modern">4 · Modern CSS: :has(), container queries, subgrid</a></li>
+        <li><a href="#components">5 · Component styling &amp; cascade layers</a></li>
+        <li><a href="#theming">6 · Theming: dark mode &amp; live re-skinning</a></li>
+        <li><a href="#performance">7 · CSS performance budget</a></li>
+        <li><a href="#checklist">8 · The styling checklist</a></li>
+      </ol>
+    </nav>
+
+    <div class="callout steal">
+      <p><strong>The one move:</strong> Define every color, space, radius, and type step as a CSS custom property on <code>:root</code>, then compose <em>everything</em> from those tokens. <span class="ref">Vercel ↗</span> ships an entire site from the Geist token system; <span class="ref">Stripe ↗</span> drives its variable font and fluid scale the same way. When a token is the single source of truth, a redesign is a find-and-replace, not a rewrite.</p>
+    </div>
+
+    <h2 id="tokens">1 · Design tokens: one source of truth</h2>
+    <p>A design token is a named value — <code>--accent</code>, <code>--space-4</code>, <code>--radius-card</code> — that every component reads instead of hardcoding. The elite sites never write <code>#f5a623</code> twice. <span class="ref">Vercel ↗</span> maps size/line-height/tracking/weight into Geist typography classes so a heading is one class, not five declarations. <span class="ref">Pitch ↗</span> (built on Framer) themes its entire body background from a single design token (<code>var(--token-9f3d2b7e…)</code>). <span class="ref">Sara Soueidan ↗</span> hand-authors custom properties keyed to a <code>data-theme</code> attribute for an enhanced tier.</p>
+
+    <p>The professional pattern is a <strong>three-layer token system</strong>: primitive (raw values) → semantic (intent) → component (usage). Semantic tokens are what components reference, so you can re-point <code>--surface</code> from one primitive to another and the whole UI follows.</p>
+
+<pre><code>:root {
+  /* 1 — Primitive: raw, brand-agnostic values */
+  --amber-500: #f5a623;
+  --ink-900:   #0b0c0e;
+  --ink-100:   #e9eaec;
+  --space:     0.25rem;            /* base unit */
+
+  /* 2 — Semantic: intent, not appearance */
+  --color-accent:  var(--amber-500);
+  --color-bg:      var(--ink-900);
+  --color-text:    var(--ink-100);
+  --space-4:       calc(var(--space) * 4);   /* 1rem */
+  --radius-card:   12px;
+
+  /* 3 — Fluid type scale (one clamp per step) */
+  --step-0: clamp(1rem, 0.95rem + 0.22vw, 1.125rem);
+  --step-3: clamp(1.8rem, 1.45rem + 1.7vw, 3.05rem);
+}
+
+/* Components only ever read SEMANTIC tokens */
+.card {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+}</code></pre>
+
+    <div class="callout tip">
+      <p>Use <code>color-mix()</code> to derive states from one token instead of defining ten shades: <code>border-color: color-mix(in srgb, var(--color-accent) 30%, transparent)</code> gives you a tinted hairline that tracks the accent automatically. The live demos on this page use exactly this.</p>
+    </div>
+
+    <h2 id="tailwind-vs-vars">2 · Tailwind v4 vs raw CSS variables</h2>
+    <p>This is the real decision for a new project. Both are token systems — Tailwind is a token system <em>with a utility-class compiler and a design-constraint guardrail</em>. In our teardowns Tailwind dominates the product/SaaS tier: <span class="ref">Linear ↗</span>, <span class="ref">Vercel ↗</span>, <span class="ref">Ramp ↗</span>, and <span class="ref">Manu Arora ↗</span> all ship utility CSS. The bespoke-craft tier (<span class="ref">Mike Hall ↗</span>, <span class="ref">Sara Soueidan ↗</span>) hand-authors CSS with custom properties and cascade layers.</p>
+
+    <p><strong>Tailwind v4</strong> changed the calculus: the config is now CSS-native. You declare tokens in a <code>@theme</code> block and they become both utility classes <em>and</em> real CSS custom properties you can read anywhere — so the old "Tailwind vs CSS variables" framing is mostly dead. You get both.</p>
+
+<pre><code>/* Tailwind v4 — tokens live in CSS, no JS config file */
+@import "tailwindcss";
+
+@theme {
+  --color-accent: #f5a623;
+  --font-display: "Newsreader", serif;
+  --radius-card: 12px;
+  --spacing: 0.25rem;          /* drives p-4, gap-6, etc. */
+}
+
+/* These tokens are now BOTH:
+   - utilities:  class="bg-accent rounded-card font-display"
+   - properties: var(--color-accent) anywhere in your CSS  */</code></pre>
+
+    <table>
+      <thead><tr><th>Dimension</th><th>Tailwind v4 (utilities)</th><th>Raw CSS variables</th></tr></thead>
+      <tbody>
+        <tr><td>Constraint</td><td>Strong — you can only pick from the scale</td><td>None — discipline is on you</td></tr>
+        <tr><td>Co-location</td><td>Styles sit in markup; fast to read in one place</td><td>Separate stylesheet; cleaner markup</td></tr>
+        <tr><td>Dynamic theming</td><td>Via the same CSS vars under the hood</td><td>Native; flip one property at runtime</td></tr>
+        <tr><td>Bundle</td><td>Tiny — unused utilities purged at build</td><td>Whatever you write; easy to bloat</td></tr>
+        <tr><td>Best for</td><td>Teams, product UI, fast iteration</td><td>Editorial / craft sites, total control</td></tr>
+      </tbody>
+      <caption>Verdict: Tailwind v4 for product work and teams; raw custom properties when the CSS <em>is</em> the design system (à la Mike Hall).</caption>
+    </table>
+
+    <div class="callout warn">
+      <p><strong>Pitfall — the utility soup:</strong> 14 utility classes on one <code>div</code> is a smell. When a pattern repeats 3+ times, extract a component (<code>@apply</code> sparingly, or a real component in React/Vue). Tailwind without component extraction drifts into the same copy-paste rot raw CSS does.</p>
+    </div>
+
+    <h2 id="fluid">3 · Fluid &amp; responsive without breakpoints</h2>
+    <p>The single biggest upgrade in modern CSS: stop writing breakpoint stacks and let one <code>clamp()</code> interpolate continuously. <span class="ref">Stripe ↗</span> renders its H1 fluidly (~34px on a laptop, scaling up) with tight leading; <span class="ref">Vercel ↗</span>, <span class="ref">Lusion ↗</span>, and <span class="ref">Family ↗</span> all lean on <code>clamp()</code> for type and spacing. The pattern: <code>clamp(MIN, PREFERRED, MAX)</code> where PREFERRED mixes a <code>rem</code> base with a <code>vw</code> slope.</p>
+
+<pre><code>/* Fluid type: never too small on mobile, never too big on 4K */
+h1     { font-size: clamp(2.3rem, 1.7rem + 2.9vw, 4.4rem); }
+.lede  { font-size: clamp(1.18rem, 1.05rem + 0.65vw, 1.55rem); }
+
+/* Fluid space: section padding scales with the viewport */
+.section { padding-block: clamp(3rem, 4vw + 1rem, 6rem); }
+
+/* Intrinsic responsive grid — auto-fit, no media queries at all */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 1.5rem;
+}</code></pre>
+
+    <p>The <code>auto-fit / minmax / min()</code> grid is the workhorse — cards reflow from 4 columns to 1 with zero media queries, and <code>min(100%, 260px)</code> stops a single card overflowing on a 320px phone. This page's card grids and <code>shared.css</code> use exactly this.</p>
+
+    <figure class="figure">
+      <img src="../workings/shots/vercel/01-hero.png" alt="Vercel homepage hero with Geist type, monochrome canvas and a single spectrum gradient line" loading="lazy" decoding="async">
+      <figcaption><strong>Vercel</strong> — the entire site is the Geist token system: fluid type, monochrome canvas, saturated color reserved only for code / data. One scale, no decorative breakpoints.</figcaption>
+    </figure>
+
+    <div class="example">
+      <p style="margin:0 0 var(--s-3); font-family:var(--font-mono); font-size:var(--step--1); color:var(--ink-dim);">Resize the window — this heading scales <em>continuously</em>, not in steps.</p>
+      <h3 id="fluid-target" style="font-family:var(--font-serif); font-size:clamp(1.5rem,1rem + 5vw,4.5rem); line-height:1.05; letter-spacing:-0.02em; margin:0; text-wrap:balance;">Fluid by clamp()</h3>
+      <p class="caption">Computed size: <b id="px" style="color:var(--accent-soft); font-family:var(--font-mono);">—</b> · one declaration, infinite breakpoints.</p>
+    </div>
+
+    <h2 id="modern">4 · Modern CSS: <code>:has()</code>, container queries, subgrid</h2>
+    <p>These three shipped to all evergreen browsers and quietly killed a lot of JavaScript.</p>
+
+    <h3><code>:has()</code> — the parent selector</h3>
+    <p><span class="ref">Mike Hall ↗</span> builds an entire <strong>5-mode theme switcher with zero JavaScript</strong> using radio inputs plus <code>:has()</code> sibling selectors — the page re-themes instantly, fully keyboard-accessible. <code>:has()</code> lets a parent style itself based on its children's state, so form-field validation, "card contains an image", and toggle UIs become pure CSS.</p>
+
+<pre><code>/* Re-theme the whole page from a checked radio — no JS (Mike Hall) */
+body:has(#theme-dark:checked)  { --color-bg: #0b0c0e; --color-text: #e9eaec; }
+body:has(#theme-sepia:checked) { --color-bg: #f4ecd8; --color-text: #2b2417; }
+
+/* A field reacts to the input inside it */
+.field:has(input:focus) { border-color: var(--color-accent); }
+.field:has(input:valid) { border-color: var(--color-ok); }</code></pre>
+
+    <div class="example">
+      <div class="has-demo">
+        <p style="margin:0 0 var(--s-3); font-family:var(--font-mono); font-size:var(--step--1); color:var(--ink-dim);">No JS — the field border is driven entirely by <code>:has(input:…)</code></p>
+        <div class="field">
+          <label for="email-demo">Email (try a bad one, then a good one)</label>
+          <input id="email-demo" type="email" placeholder="you@example.com" autocomplete="off">
+        </div>
+        <p class="hint">focus → amber · invalid → orange · valid → teal</p>
+      </div>
+      <p class="caption">The parent <code>.field</code> styles itself from its child input's <code>:focus</code> / <code>:valid</code> / <code>:invalid</code> state. Zero script.</p>
+    </div>
+
+    <h3>Container queries — components that size to their slot</h3>
+    <p>Media queries ask "how big is the viewport?" Container queries ask "how big is <em>my container</em>?" — so a card in a wide sidebar and the same card in a narrow column style themselves correctly, regardless of screen size. This is the right tool for the bento grids in <span class="ref">Ramp ↗</span>, where one card template appears at many sizes.</p>
+
+<pre><code>.card-wrap { container-type: inline-size; }      /* establish a query container */
+
+/* style the CARD based on the WRAPPER's width, not the screen */
+@container (min-width: 360px) {
+  .card { display: grid; grid-template-columns: 96px 1fr; gap: 1rem; }
+}</code></pre>
+
+    <h3>Subgrid — align nested grids to the parent's tracks</h3>
+    <p>Card grids look polished only when every card's title, body, and footer line up across the row. <code>grid-template-rows: subgrid</code> lets a card inherit the parent grid's row tracks so all titles share a baseline even with uneven content.</p>
+
+<pre><code>.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.card {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;   /* title / body / footer align across ALL cards */
+}</code></pre>
+
+    <h2 id="components">5 · Component styling &amp; cascade layers</h2>
+    <p>The recurring approach across crafted sites is to scope styles and control the cascade explicitly. <span class="ref">Mike Hall ↗</span> authors with native <strong><code>@layer</code> cascade layers</strong> plus logical properties (<code>margin-inline</code>, <code>padding-block</code>) and relative units. <span class="ref">Ramp ↗</span> and <span class="ref">Brittany Chiang ↗</span> use <strong>CSS Modules</strong> (hashed class names) for collision-free scoping. <span class="ref">Josh Comeau ↗</span> uses <strong>Linaria</strong> — zero-runtime CSS-in-JS compiled to CSS Modules — specifically to drop the styled-components runtime and stay RSC-compatible.</p>
+
+    <p>Cascade layers end specificity wars. You declare an order once, and later layers always win regardless of selector strength — so your tokens, base, components, and utilities never fight.</p>
+
+<pre><code>/* Declare the cascade order ONCE — predictable forever after */
+@layer reset, tokens, base, components, utilities;
+
+@layer components {
+  .button { background: var(--color-accent); border-radius: var(--radius-card); }
+}
+@layer utilities {
+  /* a single-class utility always beats the component layer — no !important */
+  .mt-0 { margin-block-start: 0; }
+}</code></pre>
+
+    <div class="callout tip">
+      <p><strong>Logical properties</strong> (<code>margin-inline</code>, <code>inset-block</code>, <code>padding-inline</code>) make a layout RTL- and vertical-writing-ready for free. <code>shared.css</code> uses <code>margin-inline: auto</code> and <code>padding-block</code> throughout for exactly this reason — write once, work in every writing mode.</p>
+    </div>
+
+    <h2 id="theming">6 · Theming: dark mode &amp; live re-skinning</h2>
+    <p>Because every color is a token, theming is just re-pointing those tokens. <span class="ref">Josh Comeau ↗</span> — who wrote the canonical "Perfect Dark Mode" — ships a flicker-free, persisted, token-driven toggle. <span class="ref">Sara Soueidan ↗</span> swaps a <code>data-theme</code> attribute. <span class="ref">Mike Hall ↗</span> does it with pure <code>:has()</code>. The mechanism is always the same: override semantic tokens, let the cascade repaint.</p>
+
+<pre><code>:root               { --color-bg: #fff;     --color-text: #111; }
+[data-theme="dark"] { --color-bg: #0b0c0e; --color-text: #e9eaec; }
+
+/* Respect the OS default, allow manual override */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --color-bg: #0b0c0e; --color-text: #e9eaec; }
+}
+html { color-scheme: light dark; }   /* themes native UI: scrollbars, form controls */</code></pre>
+
+    <div class="example">
+      <div class="theme-demo">
+        <div class="skin" id="skin">
+          <h4>Live token re-skin</h4>
+          <p style="margin-top:var(--s-2); color:inherit; opacity:.8;">Every property below is read from a CSS variable. Change the token, the component follows — no rebuild.</p>
+          <span class="pill">--color-accent</span>
+        </div>
+        <div class="theme-controls">
+          <label>Accent token
+            <input type="color" id="accent-input" value="#f5a623">
+          </label>
+          <label>Radius token — <span id="radius-val" style="color:var(--accent-soft)">14</span>px
+            <input type="range" id="radius-input" min="0" max="32" value="14">
+          </label>
+          <div class="swatch-row">
+            <button type="button" data-bg="#14171c" data-fg="#e9eaec">Ink</button>
+            <button type="button" data-bg="#f4ecd8" data-fg="#2b2417">Sepia</button>
+            <button type="button" data-bg="#0d1f1c" data-fg="#d6f5ec">Forest</button>
+          </div>
+        </div>
+      </div>
+      <p class="caption">One element, four tokens. This is how Josh Comeau, Sara Soueidan and Mike Hall re-skin entire pages — flip the variables, the cascade repaints.</p>
+    </div>
+
+    <figure class="figure">
+      <img src="../workings/shots/mike-hall-mikemai-net/01-hero.png" alt="Mike Hall mikemai.net — bold brutalist display type and a CSS-only theme switcher" loading="lazy" decoding="async">
+      <figcaption><strong>Mike Hall (mikemai.net)</strong> — a 5-mode theme switcher built entirely from radio inputs + <code>:has()</code>, no JavaScript. The CSS <em>is</em> the design system: cascade layers, logical properties, near-zero JS budget.</figcaption>
+    </figure>
+
+    <h2 id="performance">7 · CSS performance budget</h2>
+    <p>CSS is render-blocking — it sits on the critical path to first paint. The fast sites keep it lean and animate cheaply.</p>
+    <ul>
+      <li><strong>Animate only <code>transform</code> and <code>opacity</code>.</strong> <span class="ref">Stripe ↗</span> bakes this into its motion token system as a hard rule and isolates animated components to limit repaint. These two properties run on the compositor and skip layout / paint.</li>
+      <li><strong>Kill layout shift from fonts.</strong> <span class="ref">Ramp ↗</span> uses <code>next/font local</code> with a metric-matched fallback so its paid typeface swaps in with zero CLS. Pair with <code>font-display: swap</code>.</li>
+      <li><strong>Use <code>content-visibility: auto</code></strong> on long off-screen sections to skip rendering work until they scroll near the viewport — near-free virtualization.</li>
+      <li><strong>Reach for <code>will-change</code> only just before an animation</strong> and remove it after; leaving it on permanently wastes GPU memory.</li>
+      <li><strong>Purge unused CSS.</strong> Tailwind does this automatically; hand-authored CSS needs discipline. <span class="ref">Mike Hall ↗</span> ships two stylesheets total and only an analytics beacon for JS — instant load.</li>
+    </ul>
+
+<pre><code>/* Skip rendering off-screen blocks until needed */
+.section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;   /* reserve height to avoid scroll jumps */
+}
+
+/* GPU-friendly hover — transform/opacity only, no width/top/box-shadow thrash */
+.card { transition: transform .2s var(--ease), opacity .2s var(--ease); }
+.card:hover { transform: translateY(-2px); }</code></pre>
+
+    <div class="callout warn">
+      <p><strong>Pitfall — animating layout properties:</strong> transitioning <code>width</code>, <code>height</code>, <code>top</code>, or <code>margin</code> forces layout + paint on every frame and janks on mobile. Animate <code>transform: scale()</code> / <code>translate()</code> instead. <code>backdrop-filter: blur()</code> (the glass nav in <span class="ref">Nothing ↗</span> and our own header) is expensive — use it on small, static surfaces, never on scrolling content.</p>
+    </div>
+
+    <h2 id="checklist">8 · The styling checklist</h2>
+    <div class="grid">
+      <div class="card">
+        <h4>Tokens first</h4>
+        <p>Every color, space, radius, and type step is a custom property on <code>:root</code>. No hardcoded hex twice. Semantic tokens, not raw values, in components.</p>
+      </div>
+      <div class="card">
+        <h4>Fluid by default</h4>
+        <p>Type and section spacing use one <code>clamp()</code>, not breakpoint stacks. Grids use <code>auto-fit + minmax + min()</code> — reflow without media queries.</p>
+      </div>
+      <div class="card">
+        <h4>Modern selectors</h4>
+        <p><code>:has()</code> for parent-aware styling, container queries for component-level responsiveness, subgrid for cross-card alignment. Delete the JS they replace.</p>
+      </div>
+      <div class="card">
+        <h4>Control the cascade</h4>
+        <p>Declare <code>@layer</code> order once. Scope components (CSS Modules / zero-runtime). Logical properties for free RTL.</p>
+      </div>
+      <div class="card">
+        <h4>Theme via tokens</h4>
+        <p>Dark mode = re-point semantic variables. <code>color-scheme</code> for native UI. Flicker-free, persisted, no duplicate stylesheets.</p>
+      </div>
+      <div class="card">
+        <h4>Cheap to paint</h4>
+        <p>Animate transform / opacity only. <code>content-visibility</code> for long pages. Purge unused CSS. Metric-matched font fallbacks to kill CLS.</p>
+      </div>
+    </div>
+
+    <div class="callout steal">
+      <p><strong>Steal this stack:</strong> Tailwind v4 <code>@theme</code> tokens (or raw custom properties if you want full control) → fluid <code>clamp()</code> type + <code>auto-fit</code> grids → <code>:has()</code> and container queries instead of JS → <code>@layer</code> to tame the cascade → theme by re-pointing variables → animate only transform / opacity. That is the spine under Vercel, Linear, Stripe, Ramp, and every hand-crafted site in this atlas.</p>
+    </div>
+  </main>
+
+  <footer class="ftr">
+    <div class="wrap">
+      <p><a class="brand" href="../PLAN.html">◆ Craft Atlas</a></p>
+      <p>Page 06 of 13 · <a href="../PLAN.html">← Back to the Build Plan</a></p>
+      <p>Craft Atlas — synthesized from 80 live site teardowns.</p>
+    </div>
+  </footer>
+
+  <script>
+    // --- demo 1: live px readout for the clamp() heading ---
+    (function () {
+      var t = document.getElementById('fluid-target');
+      var px = document.getElementById('px');
+      if (!t || !px) return;
+      function tick() { px.textContent = Math.round(parseFloat(getComputedStyle(t).fontSize)) + 'px'; }
+      addEventListener('resize', tick, { passive: true });
+      tick();
+    })();
+
+    // --- demo 2: live token re-skin ---
+    (function () {
+      var skin = document.getElementById('skin');
+      if (!skin) return;
+      var accent = document.getElementById('accent-input');
+      var radius = document.getElementById('radius-input');
+      var radiusVal = document.getElementById('radius-val');
+      accent.addEventListener('input', function () { skin.style.setProperty('--t-accent', accent.value); });
+      radius.addEventListener('input', function () {
+        skin.style.setProperty('--t-radius', radius.value + 'px');
+        radiusVal.textContent = radius.value;
+      });
+      document.querySelectorAll('.swatch-row button').forEach(function (b) {
+        b.addEventListener('click', function () {
+          skin.style.setProperty('--t-bg', b.dataset.bg);
+          skin.style.setProperty('--t-fg', b.dataset.fg);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

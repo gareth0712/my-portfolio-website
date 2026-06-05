@@ -1,0 +1,695 @@
+/* ============================================================================
+   Craft Atlas — shared.css
+   A dark editorial / technical-journal stylesheet for the Craft Atlas mini-site.
+   Aesthetic: Stripe Press × Vercel docs × Awwwards case study.
+   Fonts (loaded via <link> in HTML): Inter, Newsreader, JetBrains Mono.
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   1. Design tokens
+   ---------------------------------------------------------------------------- */
+:root {
+  /* --- Color: ink-dark base with refined warm-amber accent --- */
+  --bg:            #0b0c0e;   /* page base */
+  --bg-2:         #111317;   /* raised surface */
+  --bg-3:         #16191e;   /* cards, insets */
+  --panel:        #0e1013;   /* code panels (darker) */
+  --line:         #23272e;   /* hairline borders */
+  --line-soft:    #1b1e23;   /* fainter dividers */
+
+  --ink:          #e9eaec;   /* primary text — AA on --bg (~14:1) */
+  --ink-soft:     #b7bcc4;   /* secondary text (~9:1) */
+  --ink-dim:      #888f9a;   /* muted / meta (~5.4:1, AA) */
+  --ink-faint:    #5f6671;   /* faintest legible */
+
+  --accent:       #f5a623;   /* warm amber */
+  --accent-soft:  #ffce7a;   /* lighter amber for text-on-dark */
+  --accent-ink:   #1a1205;   /* text on amber fills */
+  --accent-glow:  rgba(245, 166, 35, 0.14);
+
+  --tip:          #4ec9b0;   /* teal */
+  --warn:         #e0703a;   /* burnt orange */
+  --steal:        #c792ea;   /* mauve — "steal this" */
+
+  --sel:          rgba(245, 166, 35, 0.26);
+
+  /* --- Typography --- */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+
+  /* Fluid type scale (min 360px → max ~1200px viewport) */
+  --step--1: clamp(0.80rem, 0.76rem + 0.18vw, 0.875rem);
+  --step-0:  clamp(1.00rem, 0.95rem + 0.22vw, 1.125rem);  /* body */
+  --step-1:  clamp(1.20rem, 1.10rem + 0.50vw, 1.45rem);
+  --step-2:  clamp(1.45rem, 1.25rem + 0.95vw, 2.05rem);
+  --step-3:  clamp(1.80rem, 1.45rem + 1.70vw, 3.05rem);
+  --step-4:  clamp(2.30rem, 1.70rem + 2.90vw, 4.40rem);  /* hero h1 */
+
+  --lede:    clamp(1.18rem, 1.05rem + 0.65vw, 1.55rem);
+
+  /* --- Space scale (8pt-ish) --- */
+  --s-1:  0.25rem;
+  --s-2:  0.5rem;
+  --s-3:  0.75rem;
+  --s-4:  1rem;
+  --s-5:  1.5rem;
+  --s-6:  2rem;
+  --s-7:  3rem;
+  --s-8:  4rem;
+  --s-9:  6rem;
+
+  /* --- Radius --- */
+  --r-1: 4px;
+  --r-2: 8px;
+  --r-3: 12px;
+  --r-4: 18px;
+  --r-pill: 999px;
+
+  /* --- Layout widths --- */
+  --w-read: 760px;
+  --w-wide: 1100px;
+
+  /* --- Effects --- */
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-2: 0 8px 30px rgba(0,0,0,0.45);
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ----------------------------------------------------------------------------
+   2. Reset & base
+   ---------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+* { margin: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.7;
+  color: var(--ink);
+  background-color: var(--bg);
+  /* Subtle layered texture: two faint radial glows + a fine vertical sheen */
+  background-image:
+    radial-gradient(1100px 620px at 78% -8%, var(--accent-glow), transparent 62%),
+    radial-gradient(900px 600px at 8% 4%, rgba(99,102,241,0.06), transparent 60%),
+    linear-gradient(180deg, #0c0d10 0%, var(--bg) 38%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'kern', 'liga', 'calt';
+  min-height: 100vh;
+  overflow-wrap: break-word;
+}
+
+img, svg, video { display: block; max-width: 100%; height: auto; }
+
+a {
+  color: var(--accent-soft);
+  text-decoration: none;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  transition: color 0.18s var(--ease), text-decoration-color 0.18s var(--ease);
+}
+a:hover { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent); }
+
+::selection { background: var(--sel); color: var(--ink); }
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+  border-radius: var(--r-1);
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background: var(--line);
+  margin: var(--s-7) 0;
+}
+
+/* ----------------------------------------------------------------------------
+   3. Layout containers
+   ---------------------------------------------------------------------------- */
+.wrap {
+  width: 100%;
+  max-width: var(--w-read);
+  margin-inline: auto;
+  padding-inline: var(--s-5);
+}
+
+.wide {
+  width: 100%;
+  max-width: var(--w-wide);
+  margin-inline: auto;
+  padding-inline: var(--s-5);
+}
+
+/* Vertical rhythm between flow elements inside reading columns */
+.wrap > * + *,
+.wide > * + * { margin-top: var(--s-5); }
+
+/* ----------------------------------------------------------------------------
+   4. Typography — headings & flow
+   ---------------------------------------------------------------------------- */
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 560;
+  line-height: 1.12;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  text-wrap: balance;
+  scroll-margin-top: 5.5rem; /* clears sticky nav for anchor jumps */
+}
+
+h1 { font-size: var(--step-3); margin-top: var(--s-8); }
+h2 {
+  font-size: var(--step-2);
+  margin-top: var(--s-8);
+  padding-bottom: var(--s-3);
+  border-bottom: 1px solid var(--line-soft);
+}
+h3 { font-size: var(--step-1); margin-top: var(--s-6); }
+h4 {
+  font-size: var(--step-0);
+  font-family: var(--font-sans);
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: var(--s-5);
+}
+
+/* first heading in a flow shouldn't push a big gap */
+.wrap > h1:first-child, .wrap > h2:first-child,
+.wide > h1:first-child, .wide > h2:first-child { margin-top: 0; }
+
+p { color: var(--ink-soft); }
+p strong, li strong { color: var(--ink); font-weight: 650; }
+em { font-style: italic; }
+
+ul, ol { padding-left: 1.4em; color: var(--ink-soft); }
+li + li { margin-top: var(--s-2); }
+li::marker { color: var(--accent); }
+
+blockquote {
+  margin: var(--s-5) 0;
+  padding: var(--s-2) 0 var(--s-2) var(--s-5);
+  border-left: 3px solid var(--accent);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--step-1);
+  color: var(--ink);
+}
+
+/* ----------------------------------------------------------------------------
+   5. Header & sticky nav
+   ---------------------------------------------------------------------------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(11, 12, 14, 0.72);
+  backdrop-filter: saturate(150%) blur(14px);
+  -webkit-backdrop-filter: saturate(150%) blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  width: 100%;
+  max-width: var(--w-wide);
+  margin-inline: auto;
+  padding: var(--s-3) var(--s-5);
+}
+
+.site-nav .brand {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-right: auto;          /* push the rest to the right */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.site-nav .brand::before {
+  content: "";
+  width: 9px; height: 9px;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+.site-nav .brand:hover { color: var(--ink); }
+
+.site-nav a {
+  color: var(--ink-dim);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: var(--s-1) 0;
+  position: relative;
+  transition: color 0.18s var(--ease);
+}
+.site-nav a:hover { color: var(--ink); text-decoration: none; }
+.site-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -2px;
+  height: 1.5px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s var(--ease);
+}
+.site-nav a:hover::after { transform: scaleX(1); }
+
+/* current-page marker (optional, agnostic): add aria-current="page" */
+.site-nav a[aria-current="page"] { color: var(--ink); }
+.site-nav a[aria-current="page"]::after { transform: scaleX(1); }
+
+.site-nav .cta {
+  color: var(--accent-ink);
+  background: var(--accent);
+  font-weight: 600;
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-pill);
+  letter-spacing: 0.01em;
+}
+.site-nav .cta::after { display: none; }
+.site-nav .cta:hover {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  text-decoration: none;
+}
+
+/* ----------------------------------------------------------------------------
+   6. Hero
+   ---------------------------------------------------------------------------- */
+.hero {
+  padding: clamp(var(--s-7), 4vw + 1rem, var(--s-9)) 0 var(--s-7);
+}
+.hero h1 {
+  font-size: var(--step-4);
+  font-weight: 580;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  margin-top: var(--s-4);
+  text-wrap: balance;
+}
+.kicker {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.lede {
+  font-family: var(--font-serif);
+  font-size: var(--lede);
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--ink-soft);
+  max-width: 42ch;
+  margin-top: var(--s-5);
+  text-wrap: pretty;
+}
+
+/* ----------------------------------------------------------------------------
+   7. Table of contents
+   ---------------------------------------------------------------------------- */
+.toc {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: var(--s-5);
+  font-size: var(--step--1);
+}
+.toc::before {
+  content: "On this page";
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: var(--s-3);
+}
+.toc ol, .toc ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--s-1);
+}
+.toc li { margin: 0; }
+.toc li::marker { content: none; }
+.toc a {
+  display: block;
+  color: var(--ink-soft);
+  padding: var(--s-1) var(--s-2);
+  border-radius: var(--r-1);
+  border-left: 2px solid transparent;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background 0.15s var(--ease);
+}
+.toc a:hover {
+  color: var(--ink);
+  background: var(--bg-3);
+  border-left-color: var(--accent);
+  text-decoration: none;
+}
+
+/* ----------------------------------------------------------------------------
+   8. Cards & grid
+   ---------------------------------------------------------------------------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: var(--s-5);
+}
+
+.card {
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: var(--s-5);
+  box-shadow: var(--shadow-1);
+  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.card > * + * { margin-top: var(--s-3); }
+.card:hover {
+  border-color: #30353d;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+.card h3, .card h4 { margin-top: 0; }
+.card h3 { font-size: var(--step-1); }
+.card p { color: var(--ink-dim); font-size: var(--step--1); }
+/* a card that is itself a link */
+a.card { color: inherit; }
+a.card:hover { text-decoration: none; }
+
+/* ----------------------------------------------------------------------------
+   9. Callouts
+   ---------------------------------------------------------------------------- */
+.callout {
+  --c: var(--accent);
+  position: relative;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--c);
+  border-radius: var(--r-2);
+  padding: var(--s-4) var(--s-5);
+  color: var(--ink-soft);
+}
+.callout > * + * { margin-top: var(--s-2); }
+.callout p { color: var(--ink-soft); }
+.callout::before {
+  content: "Note";
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c);
+  margin-bottom: var(--s-1);
+}
+.callout.tip   { --c: var(--tip); }
+.callout.warn  { --c: var(--warn); }
+.callout.steal { --c: var(--steal); background: linear-gradient(180deg, rgba(199,146,234,0.07), transparent 70%), var(--bg-2); }
+
+.callout.tip::before   { content: "Tip"; }
+.callout.warn::before  { content: "Caution"; }
+.callout.steal::before { content: "Steal this"; }
+
+/* ----------------------------------------------------------------------------
+   10. Inline citation chip (.ref)
+   ---------------------------------------------------------------------------- */
+.ref {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  font-family: var(--font-mono);
+  font-size: 0.78em;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: baseline;
+  padding: 0.22em 0.55em;
+  margin: 0 0.1em;
+  color: var(--accent-soft);
+  background: var(--accent-glow);
+  border: 1px solid rgba(245,166,35,0.28);
+  border-radius: var(--r-pill);
+  text-decoration: none;
+  transition: background 0.16s var(--ease), border-color 0.16s var(--ease), color 0.16s var(--ease);
+}
+.ref::after { content: "\2197"; font-size: 0.85em; opacity: 0.7; } /* ↗ */
+.ref:hover {
+  color: var(--accent);
+  background: rgba(245,166,35,0.2);
+  border-color: rgba(245,166,35,0.5);
+  text-decoration: none;
+}
+/* non-link refs (plain <span class="ref">) drop the arrow */
+span.ref::after { content: none; }
+
+/* ----------------------------------------------------------------------------
+   11. Code — blocks & inline
+   ---------------------------------------------------------------------------- */
+:not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: var(--accent-soft);
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  padding: 0.12em 0.4em;
+  word-break: break-word;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  line-height: 1.65;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: var(--s-5);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  color: var(--ink);
+  tab-size: 2;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+}
+pre code {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  white-space: pre;
+}
+pre::-webkit-scrollbar { height: 10px; }
+pre::-webkit-scrollbar-track { background: transparent; }
+pre::-webkit-scrollbar-thumb { background: var(--line); border-radius: var(--r-pill); }
+pre::-webkit-scrollbar-thumb:hover { background: #30353d; }
+
+/* ----------------------------------------------------------------------------
+   12. Live-demo box (.example)
+   ---------------------------------------------------------------------------- */
+.example {
+  background:
+    linear-gradient(0deg, var(--bg-3), var(--bg-3)),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.012) 0 10px, transparent 10px 20px);
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: var(--s-6) var(--s-5);
+  position: relative;
+}
+.example::before {
+  content: "Live demo";
+  position: absolute;
+  top: 0; left: var(--s-4);
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  background: var(--bg);
+  padding: 0 var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+}
+.example > figcaption,
+.example > .caption {
+  display: block;
+  margin-top: var(--s-4);
+  padding-top: var(--s-3);
+  border-top: 1px dashed var(--line);
+  font-size: var(--step--1);
+  color: var(--ink-dim);
+}
+
+/* ----------------------------------------------------------------------------
+   13. Figure (screenshot)
+   ---------------------------------------------------------------------------- */
+.figure {
+  margin: var(--s-6) 0;
+}
+.figure img {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  box-shadow: var(--shadow-2);
+}
+.figure figcaption {
+  margin-top: var(--s-3);
+  font-size: var(--step--1);
+  color: var(--ink-dim);
+  text-align: center;
+  font-family: var(--font-sans);
+}
+.figure figcaption strong { color: var(--ink-soft); }
+
+/* ----------------------------------------------------------------------------
+   14. Tables (comparison)
+   ---------------------------------------------------------------------------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--step--1);
+  /* allow horizontal scroll on narrow screens when wrapped in a block */
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@media (min-width: 640px) {
+  table { display: table; }
+}
+thead th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  background: var(--bg-2);
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+tbody td {
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--ink-soft);
+  vertical-align: top;
+}
+tbody tr:hover td { background: rgba(255,255,255,0.015); }
+tbody td:first-child { color: var(--ink); font-weight: 500; }
+table caption {
+  caption-side: bottom;
+  margin-top: var(--s-3);
+  font-size: var(--step--1);
+  color: var(--ink-dim);
+  text-align: left;
+}
+
+/* ----------------------------------------------------------------------------
+   15. Footer
+   ---------------------------------------------------------------------------- */
+.footer, .ftr {
+  margin-top: var(--s-9);
+  border-top: 1px solid var(--line);
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.25));
+  color: var(--ink-dim);
+  font-size: var(--step--1);
+}
+.footer .wrap, .footer .wide,
+.ftr .wrap, .ftr .wide {
+  padding-top: var(--s-7);
+  padding-bottom: var(--s-7);
+}
+.footer a, .ftr a { color: var(--ink-soft); }
+.footer a:hover, .ftr a:hover { color: var(--accent); }
+.footer .brand, .ftr .brand {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* ----------------------------------------------------------------------------
+   16. Motion preferences
+   ---------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   17. Responsive — tighten gutters on small screens (down to 360px)
+   ---------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .wrap, .wide { padding-inline: var(--s-4); }
+  .site-nav { padding-inline: var(--s-4); }
+  pre, .card, .callout, .example, .toc { border-radius: var(--r-2); }
+  pre, .example { padding: var(--s-4); }
+}
+
+/* ----------------------------------------------------------------------------
+   18. Print — light, ink-friendly
+   ---------------------------------------------------------------------------- */
+@media print {
+  :root {
+    --bg: #fff; --bg-2: #fff; --bg-3: #fafafa; --panel: #f6f6f6;
+    --ink: #111; --ink-soft: #222; --ink-dim: #555; --line: #ddd; --line-soft: #eee;
+    --accent: #9a6500; --accent-soft: #9a6500; --accent-glow: #f4ead4;
+  }
+  html, body {
+    background: #fff !important;
+    color: #111 !important;
+    background-image: none !important;
+  }
+  body { font-size: 11pt; line-height: 1.5; }
+  .site-header, .site-nav .cta { position: static; }
+  .site-header { border-bottom: 1px solid #ccc; backdrop-filter: none; background: #fff; }
+  a { color: #111; text-decoration: underline; }
+  .ref { background: #f4ead4; border-color: #d8c69a; color: #6a4700; }
+  .ref::after { content: ""; }
+  .card, .callout, .toc, .example, .figure img, pre, table, thead th {
+    box-shadow: none !important;
+    border-color: #ddd !important;
+  }
+  .card:hover, tbody tr:hover td { transform: none; background: transparent; }
+  pre, table, .card, .callout, .example, .figure, blockquote { page-break-inside: avoid; }
+  h1, h2, h3, h4 { page-break-after: avoid; color: #111; }
+  .site-nav a::after { display: none; }
+}

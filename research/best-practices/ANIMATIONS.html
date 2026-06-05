@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animation Craft — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* ---- page-local live-demo styles only ---- */
+
+    /* easing-curve comparison */
+    .anim-demo { display:grid; gap:.7rem; }
+    .anim-row { display:grid; grid-template-columns: 15ch 1fr; align-items:center; gap:1rem; }
+    .anim-row .label { font-family:var(--font-mono); font-size:.74rem; color:var(--ink-dim); }
+    .anim-track { position:relative; height:30px; background:var(--bg-2); border:1px solid var(--line); border-radius:var(--r-pill); }
+    .anim-dot { position:absolute; top:50%; left:4px; width:22px; height:22px; margin-top:-11px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent-glow); }
+    .anim-demo.run .anim-dot { animation: trackSlide 1.6s infinite alternate; }
+    .anim-demo.run .c-linear { animation-timing-function: linear; }
+    .anim-demo.run .c-out    { animation-timing-function: cubic-bezier(.16,1,.3,1); }       /* expo-out, the agency default */
+    .anim-demo.run .c-inout  { animation-timing-function: cubic-bezier(.65,0,.35,1); }
+    .anim-demo.run .c-back   { animation-timing-function: cubic-bezier(.34,1.56,.64,1); }    /* overshoot / back-out */
+    @keyframes trackSlide { to { left: calc(100% - 26px); } }
+
+    /* stagger reveal demo */
+    .stag-grid { display:flex; flex-wrap:wrap; gap:.55rem; }
+    .stag-chip {
+      padding:.6rem 1rem; border:1px solid var(--line); border-radius:var(--r-2);
+      background:var(--bg-2); font-family:var(--font-mono); font-size:.78rem; color:var(--ink-soft);
+      opacity:0; transform:translateY(14px) scale(.96);
+      transition: opacity .55s var(--ease), transform .55s var(--ease);
+    }
+    .stag-grid.go .stag-chip { opacity:1; transform:none; }
+
+    /* loop / loading demos */
+    .loop-row { display:flex; gap:2.5rem; align-items:center; flex-wrap:wrap; }
+    .loop-item { display:grid; gap:.5rem; justify-items:center; }
+    .loop-item .cap { font-family:var(--font-mono); font-size:.68rem; color:var(--ink-dim); }
+    .spinner { width:34px; height:34px; border-radius:50%; border:3px solid var(--line); border-top-color:var(--accent); animation: spin .8s linear infinite; }
+    .pulse { width:34px; height:34px; border-radius:50%; background:var(--accent); animation: pulse 1.4s var(--ease) infinite; }
+    .bob { width:30px; height:30px; border-radius:8px; background:var(--accent); animation: bob 2.2s ease-in-out infinite; }
+    .skel { width:120px; height:34px; border-radius:var(--r-2); background:linear-gradient(100deg,var(--bg-2) 30%,var(--line) 50%,var(--bg-2) 70%); background-size:200% 100%; animation: shimmer 1.4s linear infinite; }
+    @keyframes spin   { to { transform: rotate(360deg); } }
+    @keyframes pulse  { 0%,100% { transform: scale(.7); opacity:.5; } 50% { transform: scale(1); opacity:1; } }
+    @keyframes bob    { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-12px) rotate(-6deg); } }
+    @keyframes shimmer{ to { background-position: -200% 0; } }
+
+    /* magnetic / springy button micro-demo */
+    .micro-btn {
+      font-family:var(--font-mono); font-size:.78rem; letter-spacing:.03em;
+      color:var(--accent-ink); background:var(--accent); border:0; border-radius:var(--r-pill);
+      padding:.7rem 1.5rem; cursor:pointer;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s var(--ease);
+    }
+    .micro-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow:0 10px 26px var(--accent-glow); }
+    .micro-btn:active { transform: translateY(0) scale(.97); transition-duration:.08s; }
+
+    .demo-btn {
+      font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em; text-transform:uppercase;
+      color:var(--accent-ink); background:var(--accent); border:0; border-radius:var(--r-pill);
+      padding:.45rem 1rem; cursor:pointer;
+    }
+    .demo-btn:hover { background:var(--accent-soft); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .anim-demo.run .anim-dot,
+      .spinner, .pulse, .bob, .skel { animation:none; }
+      .stag-chip { opacity:1; transform:none; transition:none; }
+    }
+  </style>
+</head>
+<body>
+<header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="UI-DESIGN.html">UI Design</a>
+      <a href="UX.html">UX</a>
+      <a href="TYPOGRAPHY.html">Typography</a>
+      <a href="COLOR.html">Color</a>
+      <a href="STYLING.html">Styling</a>
+      <a href="MOTIONS.html">Motion</a>
+      <a href="ANIMATIONS.html">Animation</a>
+      <a href="INTERACTIONS.html">Interaction</a>
+      <a href="SPATIAL.html">3D / Spatial</a>
+      <a href="MINI-GAMES.html">Mini-Games</a>
+      <a href="STATE-MANAGEMENT.html">State</a>
+      <a href="NEXTJS.html">Meta-Framework</a>
+      <a href="../references/PORTFOLIO.html">Portfolio</a>
+      <a href="../references/TOP-LIST.html">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+<main class="wrap">
+  <span class="kicker">Craft Atlas · 07</span>
+  <h1>Animation Craft</h1>
+  <p class="lede">Motion is choreography over scroll; <em>animation</em> is the grammar underneath it — the keyframes, the easing curve, the stagger interval, the spring constant. This page is the toolbox: how the best 80 sites author transitions and keyframes, when they reach for GSAP vs. Motion vs. native CSS, how they turn a loading screen into a craft moment, and the two properties (<code>transform</code> + <code>opacity</code>) that keep all of it at 60fps. If <a href="MOTIONS.html">Motion</a> is the "what moves," this is the "how it feels."</p>
+
+  <nav class="toc" aria-label="On this page">
+    <ul>
+      <li><a href="#easing">1 · Easing is the whole personality</a></li>
+      <li><a href="#transitions-keyframes">2 · Transitions vs. keyframes</a></li>
+      <li><a href="#stagger">3 · Stagger &amp; entrance choreography</a></li>
+      <li><a href="#spring">4 · Spring physics &amp; the feel of weight</a></li>
+      <li><a href="#tooling">5 · The tooling ladder — CSS → WAAPI → GSAP → Motion</a></li>
+      <li><a href="#loops">6 · Loop &amp; idle animation</a></li>
+      <li><a href="#preloaders">7 · Preloaders as craft</a></li>
+      <li><a href="#performance">8 · Performance — the 60fps contract</a></li>
+    </ul>
+  </nav>
+
+  <h2 id="easing">1 · Easing is the whole personality</h2>
+  <p>Two animations with identical duration and distance feel like different products based on one thing: the <strong>easing curve</strong>. Nothing in the physical world accelerates linearly, so linear motion reads as robotic and cheap. The single highest-leverage upgrade you can make to any animation is to delete <code>linear</code> and pick a real curve.</p>
+  <p><span class="ref">Cassie Evans ↗</span>, a GSAP core-team member, loads <strong>CustomBounce / CustomWiggle / CustomEase</strong> so "motion has weight and personality, not linear tweens" — the hanging lamp swings, elements overshoot and settle. <span class="ref">Stripe ↗</span> goes the opposite, disciplined direction: easing is codified into <strong>design tokens</strong> (standardized durations + easings + choreography) so every sequence is predictable and reusable. <span class="ref">Robin Noguier ↗</span> mixes spring physics with explicit <strong>Bezier-Easing</strong> curves "where a precise easing is wanted." <span class="ref">Family ↗</span> matches curve to brand — rounded illustrations get bouncy, springy curves, never sharp linear ones.</p>
+
+  <div class="example">
+    <p style="font-family:var(--font-mono);font-size:.8rem;color:var(--ink-dim);margin-bottom:1rem;">Same distance, same 1.6s duration — four curves. The curve <em>is</em> the feeling:</p>
+    <div class="anim-demo" id="animDemo">
+      <div class="anim-row"><span class="label">linear</span><div class="anim-track"><div class="anim-dot c-linear"></div></div></div>
+      <div class="anim-row"><span class="label">expo-out</span><div class="anim-track"><div class="anim-dot c-out"></div></div></div>
+      <div class="anim-row"><span class="label">ease-in-out</span><div class="anim-track"><div class="anim-dot c-inout"></div></div></div>
+      <div class="anim-row"><span class="label">back-out (overshoot)</span><div class="anim-track"><div class="anim-dot c-back"></div></div></div>
+    </div>
+    <button class="demo-btn" id="animBtn" type="button" style="margin-top:1rem;">Play / pause</button>
+    <figcaption><code>cubic-bezier(.16,1,.3,1)</code> (expo-out) is the agency default — a confident snap that decelerates into place. The back-out curve has a control point &gt;1, so it overshoots and settles: that overshoot is what the eye reads as "tactile."</figcaption>
+  </div>
+
+  <div class="callout tip">
+    <p><strong>The two-rule heuristic that covers 90% of UI motion:</strong> use <strong>ease-out</strong> for entrances (fast start, gentle settle — the object arrives and relaxes) and <strong>ease-in</strong> for exits (it accelerates away). Reserve <strong>overshoot / spring</strong> for small, playful, low-stakes elements — buttons, toggles, toy-like UI à la Cassie Evans — never for primary content reveals, where overshoot reads as imprecise. Keep durations short: 150–400ms for UI, up to ~600ms for large hero motion.</p>
+  </div>
+
+  <figure class="figure">
+    <img src="../workings/shots/cassie-evans/01-hero.png" alt="Cassie Evans portfolio hero — pastel split layout, hanging lamp illustration, bold headline with stroked clickable keywords">
+    <figcaption><strong>Cassie Evans</strong> — the entire site is the demo of its own craft. The hanging lamp swings on a <code>CustomWiggle</code> curve, the headline's outlined keywords (<em>fun</em>, <em>talk</em>, <em>write</em>) bounce in with <code>CustomBounce</code>, and the SVG logo draws itself via <code>DrawSVGPlugin</code>. No linear tween anywhere — every motion has overshoot and weight.</figcaption>
+  </figure>
+
+  <h2 id="transitions-keyframes">2 · Transitions vs. keyframes — pick the right tool</h2>
+  <p>Before any library, CSS gives you two native primitives, and choosing wrong is the most common beginner mistake.</p>
+  <ul>
+    <li><strong><code>transition</code></strong> — animates <em>between two states</em> (A → B), triggered by a state change (<code>:hover</code>, a toggled class, a media query). Perfect for hover micro-states, reveals (resting ↔ revealed), accordions. It cannot loop and has no intermediate steps.</li>
+    <li><strong><code>@keyframes</code> + <code>animation</code></strong> — a fully authored timeline with intermediate frames (0% → 50% → 100%), that can <strong>loop</strong>, alternate, delay, and run on load with no trigger. This is for spinners, idle bobs, marquees, intro sequences.</li>
+  </ul>
+  <p><span class="ref">Robb Owen ↗</span> earns Awwwards-grade "elegant motion design" praise with <em>zero</em> animation library — just hand-rolled CSS transitions + keyframes in a single <code>main.js</code>. <span class="ref">Jhey Tompkins ↗</span> ships a single-screen bio with "7 active CSS animations detected on load" — pure keyframes, no GSAP, where a mascot blinks and idles. Proof you do not need a library to win.</p>
+
+  <pre><code>/* transition — state-to-state, the workhorse of hover/reveal */
+.card {
+  transform: translateY(0);
+  transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s ease;
+}
+.card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgb(0 0 0 / .3); }
+
+/* @keyframes — an authored, loopable timeline (no trigger needed) */
+@keyframes float {
+  0%, 100% { transform: translateY(0)   rotate(0); }
+  50%      { transform: translateY(-12px) rotate(-4deg); }
+}
+.mascot { animation: float 3s ease-in-out infinite; }</code></pre>
+
+  <div class="callout warn">
+    <p><strong>Set the resting state as the CSS default, never the animated one.</strong> If JS adds the trigger class, a no-JS or reduced-motion visitor must still see finished content — author entrances as "the <code>.in</code> class <em>adds</em> the reveal," not "the default is invisible and JS reveals it." Otherwise a script failure or a slow connection leaves your page blank.</p>
+  </div>
+
+  <h2 id="stagger">3 · Stagger &amp; entrance choreography</h2>
+  <p>Revealing ten elements simultaneously feels like a flash; revealing them <strong>40–80ms apart</strong> feels like a wave with rhythm and intent. Stagger is the cheapest way to make a reveal feel designed rather than dumped.</p>
+  <p><span class="ref">Hello Monday ↗</span> staggers <strong>column offsets</strong> so cards fade/translate in with "amplified" rhythm across an asymmetric grid. <span class="ref">Dennis Snellenberg ↗</span> uses GSAP ScrollTrigger for staggered text/line reveals on work rows. <span class="ref">Lusion ↗</span> and <span class="ref">Aristide Benoist ↗</span> both pre-split headlines into <strong>individual character spans</strong> (Lusion even duplicates glyphs — "O O O r r r y y y") for per-letter stagger and marquee effects. <span class="ref">Vercel ↗</span> renders its final CTA as individually spaced spans ("S t a r t  D e p l o y i n g") as a per-character motion hook.</p>
+
+  <div class="example">
+    <p style="font-family:var(--font-mono);font-size:.8rem;color:var(--ink-dim);margin-bottom:.9rem;">Stagger in action — replay to feel the wave:</p>
+    <div class="stag-grid" id="stagGrid">
+      <span class="stag-chip">design</span><span class="stag-chip">animate</span><span class="stag-chip">build</span>
+      <span class="stag-chip">ship</span><span class="stag-chip">refine</span><span class="stag-chip">repeat</span>
+    </div>
+    <button class="demo-btn" id="stagBtn" type="button" style="margin-top:1rem;">Replay stagger</button>
+    <figcaption>Each chip gets <code>transition-delay: index × 70ms</code>. Same animation on every chip — the offset is the entire effect.</figcaption>
+  </div>
+
+  <p>Pure CSS handles a fixed count cleanly; GSAP's <code>stagger</code> handles dynamic lists and gives you eases <em>across</em> the stagger (e.g. start fast, end slow):</p>
+  <pre><code>/* CSS: fixed list, delay = nth-child index */
+.item { opacity:0; transform:translateY(16px); transition:.5s var(--ease); }
+.item:nth-child(1){ transition-delay:0ms } .item:nth-child(2){ transition-delay:70ms }
+.item:nth-child(3){ transition-delay:140ms } /* … */
+.ready .item { opacity:1; transform:none; }</code></pre>
+  <pre><code>// GSAP: dynamic list, one line, plus easing across the stagger
+gsap.from('.item', {
+  y: 24, opacity: 0, duration: .6, ease: 'expo.out',
+  stagger: { each: 0.07, from: 'start' },   // or 'center' / 'edges' / a grid
+});
+
+// Split a headline into chars first (GSAP SplitText), then stagger them:
+const split = new SplitText('h1', { type: 'chars' });
+gsap.from(split.chars, { yPercent: 120, stagger: 0.03, ease: 'back.out(1.7)' });</code></pre>
+
+  <h2 id="spring">4 · Spring physics &amp; the feel of weight</h2>
+  <p>Bezier curves are <em>duration-based</em>: you declare "600ms with this curve." Springs are <em>physics-based</em>: you declare stiffness, damping, and mass, and the animation runs until it naturally settles. Springs feel more alive because their velocity is continuous — interrupt one mid-flight and it carries momentum into the new target instead of snapping.</p>
+  <p><span class="ref">Robin Noguier ↗</span> drives his entire scroll-hijacked slide showcase with <strong>React-Spring</strong> — "projects snap/interpolate in" with spring physics rather than linear scroll, plus <code>useTransition</code> for app-like route changes. <span class="ref">Lusion ↗</span>'s hero connector cluster reacts to the pointer with "momentum/spring motion and real-time shadow updates." <span class="ref">Josh Comeau ↗</span> — who literally teaches a course on spring physics and "whimsical animations" — uses spring-based motion and squash-and-stretch in his site's microinteractions. <span class="ref">Framer ↗</span>'s Motion library is spring-first by default.</p>
+
+  <pre><code>// Motion (the Framer Motion successor) — springs are the default transition
+import { motion } from 'motion/react';
+
+&lt;motion.div
+  initial={{ opacity: 0, y: 24 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ type: 'spring', stiffness: 320, damping: 28, mass: 1 }}
+/&gt;
+// Lower damping = more overshoot/bounce. Higher stiffness = snappier.
+// No `duration` — the spring settles when the physics say so.</code></pre>
+
+  <div class="callout tip">
+    <p><strong>Tune springs by feel, not by number.</strong> Start at <code>stiffness: 300, damping: 30</code> (a clean, barely-overshooting snap). Want bounce? Drop damping toward 15. Want it heavier/slower? Raise mass. The killer feature is <em>interruptibility</em>: a spring animating to a new target mid-flight inherits its current velocity, so rapid hover-on/hover-off never looks janky — something duration-based <code>transition</code> can't do.</p>
+  </div>
+
+  <h2 id="tooling">5 · The tooling ladder — reach down before you reach up</h2>
+  <p>The corpus reveals a clear hierarchy. Start at the cheapest tool that does the job and only climb when you genuinely need to. <span class="ref">Vercel ↗</span> publishes this as an explicit engineering rule: motion priority is <strong>CSS &gt; Web Animations API &gt; JS libs</strong>.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>1 · CSS transitions / keyframes</h3>
+      <p>Compositor-driven, zero JS, free. Covers hovers, reveals, spinners, loops, marquees. <span class="ref">Robb Owen ↗</span> &amp; <span class="ref">Jhey Tompkins ↗</span> win awards on this tier alone. <strong>Default here.</strong></p>
+    </div>
+    <div class="card">
+      <h3>2 · Web Animations API (WAAPI)</h3>
+      <p>CSS-keyframe performance with JS control (chain, pause, reverse, await <code>.finished</code>). <span class="ref">Stripe ↗</span> authors motion in "vanilla JS with no heavy library" via WAAPI. Best for orchestrated sequences without a dependency.</p>
+    </div>
+    <div class="card">
+      <h3>3 · GSAP</h3>
+      <p>The timeline workhorse: precise sequencing, ScrollTrigger, SplitText, bespoke eases, SVG morph/draw. <span class="ref">Cassie Evans ↗</span>, <span class="ref">Dennis Snellenberg ↗</span>, <span class="ref">Basement Studio ↗</span>. Reach here for complex choreography or scroll-scrubbing.</p>
+    </div>
+    <div class="card">
+      <h3>4 · Motion / React-Spring</h3>
+      <p>Declarative, spring-physics, component-state-driven, interruptible. <span class="ref">Family ↗</span>, <span class="ref">Linear ↗</span>, <span class="ref">Framer ↗</span> (Motion), <span class="ref">Robin Noguier ↗</span> (React-Spring). Best inside React/component UIs.</p>
+    </div>
+  </div>
+
+  <p style="margin-top:1.5rem;">The split in practice: <strong>agency / creative-dev portfolios lean GSAP</strong> (timeline control, scroll-scrubbing, SVG, vanilla-JS friendliness) while <strong>product / React marketing sites lean Motion</strong> (state-driven, springy, declarative). <span class="ref">Stripe ↗</span> and <span class="ref">Obys Agency ↗</span> deliberately use <em>neither</em> — "you do NOT need GSAP for everything; a small <code>requestAnimationFrame</code> loop driving the scroll-sync is enough and lighter."</p>
+
+  <pre><code>// Same fade-up entrance, three tiers — note the cost climbing:
+
+/* TIER 1 — CSS only. Free, compositor-driven, no JS. */
+.fade { opacity:0; transform:translateY(20px); transition:.6s cubic-bezier(.16,1,.3,1); }
+.fade.in { opacity:1; transform:none; }
+
+// TIER 2 — WAAPI. JS control, still no dependency.
+el.animate(
+  [{ opacity:0, transform:'translateY(20px)' }, { opacity:1, transform:'none' }],
+  { duration:600, easing:'cubic-bezier(.16,1,.3,1)', fill:'forwards' }
+);
+
+// TIER 3 — GSAP. Only when you need timelines/stagger/scrub.
+gsap.from('.fade', { y:20, opacity:0, duration:.6, ease:'expo.out', stagger:.07 });</code></pre>
+
+  <h2 id="loops">6 · Loop &amp; idle animation — keeping a page alive</h2>
+  <p>An <strong>idle/loop animation</strong> is motion that runs continuously without user input: a logo orb pulsing, illustrations bobbing, a loading shimmer, a rotating word. Used sparingly it signals "this page is alive and responsive"; overused it's a battery-draining distraction.</p>
+  <p><span class="ref">Family ↗</span> floats illustration elements with "gentle physics/parallax and idle bob animations so the hero feels alive rather than static." <span class="ref">Active Theory ↗</span> makes a single glowing logo orb the "loading/idle centerpiece" that anchors every state. <span class="ref">Hello Monday ↗</span> runs a <strong>rotating-word hero</strong> — the headline literally cycles its disciplines on a loop instead of a static tagline. <span class="ref">Lusion ↗</span> and <span class="ref">Dennis Snellenberg ↗</span> run bleeding <strong>marquee</strong> wordmarks looping off both edges.</p>
+
+  <div class="example">
+    <p style="font-family:var(--font-mono);font-size:.8rem;color:var(--ink-dim);margin-bottom:1.1rem;">Four infinite-loop primitives — all pure CSS <code>@keyframes</code>:</p>
+    <div class="loop-row">
+      <div class="loop-item"><div class="spinner"></div><span class="cap">spin (loader)</span></div>
+      <div class="loop-item"><div class="pulse"></div><span class="cap">pulse (idle orb)</span></div>
+      <div class="loop-item"><div class="bob"></div><span class="cap">bob (Family-style)</span></div>
+      <div class="loop-item"><div class="skel"></div><span class="cap">shimmer (skeleton)</span></div>
+    </div>
+    <figcaption>Each is one <code>@keyframes</code> + <code>animation: … infinite</code>. The shimmer is a moving <code>background-position</code> gradient — the canonical skeleton-loading effect.</figcaption>
+  </div>
+
+  <div class="callout warn">
+    <p><strong>Looping animation is a battery and attention tax that never stops.</strong> A perpetually spinning/pulsing element on screen burns GPU cycles every frame for as long as it's visible. Pause loops when off-screen (IntersectionObserver) or in background tabs — <span class="ref">Obys Agency ↗</span> explicitly "pauses tweens in background tabs." And never set a busy idle loop near body copy: continuous peripheral motion makes text measurably harder to read.</p>
+  </div>
+
+  <h2 id="preloaders">7 · Preloaders as craft, not apology</h2>
+  <p>A preloader is the most over-apologized-for screen on the web — but the best sites treat it as the <strong>first act of the experience</strong>, not dead time. When a site must compile shaders or warm a WebGL scene, a deliberate intro covers the work and sets the tone before the hero even arrives.</p>
+  <p><span class="ref">Lusion ↗</span> gates entry with a <strong>numeric "100" counter on black</strong> that "masks shader compile / asset load, then transitions into the live scene." <span class="ref">Obys Agency ↗</span> counts up a <code>%</code> indicator over a circular mask reveal (caught at "94" mid-load). <span class="ref">Dennis Snellenberg ↗</span> turns the loader into a personality moment: a <strong>rotating multilingual greeting</strong> ("Hello / Bonjour / Ciao / こんにちは…") that doubles as the load sequence. <span class="ref">Basement Studio ↗</span> uses a "staged loader → composite reveal" to cover WebGL warm-up "instead of a flash of unstyled content."</p>
+
+  <figure class="figure">
+    <img src="../workings/shots/lusion/01-hero.png" alt="Lusion preloader — a large '100' counter and a small white shape on a pure black screen">
+    <figcaption><strong>Lusion</strong> — the preloader <em>is</em> the brand's opening statement: a tall lining-figure "100" counter on pure black, masking shader compile and asset load. When it hits 100 it resolves into the bright, tactile 3D hero. The load isn't hidden — it's choreographed.</figcaption>
+  </figure>
+
+  <div class="callout steal">
+    <p>A real progress counter (0→100) is worth far more than a generic spinner: it converts uncertain waiting into a measurable, almost-done feeling, <em>and</em> it's a free canvas for personality (a greeting cycle, a brand mark, a count-up). The rule: only show a preloader when there's <strong>real heavy work to mask</strong> (WebGL/shaders/large media). On a fast content site, a fake preloader just inserts a delay you didn't need — ship the content instead.</p>
+  </div>
+
+  <pre><code>// A real, honest preloader: drive the counter off actual load progress,
+// then animate out. No fake timers.
+const items = [...document.images, ...customAssets];
+let loaded = 0;
+const counter = document.querySelector('.preload-num');
+
+function bump() {
+  loaded++;
+  const pct = Math.round((loaded / items.length) * 100);
+  counter.textContent = pct;           // honest 0 → 100
+  if (loaded === items.length) reveal();
+}
+items.forEach(a => a.complete ? bump() : a.addEventListener('load', bump));
+
+async function reveal() {
+  await document.querySelector('.preloader').animate(
+    [{ transform:'translateY(0)' }, { transform:'translateY(-100%)' }],
+    { duration:700, easing:'cubic-bezier(.7,0,.2,1)', fill:'forwards' }
+  ).finished;
+  startHero();                          // kick off scene only after reveal
+}</code></pre>
+
+  <h2 id="performance">8 · Performance — the 60fps contract</h2>
+  <p>Every animation is rendered 60 times a second (more on high-refresh screens). Cross the per-frame budget and you get jank — and on a portfolio, janky animation is <em>worse</em> than no animation, because it actively signals a lack of craft. The rules below are non-negotiable and the corpus is unanimous.</p>
+
+  <h3>Animate only <code>transform</code> and <code>opacity</code></h3>
+  <p><span class="ref">Stripe ↗</span> states it flatly: animate only <code>transform</code> and <code>opacity</code>, <strong>never layout properties</strong> (<code>width</code> / <code>height</code> / <code>top</code> / <code>left</code> / <code>margin</code>). Layout props trigger <em>layout → paint → composite</em> on every frame; transform and opacity skip straight to <strong>composite</strong>, handled by the GPU off the main thread. <span class="ref">Vercel ↗</span> bans "layout-triggering animation." <span class="ref">Apple ↗</span>'s discipline: "most effects are simple GPU-friendly transforms + timed easing."</p>
+
+  <pre><code>/* ❌ janky — animates layout, recalculates geometry every frame */
+.box { left: 0; transition: left .4s, width .4s; }
+.box:hover { left: 200px; width: 320px; }
+
+/* ✅ smooth — same visual result, compositor-only, never touches layout */
+.box { transform: translateX(0) scaleX(1); transition: transform .4s; }
+.box:hover { transform: translateX(200px) scaleX(1.4); }</code></pre>
+
+  <h3>Use <code>will-change</code> like a scalpel, not a sledgehammer</h3>
+  <p><code>will-change</code> promotes an element to its own GPU layer <em>ahead</em> of animating, avoiding a first-frame hitch. But every promoted layer costs memory, and blanket-applying it (<code>* { will-change: transform }</code>) exhausts GPU memory and makes things <em>slower</em>. Set it just before the animation, remove it after.</p>
+
+  <pre><code>/* Apply narrowly — ideally on hover-intent, then drop it on animationend */
+.card:hover { will-change: transform; }
+/* or in JS: add before animating, remove when .finished resolves */</code></pre>
+
+  <h3>Honor <code>prefers-reduced-motion</code> — every time</h3>
+  <p><span class="ref">Obys Agency ↗</span> proves heavy motion and fast LCP (≈1.3s) coexist: it "freezes glyph morphs and swaps slide-ins for fades" under reduced-motion, and keeps a real progress preloader. <span class="ref">Stripe ↗</span> evaluates the query at runtime. This isn't optional polish — for users with vestibular disorders, unchecked motion causes physical nausea. <code>shared.css</code> already collapses transitions/animations under reduced-motion; your JS must gate scroll-jacking, loops, and observers behind the same query.</p>
+
+  <pre><code>/* The floor every animated site must ship. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;   /* kills infinite loops */
+    transition-duration: .001ms !important;
+  }
+}</code></pre>
+  <pre><code>// JS side — gate the expensive stuff behind the same query.
+const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+if (!reduce.matches) { startLoops(); startSplitText(); startScrollScrub(); }
+reduce.addEventListener('change', () => location.reload());</code></pre>
+
+  <div class="example">
+    <p style="font-family:var(--font-mono);font-size:.8rem;color:var(--ink-dim);margin-bottom:1rem;">A correct microinteraction in miniature — transform-only, springy curve, fast active state:</p>
+    <button class="micro-btn" type="button">Hover &amp; press me</button>
+    <figcaption>Hover lifts + scales on a <code>back-out</code> curve (overshoot = tactile); <code>:active</code> snaps down in 80ms (button "obeys" instantly). Only <code>transform</code> + <code>box-shadow</code> animate — no layout, so it's compositor-cheap.</figcaption>
+  </div>
+
+  <div class="callout steal">
+    <p>The whole animation craft, distilled: <strong>delete <code>linear</code></strong> (ease-out for entrances, spring for play) → <strong>transition for state, keyframes for loops</strong> → <strong>stagger 40–80ms</strong> so reveals read as a wave → <strong>climb the tooling ladder only when CSS runs out</strong> (CSS → WAAPI → GSAP → Motion) → <strong>make the preloader the opening act</strong>, not an apology → and bind every effect to the <strong>60fps contract</strong>: transform + opacity only, surgical <code>will-change</code>, and a hard <code>prefers-reduced-motion</code> gate. Janky motion is worse than none.</p>
+  </div>
+</main>
+
+<footer class="ftr">
+  <div class="wrap">
+    <p><a href="../PLAN.html">← Back to the Build Plan</a></p>
+    <p style="margin-top:1rem;"><span class="brand">Craft Atlas</span> — synthesized from 80 live site teardowns.</p>
+  </div>
+</footer>
+
+<script>
+  // ---- easing-curve demo ----
+  const animDemo = document.getElementById('animDemo');
+  document.getElementById('animBtn').addEventListener('click', () => animDemo.classList.toggle('run'));
+  animDemo.classList.add('run');
+
+  // ---- stagger demo ----
+  const stagGrid = document.getElementById('stagGrid');
+  const chips = stagGrid.querySelectorAll('.stag-chip');
+  chips.forEach((c, i) => { c.style.transitionDelay = (i * 70) + 'ms'; });
+  function runStagger() {
+    stagGrid.classList.remove('go');
+    void stagGrid.offsetWidth;          // force reflow so the replay re-triggers
+    stagGrid.classList.add('go');
+  }
+  document.getElementById('stagBtn').addEventListener('click', runStagger);
+
+  // reveal on first view (resting state is default, so reduced-motion is safe)
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) {
+    stagGrid.classList.add('go');
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { runStagger(); io.unobserve(e.target); } });
+    }, { threshold: 0.4 });
+    io.observe(stagGrid);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UX — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* Page-local live demos only */
+    .demo-nav {
+      display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; align-items: center;
+      padding: 0.7rem 1rem; border: 1px solid var(--line);
+      border-radius: var(--r-2); background: var(--bg-2);
+    }
+
+    /* Skip-link live demo */
+    .skip-demo { position: relative; min-height: 3.4rem; }
+    .skip-demo .skip-link {
+      position: absolute; left: 0.5rem; top: 0.5rem;
+      transform: translateY(-200%); opacity: 0;
+      background: var(--accent); color: var(--accent-ink);
+      font-family: var(--font-mono); font-weight: 600; font-size: 0.8rem;
+      padding: 0.4rem 0.8rem; border-radius: var(--r-1);
+      transition: transform 0.18s var(--ease), opacity 0.18s var(--ease);
+    }
+    .skip-demo .skip-link:focus {
+      transform: translateY(0); opacity: 1; text-decoration: none;
+    }
+    .skip-demo p { margin-top: 0.4rem; color: var(--ink-dim); font-size: 0.85rem; }
+
+    /* Mega-menu morph demo */
+    .morph { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .morph button {
+      font: inherit; font-size: 0.85rem; color: var(--ink-soft);
+      background: var(--bg-3); border: 1px solid var(--line);
+      border-radius: var(--r-pill); padding: 0.4rem 0.9rem; cursor: pointer;
+      transition: border-color 0.18s var(--ease), color 0.18s var(--ease);
+    }
+    .morph button:hover, .morph button[aria-expanded="true"] {
+      color: var(--ink); border-color: var(--accent);
+    }
+    .morph-panel {
+      margin-top: 0.8rem; overflow: hidden;
+      max-height: 0; opacity: 0;
+      transition: max-height 0.45s var(--ease), opacity 0.3s var(--ease), padding 0.45s var(--ease);
+      border: 1px solid transparent; border-radius: var(--r-2);
+    }
+    .morph-panel[data-open] {
+      max-height: 240px; opacity: 1; padding: 1rem;
+      border-color: var(--line); background: var(--bg-2);
+    }
+    .morph-panel .mp-row { display: grid; gap: 0.15rem; padding: 0.4rem 0; }
+    .morph-panel .mp-row strong { color: var(--ink); font-size: 0.9rem; }
+    .morph-panel .mp-row span { color: var(--ink-dim); font-size: 0.8rem; }
+
+    /* Empty-state demo */
+    .empty-state {
+      text-align: center; padding: 1.6rem 1rem;
+      border: 1px dashed var(--line); border-radius: var(--r-3);
+      background: var(--bg-2);
+    }
+    .empty-state .es-glyph {
+      font-family: var(--font-mono); font-size: 1.8rem; color: var(--ink-faint);
+    }
+    .empty-state h4 { margin-top: 0.6rem; color: var(--ink); }
+    .empty-state p { color: var(--ink-dim); font-size: 0.86rem; margin-top: 0.3rem; }
+    .empty-state .es-cta {
+      display: inline-block; margin-top: 0.9rem;
+      background: var(--accent); color: var(--accent-ink);
+      font-weight: 600; font-size: 0.85rem;
+      padding: 0.45rem 1rem; border-radius: var(--r-pill);
+    }
+    .es-cta:hover { background: var(--accent-soft); text-decoration: none; }
+    kbd {
+      font-family: var(--font-mono); font-size: 0.78em;
+      background: var(--bg-3); border: 1px solid var(--line);
+      border-bottom-width: 2px; border-radius: var(--r-1);
+      padding: 0.05em 0.4em; color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="UI-DESIGN.html">UI Design</a>
+      <a href="UX.html" aria-current="page">UX</a>
+      <a href="TYPOGRAPHY.html">Typography</a>
+      <a href="COLOR.html">Color</a>
+      <a href="STYLING.html">Styling</a>
+      <a href="MOTIONS.html">Motion</a>
+      <a href="ANIMATIONS.html">Animation</a>
+      <a href="INTERACTIONS.html">Interaction</a>
+      <a href="SPATIAL.html">3D / Spatial</a>
+      <a href="MINI-GAMES.html">Mini-Games</a>
+      <a href="STATE-MANAGEMENT.html">State</a>
+      <a href="NEXTJS.html">Meta-Framework</a>
+      <a href="../references/PORTFOLIO.html">Portfolio</a>
+      <a href="../references/TOP-LIST.html">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+  <main class="wrap" id="main">
+    <p class="kicker">Craft Atlas · 04</p>
+    <h1>User Experience: the architecture of "where am I, and where next?"</h1>
+    <p class="lede">UX is not decoration applied at the end. It is the structure underneath — how a site is divided, named, navigated, and recovered from when things break. Mined from 80 live teardowns, here is what elite sites actually do.</p>
+
+    <nav class="toc" aria-label="On this page">
+      <ol>
+        <li><a href="#ia">1 · Information architecture</a></li>
+        <li><a href="#nav">2 · Navigation patterns</a></li>
+        <li><a href="#wayfinding">3 · Wayfinding &amp; orientation</a></li>
+        <li><a href="#first">4 · First impression &amp; onboarding</a></li>
+        <li><a href="#content">5 · Content design</a></li>
+        <li><a href="#perf">6 · Performance as UX</a></li>
+        <li><a href="#a11y">7 · Accessibility is the baseline</a></li>
+        <li><a href="#states">8 · Error &amp; empty states</a></li>
+        <li><a href="#checklist">9 · The steal-this checklist</a></li>
+      </ol>
+    </nav>
+
+    <!-- ============================================================= -->
+    <section id="ia">
+      <h2>1 · Information architecture</h2>
+      <p>Before a single pixel of style, every great site answers one question: <em>what are the chunks, and in what order do they reveal?</em> Across our teardowns, the winning IA is almost always a <strong>linear scroll narrative built from self-contained bands</strong> — not a sprawling sitemap you have to hold in your head.</p>
+
+      <p><span class="ref">Linear ↗</span> structures its entire homepage as a <strong>numbered chapter system</strong>: hero → logo wall → thesis → five numbered capability sections (1.0–5.0), each with sub-feature tabs (1.1 Agent, 1.2 Triage…) → changelog → quotes → CTA → mega-footer. The numbering <em>is</em> the IA — it tells you exactly how deep you are and how much is left. <span class="ref">Stripe ↗</span> runs a different but equally legible spine: a <strong>top-of-funnel ladder</strong> — hero claim → social-proof logo wall → 6-proposition accordion → stat band (135+ currencies, $1.9T volume, 99.999% uptime) → segmented Enterprise/Startups/Platforms tabs → developer section → news carousel → dual CTA → mega-footer.</p>
+
+      <figure class="figure">
+        <img src="../workings/shots/stripe/04-full.png" alt="Full-page capture of stripe.com showing the funnel ladder: hero, logo wall, accordion, stat band, segmented tabs, and a dense mega-footer.">
+        <figcaption><strong>Stripe</strong> — the full-page IA reads as a deliberate funnel. Each band is one idea, ordered claim → proof → depth → conversion. Density rises only at the mega-footer (the sitemap), never in the body.</figcaption>
+      </figure>
+
+      <p>Three IA principles recur across the reference set:</p>
+      <div class="grid">
+        <div class="card">
+          <h4>One idea per band</h4>
+          <p><span class="ref">Apple ↗</span> uses full-bleed stacked bands with deliberately low density — "one idea per screen." The page is long but never crowded; whitespace separates concepts so nothing competes.</p>
+        </div>
+        <div class="card">
+          <h4>Semantic heading map</h4>
+          <p><span class="ref">Apple ↗</span> reserves h1 for the brand anchor, h2 for marquee products, h3 for secondary tiles — a clean scannable outline a screen reader can traverse top-to-bottom.</p>
+        </div>
+        <div class="card">
+          <h4>Dense only where expected</h4>
+          <p><span class="ref">Linear ↗</span> keeps marketing copy sparse but makes the embedded app mockups intentionally dense — density signals product depth, and the user opts into it.</p>
+        </div>
+      </div>
+
+      <div class="callout steal">
+        <p><strong>The mega-footer is your sitemap, not your nav.</strong> Nearly every reference site — <span class="ref">Linear ↗</span>, <span class="ref">Stripe ↗</span>, <span class="ref">Apple ↗</span>, <span class="ref">Arc ↗</span> — keeps the top nav lean and dumps full breadth into a dense multi-column footer. The header is for the 3–5 things most people want; the footer catches everything else without cluttering the chrome.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="nav">
+      <h2>2 · Navigation patterns</h2>
+      <p>A navigation bar is a promise about scope. The teardowns cluster into three honest archetypes — and the best sites pick one deliberately rather than defaulting to a hamburger.</p>
+
+      <h3>Pattern A — Lean text nav (brochure confidence)</h3>
+      <p><span class="ref">Things ↗</span> ships the most confident nav we found: wordmark + three text links (Features, Support, Blog). No hamburger, no mega-menu, no sticky-on-scroll transformation. Critically, the download CTAs are <strong>deliberately not in the nav</strong> — they live in a dedicated mid-page "Get Things" section, keeping the chrome uncluttered. The nav assumes you came to learn, get help, or read, and pushes the purchase decision into the body. <span class="ref">Sara Soueidan ↗</span> does the same with honest underlined text links in a real <code>&lt;nav aria-label="Main"&gt;</code> — no hamburger on desktop, no mega-menu.</p>
+
+      <h3>Pattern B — Mega-menu (when breadth is real)</h3>
+      <p>When you genuinely have dozens of destinations, use categorized panels — but make them <em>real ARIA buttons</em>, not hover traps. <span class="ref">Stripe ↗</span>, <span class="ref">Vercel ↗</span>, <span class="ref">Apple ↗</span>, <span class="ref">Linear ↗</span> and <span class="ref">Family ↗</span> all expose Products/Resources/Solutions as <code>aria-expanded</code> buttons. The Stripe nav is the famous one: <strong>a single morphing dropdown panel that tweens its width/height/position between menu items</strong> rather than swapping four discrete dropdowns — moving Products→Solutions feels like one fluid surface.</p>
+
+      <div class="example">
+        <p style="color:var(--ink-soft);font-size:0.9rem;margin-bottom:0.6rem;">Click a trigger — the panel <em>morphs open</em> in place instead of popping a separate menu (the Stripe move). The triggers are real <code>aria-expanded</code> buttons you can Tab to.</p>
+        <div class="morph">
+          <button type="button" aria-expanded="false" data-target="prod">Products</button>
+          <button type="button" aria-expanded="false" data-target="res">Resources</button>
+          <button type="button" aria-expanded="false" data-target="sol">Solutions</button>
+        </div>
+        <div class="morph-panel" id="morph-panel" role="region" aria-label="Menu detail"></div>
+        <figcaption>Mega-menu-lite: each row carries a <strong>title + one-line description</strong> (the Family pattern) so the menu teaches, not just links.</figcaption>
+      </div>
+
+      <p><span class="ref">Family ↗</span> sharpens this: dropdowns are content-rich (ConnectKit, Family Account, Blog, Changelog, FAQs) with a title <em>and</em> a one-line description per item — "mega-menu-lite." The menu becomes a tiny landing page.</p>
+
+      <h3>Pattern C — Sticky cross-sell / contextual ribbon</h3>
+      <p><span class="ref">Arc ↗</span> pins a "Meet Dia" promo strip directly under the nav that rides along on scroll — keeping a cross-sell CTA permanently visible <strong>without a modal</strong>. <span class="ref">Vercel ↗</span> does the restrained version: an event ribbon styled as a contextual chip ("Ship 26 is coming…"), not an intrusive bar. The lesson: persistent promotion is fine if it's a thin companion to the nav — not an interstitial that blocks the page.</p>
+
+      <pre><code>/* The transparent-over-hero sticky nav (Linear, Vercel pattern).
+   Backdrop-blur appears only once you scroll past the hero. */
+.site-header {
+  position: sticky;
+  top: 0;
+  background: transparent;
+  transition: background .25s ease, border-color .25s ease;
+}
+.site-header[data-scrolled] {
+  background: rgba(11, 12, 14, .72);
+  backdrop-filter: saturate(150%) blur(14px);
+  border-bottom: 1px solid var(--line);
+}</code></pre>
+
+      <pre><code>// Toggle the scrolled state with a sentinel + IntersectionObserver
+// (cheaper and jank-free vs. a scroll listener).
+const header = document.querySelector('.site-header');
+const sentinel = document.querySelector('#hero-sentinel');
+
+new IntersectionObserver(([entry]) => {
+  header.toggleAttribute('data-scrolled', !entry.isIntersecting);
+}, { rootMargin: '-1px 0px 0px 0px', threshold: 0 }).observe(sentinel);</code></pre>
+
+      <div class="callout warn">
+        <p><strong>Anti-pattern: the hover-only mega-menu.</strong> A dropdown that opens on hover with no keyboard or click path strands touch and keyboard users entirely. Every reference site uses <code>aria-expanded</code> buttons you can <kbd>Tab</kbd> to and <kbd>Enter</kbd> on. If it only works with a mouse, it's broken for a large slice of your visitors.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="wayfinding">
+      <h2>3 · Wayfinding &amp; orientation</h2>
+      <p>Wayfinding answers "where am I?" mid-scroll. The strongest sites bake orientation into the content rather than relying on a breadcrumb trail.</p>
+
+      <ul>
+        <li><strong>Numbered chapters</strong> — <span class="ref">Linear ↗</span> uses 1.0–5.0 capability sections so position is always explicit; wayfinding "comes from the numbered chapter system rather than nav anchors."</li>
+        <li><strong>Eyebrow labels</strong> — <span class="ref">Josh Comeau ↗</span> introduces every section with a small uppercase eyebrow (ARTICLES AND TUTORIALS, BROWSE BY CATEGORY, POPULAR CONTENT). <span class="ref">Family ↗</span> puts a green "Simple" pill above headlines to categorize. The eyebrow is a cheap, scannable "you are here" marker.</li>
+        <li><strong>A fixed identity rail</strong> — <span class="ref">Brittany Chiang ↗</span>'s signature split-screen pins name, role, and in-page nav in a sticky left column while content scrolls past on the right. The identity never leaves the viewport, so you always know whose site you're on and what the sections are.</li>
+        <li><strong>An anchored focal point</strong> — <span class="ref">Active Theory ↗</span> has almost no DOM content; wayfinding "relies on motion and the persistent center orb as an anchor rather than breadcrumbs."</li>
+      </ul>
+
+      <figure class="figure">
+        <img src="../workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang portfolio: a fixed left column pins name, role, tagline and an in-page nav with the active section highlighted; the right column holds scrolling content.">
+        <figcaption><strong>Brittany Chiang</strong> — the sticky left rail is persistent wayfinding. Its in-page nav highlights the active section (an <code>aria-current</code> / scroll-spy pattern) so the reader's position is always legible.</figcaption>
+      </figure>
+
+      <p>That active-section highlight is a scroll-spy. The robust, broadly-supported version is a tiny <code>IntersectionObserver</code>:</p>
+
+      <pre><code>// Scroll-spy: mark the in-view section's nav link as current.
+const links = new Map(
+  [...document.querySelectorAll('.rail-nav a')]
+    .map(a => [a.getAttribute('href').slice(1), a])
+);
+
+const spy = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (!e.isIntersecting) continue;
+    links.forEach(a => a.removeAttribute('aria-current'));
+    links.get(e.target.id)?.setAttribute('aria-current', 'true');
+  }
+}, { rootMargin: '-45% 0px -45% 0px' });  // trigger near viewport center
+
+document.querySelectorAll('main section[id]').forEach(s => spy.observe(s));</code></pre>
+
+      <div class="callout tip">
+        <p>Pair scroll-spy with <code>scroll-margin-top</code> on your headings (shared.css already sets <code>5.5rem</code>) so anchor jumps land <em>below</em> the sticky nav, not hidden behind it. This one property is the difference between a polished and a broken anchor-link experience.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="first">
+      <h2>4 · First impression &amp; onboarding</h2>
+      <p>You get one frame to establish what kind of place this is. The teardowns show two opposite — both valid — strategies.</p>
+
+      <h3>Strategy 1 — Instant content (credibility through speed)</h3>
+      <p><span class="ref">Sara Soueidan ↗</span> loads instantly with a 100% system-font stack — zero web-font requests, zero FOUT, "perfect rendering everywhere." For a content site, the fastest possible first paint <em>is</em> the first impression: it says "I respect your time." <span class="ref">Things ↗</span> and <span class="ref">Apple ↗</span> similarly front-load the single most important idea above the fold and let you scroll into depth.</p>
+
+      <h3>Strategy 2 — The crafted preloader (personality moment)</h3>
+      <p>For experiential sites, a loader buys asset-load time <em>and</em> sets tone. <span class="ref">Dennis Snellenberg ↗</span> cycles a multilingual greeting sequence ("Hello / Bonjour / स्वागत हे / Ciao / Olá…") — nine <code>h2</code>s that double as a loading counter and a personality moment. <span class="ref">Active Theory ↗</span> makes the brand orb itself the loading/idle centerpiece, so the very first frame is already the experience.</p>
+
+      <div class="callout warn">
+        <p><strong>Pitfall: the loader that's slower than the content.</strong> A preloader is only justified if real work is happening behind it (WebGL scene compile, heavy media). On a content site, an artificial 2-second intro is a tax you charge every returning visitor. Gate it behind <code>prefers-reduced-motion</code> and skip it on repeat loads.</p>
+      </div>
+
+      <pre><code>// Honest preloader: show it only while assets actually load,
+// respect motion prefs, and never block repeat visits.
+const seen = sessionStorage.getItem('intro-seen');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (seen || reduced) {
+  document.documentElement.dataset.intro = 'skip';
+} else {
+  await Promise.all([
+    document.fonts.ready,
+    ...heavyAssets.map(load),   // your real load promises
+  ]);
+  sessionStorage.setItem('intro-seen', '1');
+  document.documentElement.dataset.intro = 'done';
+}</code></pre>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="content">
+      <h2>5 · Content design</h2>
+      <p>Content design is UX — the words <em>are</em> the interface. The teardowns reward two moves repeatedly.</p>
+
+      <p><strong>Two-tone emphasis instead of a second font.</strong> <span class="ref">Linear ↗</span> renders the first clause of a heading in bright white and the continuation in muted gray within the <em>same</em> <code>h2</code> ("A new species of product tool." bright, the rest dimmed) — emphasis without a second typeface or hue. It directs the eye to the claim and demotes the supporting clause in one element.</p>
+
+      <pre><code>&lt;!-- One heading, two emphasis levels — no extra font, no color hue --&gt;
+&lt;h2 class="lede-heading"&gt;
+  &lt;span class="hot"&gt;A new species of product tool.&lt;/span&gt;
+  Built for how software is designed and shipped today.
+&lt;/h2&gt;
+
+&lt;style&gt;
+  .lede-heading { color: var(--ink-dim); }   /* continuation dims back */
+  .lede-heading .hot { color: var(--ink); }  /* claim stays bright     */
+&lt;/style&gt;</code></pre>
+
+      <p><strong>Descriptions that teach inside navigation.</strong> <span class="ref">Family ↗</span> and <span class="ref">Stripe ↗</span> never ship a bare link list — each destination gets a one-line description so the menu itself answers "is this the thing I want?" before the click. This is content design doing wayfinding's job.</p>
+
+      <div class="callout steal">
+        <p><strong>Write labels for strangers, not insiders.</strong> <span class="ref">Things ↗</span> labels its nav "Features / Support / Blog" — verbs of intent, not internal product names. The test: a first-time visitor should predict what's behind every nav item without clicking. If a label needs a tooltip to be understood, it's the wrong label.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="perf">
+      <h2>6 · Performance as UX</h2>
+      <p>Speed is not a separate engineering concern — it is felt as quality. Slow is a UX bug. The teardowns treat performance as a design constraint.</p>
+
+      <ul>
+        <li><strong>Self-hosted variable fonts.</strong> <span class="ref">Vercel ↗</span> ships one variable family (Geist Sans + Geist Mono) as self-hosted woff2 — one typeface covers display <em>and</em> mono via weight + tracking, cutting requests. <span class="ref">Linear ↗</span> does the same with Inter Variable.</li>
+        <li><strong>The zero-font extreme.</strong> <span class="ref">Sara Soueidan ↗</span> loads <em>no</em> web fonts at all — a deliberate "performance + resilience decision (zero font requests, zero FOUT, perfect rendering everywhere)."</li>
+        <li><strong>Lazy-load below-the-fold media.</strong> <span class="ref">Dennis Snellenberg ↗</span> ships vanilla-lazyload so off-screen imagery never competes with the first paint.</li>
+        <li><strong>GPU-only motion.</strong> Per <span class="ref">Vercel ↗</span>'s own published guidelines: motion priority is CSS &gt; Web Animations API &gt; JS libs; animate only <code>transform</code>/<code>opacity</code>, never layout-triggering properties, no gratuitous autoplay.</li>
+      </ul>
+
+      <pre><code>&lt;!-- Below-the-fold images: native lazy + explicit dimensions kill CLS --&gt;
+&lt;img src="case-study.webp" alt="…"
+     loading="lazy" decoding="async"
+     width="1200" height="675" /&gt;
+
+&lt;!-- The ONE hero image gets the opposite treatment: load it eagerly --&gt;
+&lt;img src="hero.webp" alt="…" fetchpriority="high" /&gt;</code></pre>
+
+      <div class="callout tip">
+        <p>Always set <code>width</code>/<code>height</code> (or <code>aspect-ratio</code>) on media. The reserved box prevents Cumulative Layout Shift — content jumping as images arrive is the most common, most jarring perceived-performance failure, and it's free to fix.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="a11y">
+      <h2>7 · Accessibility is the baseline</h2>
+      <p>The reference-class sites treat a11y as structure, not a plugin. The clearest tell is the <strong>skip link as the literal first DOM node</strong>.</p>
+
+      <p><span class="ref">Linear ↗</span> includes an accessible "Skip to content" link as the first focusable element ("good a11y discipline"). <span class="ref">Sara Soueidan ↗</span> goes furthest: a skip link is "the very first element in the DOM," followed by real ARIA-labelled landmarks — "accessibility baked into structure, not bolted on." <span class="ref">Vercel ↗</span> ships a skip-to-content link too.</p>
+
+      <div class="example skip-demo">
+        <a href="#main" class="skip-link">Skip to content</a>
+        <p>Click into this box, then press <kbd>Tab</kbd> — the skip link slides in from off-screen. It's invisible until focused, then it's the first stop for keyboard users.</p>
+      </div>
+
+      <pre><code>&lt;body&gt;
+  &lt;a class="skip-link" href="#main"&gt;Skip to content&lt;/a&gt;
+  &lt;header&gt;…nav…&lt;/header&gt;
+  &lt;main id="main"&gt;…&lt;/main&gt;
+&lt;/body&gt;
+
+&lt;style&gt;
+  .skip-link {
+    position: absolute; left: .5rem; top: .5rem;
+    transform: translateY(-200%);   /* off-screen but focusable */
+    transition: transform .15s ease;
+  }
+  .skip-link:focus { transform: translateY(0); }  /* reveal on focus */
+&lt;/style&gt;</code></pre>
+
+      <p>Beyond the skip link, the patterns that recur:</p>
+      <ul>
+        <li><strong>Never use color as the only signifier.</strong> <span class="ref">Sara Soueidan ↗</span> keeps links black, differentiated by underline not hue — "so color is never the sole signifier."</li>
+        <li><strong>Real landmarks.</strong> Every nav is a labelled <code>&lt;nav aria-label="…"&gt;</code>; sections are <code>region</code>s with ARIA headings (<span class="ref">Brittany Chiang ↗</span>).</li>
+        <li><strong>Visible focus + keyboard paths.</strong> <code>focus-visible</code> outlines and keyboard-operable skip / back-to-top anchors (<span class="ref">Sara Soueidan ↗</span>) — "microinteractions serve accessibility, not spectacle."</li>
+        <li><strong>Respect <code>prefers-reduced-motion</code>.</strong> shared.css disables animation under the query; honor it for every loader and scroll effect.</li>
+      </ul>
+
+      <div class="callout warn">
+        <p><strong>Pitfall: ARIA theater.</strong> Sprinkling <code>role</code> and <code>aria-*</code> onto <code>&lt;div&gt;</code>s does not make a site accessible — and often makes it worse. The reference sites use <em>real</em> semantic elements (<code>nav</code>, <code>main</code>, <code>button</code>, headings) first, and add ARIA only to fill genuine gaps. A native <code>&lt;button&gt;</code> beats <code>&lt;div role="button"&gt;</code> every time.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="states">
+      <h2>8 · Error &amp; empty states</h2>
+      <p>The forgotten screens — empty lists, failed loads, 404s, first-run states — are where polish is proven. The teardowns show the discipline of <strong>states that carry their own way out</strong>.</p>
+
+      <p><span class="ref">Stripe ↗</span>'s prev/next carousel controls ship "proper disabled states on the first slide" — the control communicates its own boundary instead of failing silently. The same principle scales to every dead-end: an empty or error state should explain <em>what</em>, <em>why</em>, and <em>the next action</em>.</p>
+
+      <div class="example">
+        <div class="empty-state">
+          <div class="es-glyph" aria-hidden="true">⌁</div>
+          <h4>No projects yet</h4>
+          <p>Your work will show up here. Start by importing a repository or creating one from a template.</p>
+          <a class="es-cta" href="#states">Create your first project</a>
+        </div>
+        <figcaption>A complete empty state: an icon, a plain-language line that reframes "nothing here" as "here's what goes here," and a single primary action — never a dead end.</figcaption>
+      </div>
+
+      <p>The anatomy the strong examples share:</p>
+      <table>
+        <thead>
+          <tr><th>State</th><th>Must answer</th><th>Reference move</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Empty</td><td>"What goes here + how do I fill it?"</td><td>One icon + reframed line + single primary CTA</td></tr>
+          <tr><td>Disabled</td><td>"Why can't I act?"</td><td><span class="ref">Stripe ↗</span> disabled carousel arrow at the boundary</td></tr>
+          <tr><td>Error / 404</td><td>"What broke + a way back"</td><td>Keep the nav + a clear "back to home" anchor (the <span class="ref">Sara Soueidan ↗</span> back-to-top discipline applied to dead ends)</td></tr>
+          <tr><td>Loading</td><td>"Is it working?"</td><td><span class="ref">Dennis Snellenberg ↗</span> greeting counter doubles as honest progress</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout steal">
+        <p><strong>Every dead end keeps the chrome.</strong> A 404 or error page that strips the nav traps the user. Keep the header and footer sitemap on error screens — the <span class="ref">Arc ↗</span> / <span class="ref">Linear ↗</span> mega-footer is a built-in escape hatch from <em>any</em> broken state. The cheapest error recovery is the navigation you already built.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section id="checklist">
+      <h2>9 · The steal-this checklist</h2>
+      <p>A scannable pass to run against any page before you ship it.</p>
+
+      <div class="grid">
+        <div class="card">
+          <h4>Architecture</h4>
+          <ul>
+            <li>One idea per band (Apple)</li>
+            <li>Clean h1→h2→h3 outline (Apple)</li>
+            <li>Breadth lives in the footer, not the nav</li>
+            <li>Density only where users opt in (Linear mockups)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Navigation &amp; wayfinding</h4>
+          <ul>
+            <li>Pick one nav archetype on purpose (Things vs Stripe)</li>
+            <li><code>aria-expanded</code> buttons, not hover traps</li>
+            <li>Eyebrow labels or numbered chapters for position</li>
+            <li>Scroll-spy <code>aria-current</code> + <code>scroll-margin-top</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Performance &amp; a11y</h4>
+          <ul>
+            <li>One self-hosted variable font (Vercel / Linear)</li>
+            <li>Skip link as the first DOM node (Sara Soueidan)</li>
+            <li><code>width</code>/<code>height</code> on every image (no CLS)</li>
+            <li>Honor <code>prefers-reduced-motion</code> on loaders</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>States</h4>
+          <ul>
+            <li>Empty = icon + reframed line + one CTA</li>
+            <li>Disabled controls show their boundary (Stripe)</li>
+            <li>404/error keeps the nav + footer escape hatch</li>
+            <li>Loaders are honest, skippable, reduced-motion-safe</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ftr">
+    <div class="wide">
+      <p><span class="brand">◆ Craft Atlas</span></p>
+      <p>UX — information architecture, navigation, wayfinding, onboarding, content design, performance-as-UX, accessibility, and error/empty states. Synthesized from 80 live site teardowns.</p>
+      <p><a href="../PLAN.html">← Back to the Build Plan</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // Mega-menu morph demo — a single morphing panel (the Stripe move)
+    (function () {
+      const data = {
+        prod: [
+          ['Payments', 'Accept cards, wallets, and bank transfers'],
+          ['Billing', 'Subscriptions and recurring revenue'],
+          ['Connect', 'Payouts for platforms and marketplaces'],
+        ],
+        res: [
+          ['Docs', 'Guides, API reference, and SDKs'],
+          ['Changelog', 'What shipped this week'],
+          ['Support', 'Help center and contact'],
+        ],
+        sol: [
+          ['Enterprise', 'Scale, compliance, and SLAs'],
+          ['Startups', 'Get to revenue faster'],
+          ['Platforms', 'Embed payments in your product'],
+        ],
+      };
+      const panel = document.getElementById('morph-panel');
+      const btns = document.querySelectorAll('.morph button');
+
+      const render = (key) => {
+        panel.innerHTML = data[key]
+          .map(([t, d]) => '<div class="mp-row"><strong>' + t + '</strong><span>' + d + '</span></div>')
+          .join('');
+      };
+
+      btns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const isOpen = btn.getAttribute('aria-expanded') === 'true';
+          btns.forEach((b) => b.setAttribute('aria-expanded', 'false'));
+          if (isOpen) {
+            panel.removeAttribute('data-open');
+            return;
+          }
+          btn.setAttribute('aria-expanded', 'true');
+          render(btn.dataset.target);
+          panel.setAttribute('data-open', '');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

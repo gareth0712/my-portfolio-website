@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+# --- Research media: heavy binaries kept local (see research/RESEARCH-SPEC.md) ---
+# Full-page screenshots (~94MB) and source WebM clips (~47MB) are excluded to keep the repo slim.
+# Compressed GIF previews + hero/mid/lower screenshots ARE committed so the Craft Atlas pages render.
+research/workings/shots/**/04-full.png
+research/workings/clips/*.webm

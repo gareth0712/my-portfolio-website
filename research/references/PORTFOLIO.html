@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Portfolio Field Guide — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,wght@0,400;0,560;1,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../best-practices/shared.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="../best-practices/UI-DESIGN.html">UI Design</a>
+      <a href="../best-practices/UX.html">UX</a>
+      <a href="../best-practices/TYPOGRAPHY.html">Typography</a>
+      <a href="../best-practices/COLOR.html">Color</a>
+      <a href="../best-practices/STYLING.html">Styling</a>
+      <a href="../best-practices/MOTIONS.html">Motion</a>
+      <a href="../best-practices/ANIMATIONS.html">Animation</a>
+      <a href="../best-practices/INTERACTIONS.html">Interaction</a>
+      <a href="../best-practices/SPATIAL.html">3D / Spatial</a>
+      <a href="../best-practices/MINI-GAMES.html">Mini-Games</a>
+      <a href="../best-practices/STATE-MANAGEMENT.html">State</a>
+      <a href="../best-practices/NEXTJS.html">Meta-Framework</a>
+      <a href="PORTFOLIO.html" aria-current="page">Portfolio</a>
+      <a href="TOP-LIST.html">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+  <main class="wide">
+    <div class="hero">
+      <span class="kicker">Craft Atlas · Reference / Portfolios</span>
+      <h1>Developer Portfolio Field Guide — curated &amp; ranked.</h1>
+      <p class="lede">A quality-filtered shortlist of the best developer / design-engineer portfolio sites, derived from hands-on teardowns. Each entry was loaded live, inspected at the DOM/asset level, and screenshotted — ranked by craft you can learn from, not fame.</p>
+    </div>
+
+    <nav class="toc" aria-label="On this page">
+      <ol>
+        <li><a href="#how">1 · How to read this</a></li>
+        <li><a href="#ranked">2 · The ranked table (30 sites)</a></li>
+        <li><a href="#tiers">3 · Tiers — why each sits where it does</a></li>
+        <li><a href="#patterns">4 · Patterns common to great dev portfolios</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="how">1 · How to read this</h2>
+    <p>This is <strong>curated, not a dump.</strong> The well-known list <a href="https://github.com/emmabostian/developer-portfolios">emmabostian/developer-portfolios</a> is a raw, unranked firehose — hundreds of links, most generic, no signal on which are actually worth studying. What follows is the opposite: the standouts that survived a real teardown, ranked by craft you can learn from.</p>
+    <ul>
+      <li><strong>"Standout craft"</strong> = the one thing this site does better than almost anyone.</li>
+      <li><strong>"Best for learning…"</strong> = what skill/pattern you'd open it to study.</li>
+      <li><strong>Brutal-honesty rule:</strong> a few entries are famous but not worth deep study (template-grade, or the live site no longer matches its reputation). Those are flagged explicitly and sit lower or in "Notable but niche."</li>
+      <li><strong>Reachability caveats</strong> are called out inline. Five targets were down/stubbed at teardown time (<code>aprilzero</code>, <code>gao.show</code>, <code>gianmarco.xyz</code>, <code>calebbrown.dev</code>, <code>wei-gao</code>); see their files for the forensic detail.</li>
+    </ul>
+
+    <h2 id="ranked">2 · The ranked table</h2>
+    <p>Ranked by <em>craft you can learn from</em>. The <strong>Teardown</strong> column links to the full DOM/stack/motion write-up for each site.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Portfolio</th>
+          <th>URL</th>
+          <th>Standout craft</th>
+          <th>Best for learning…</th>
+          <th>Teardown</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td><span class="ref">Brittany Chiang</span></td><td><a href="https://brittanychiang.com">brittanychiang.com</a></td><td>The reference dev-portfolio: sticky split-screen, scroll-spy nav, cursor spotlight, a11y as a feature</td><td>The canonical "calm engineer" single-page layout</td><td><a href="../workings/brittany-chiang.md">brittany-chiang.md</a></td></tr>
+        <tr><td>2</td><td><span class="ref">Cassie Evans</span></td><td><a href="https://www.cassie.codes">cassie.codes</a></td><td>The site <em>is</em> the demo reel — GSAP physics motion + hand-drawn SVG, zero stock</td><td>Performing skill instead of describing it</td><td><a href="../workings/cassie-evans.md">cassie-evans.md</a></td></tr>
+        <tr><td>3</td><td><span class="ref">Josh Comeau</span></td><td><a href="https://www.joshwcomeau.com">joshwcomeau.com</a></td><td>Homepage is a live demo of the whimsical craft it teaches; modern RSC stack, no template smell</td><td>"Prove, don't claim" + correct dark-mode/perf</td><td><a href="../workings/josh-comeau.md">josh-comeau.md</a></td></tr>
+        <tr><td>4</td><td><span class="ref">Dennis Snellenberg</span></td><td><a href="https://dennissnellenberg.com">dennissnellenberg.com</a></td><td>Award-tier from motion alone: buttery transitions, magnetic links, photo-matched-to-UI palette</td><td>High-end freelancer motion + microinteraction budget</td><td><a href="../workings/dennis-snellenberg.md">dennis-snellenberg.md</a></td></tr>
+        <tr><td>5</td><td><span class="ref">Sara Soueidan</span></td><td><a href="https://www.sarasoueidan.com">sarasoueidan.com</a></td><td>Flawless semantic structure + world-class type; the DOM itself is the credibility</td><td>Accessibility-first, system-font, whitespace-as-hierarchy</td><td><a href="../workings/sara-soueidan.md">sara-soueidan.md</a></td></tr>
+        <tr><td>6</td><td><span class="ref">Henry Heffernan</span></td><td><a href="https://henryheffernan.com">henryheffernan.com</a></td><td>A working 90s OS rendered onto a 3D CRT — real React UI on a screen mesh</td><td>Diegetic IA + boot-gate, with a11y DOM kept underneath</td><td><a href="../workings/henry-heffernan.md">henry-heffernan.md</a></td></tr>
+        <tr><td>7</td><td><span class="ref">Lee Robinson</span></td><td><a href="https://leerob.com">leerob.com</a></td><td>Throws out the whole playbook: 3 paragraphs of serif prose, nouns are the links</td><td>Radical reductive "bio-as-homepage" confidence</td><td><a href="../workings/lee-robinson.md">lee-robinson.md</a></td></tr>
+        <tr><td>8</td><td><span class="ref">Tim Roussilhe</span></td><td><a href="https://timroussilhe.com">timroussilhe.com</a></td><td>Navigation <em>is</em> a WebGL portal that morphs screens into letterforms</td><td>DOM-synced shaders, scroll-velocity uniforms (advanced)</td><td><a href="../workings/tim-roussilhe.md">tim-roussilhe.md</a></td></tr>
+        <tr><td>9</td><td><span class="ref">Paul Stamatiou</span></td><td><a href="https://paulstamatiou.com">paulstamatiou.com</a></td><td>Reads like an art-directed print magazine; bespoke font program, paper palette</td><td>Editorial restraint + custom type as identity</td><td><a href="../workings/paul-stamatiou.md">paul-stamatiou.md</a></td></tr>
+        <tr><td>10</td><td><span class="ref">Jhey Tompkins</span></td><td><a href="https://jhey.dev">jhey.dev</a></td><td>One-screen bio with a live "now" status island; three typefaces encode tone</td><td>Astro islands + typeface-driven hierarchy</td><td><a href="../workings/jhey-tompkins.md">jhey-tompkins.md</a></td></tr>
+        <tr><td>11</td><td><span class="ref">Adham Dannaway</span></td><td><a href="https://www.adhamdannaway.com">adhamdannaway.com</a></td><td>One split-portrait hero states "designer + developer" with near-zero copy</td><td>Concept-over-tech hero (it's just WordPress)</td><td><a href="../workings/adham-dannaway.md">adham-dannaway.md</a></td></tr>
+        <tr><td>12</td><td><span class="ref">Robb Owen</span></td><td><a href="https://robbowen.digital">robbowen.digital</a></td><td>Bespoke per-project line-art + SVG textures; motion praise without GSAP/WebGL</td><td>Illustration-led storytelling on a light theme</td><td><a href="../workings/robb-owen.md">robb-owen.md</a></td></tr>
+        <tr><td>13</td><td><span class="ref">Tania Rascia</span></td><td><a href="https://www.taniarascia.com">taniarascia.com</a></td><td>Content-dense "digital garden" that stays calm; sidebar IA + editorial type</td><td>Fixed-sidebar shell for content-heavy sites</td><td><a href="../workings/tania-rascia.md">tania-rascia.md</a></td></tr>
+        <tr><td>14</td><td><span class="ref">Hakim El Hattab</span></td><td><a href="https://hakim.se">hakim.se</a></td><td>Magazine-essay bio + live animating project tiles; reveal.js author</td><td>Editorial serif prose + inline progressive disclosure</td><td><a href="../workings/hakim-el-hattab.md">hakim-el-hattab.md</a></td></tr>
+        <tr><td>15</td><td><span class="ref">Mike Hall</span></td><td><a href="https://mikemai.net">mikemai.net</a></td><td>World-class craft from semantic HTML + CSS only; CSS-only 5-mode theme switcher</td><td>Typography-as-brand, near-zero-JS discipline</td><td><a href="../workings/mike-hall-mikemai-net.md">mike-hall-mikemai-net.md</a></td></tr>
+        <tr><td>16</td><td><span class="ref">Jack McDade</span></td><td><a href="https://jackmcdade.com">jackmcdade.com</a></td><td>Defiantly anti-minimalist kitsch executed so well the chaos reads as intentional</td><td>A loud, opinionated brand point-of-view</td><td><a href="../workings/jack-mcdade.md">jack-mcdade.md</a></td></tr>
+        <tr><td>17</td><td><span class="ref">Lynn Fisher</span></td><td><a href="https://lynnandtonic.com">lynnandtonic.com</a></td><td>Rebuilds her whole site from a blank CSS file every year; each is CSS art</td><td>CSS-art restraint + version/archive as a flex</td><td><a href="../workings/lynn-fisher.md">lynn-fisher.md</a></td></tr>
+        <tr><td>18</td><td><span class="ref">Jesper Landberg</span></td><td><a href="https://jesper-landberg.dev">jesper-landberg.dev</a></td><td>30+ Awwwards SOTD; current site is a stripped-back Swiss type index</td><td>Confidence-through-subtraction, editorial index</td><td><a href="../workings/jesper-landberg.md">jesper-landberg.md</a></td></tr>
+        <tr><td>19</td><td><span class="ref">Cassidy Williams</span></td><td><a href="https://cassidoo.co">cassidoo.co</a></td><td>Hand-crafted monospace single-column with rainbow links + "random post"</td><td>Voice/personality over framework</td><td><a href="../workings/cassidy-williams.md">cassidy-williams.md</a></td></tr>
+        <tr><td>20</td><td><span class="ref">Lou Hoebregts (LHC)</span></td><td><a href="https://lhc.fr">lhc.fr</a></td><td>IBM Plex Mono grid + per-letter color type + lazy-mounted phyllotaxis field</td><td>Vanilla-JS generative centerpiece, mono identity</td><td><a href="../workings/lhc-louis-hoebregts.md">lhc-louis-hoebregts.md</a></td></tr>
+        <tr><td>21</td><td><span class="ref">Andrei Terteci</span></td><td><a href="https://www.andreiterteci.com">andreiterteci.com</a></td><td>"Boring" Next.js + Tailwind made premium by one gradient + sharp copy</td><td>Conversion-funnel IA + founder-framed copywriting</td><td><a href="../workings/andrei-terteci.md">andrei-terteci.md</a></td></tr>
+        <tr><td>22</td><td><span class="ref">Manu Arora</span></td><td><a href="https://manuarora.in">manuarora.in</a></td><td>Aceternity UI's founder chose a text-first "personal letter" — taste over spectacle</td><td>Anti-portfolio restraint, list-as-résumé pattern</td><td><a href="../workings/manu-arora.md">manu-arora.md</a></td></tr>
+        <tr><td>23</td><td><span class="ref">Pol Piella</span></td><td><a href="https://www.polpiella.dev">polpiella.dev</a></td><td>"World-class" on pure Astro + Tailwind + system fonts; proof-led IA</td><td>Zero-animation polish, dated-achievement lists</td><td><a href="../workings/pol-piella.md">pol-piella.md</a></td></tr>
+        <tr><td>24</td><td><span class="ref">Olaolu Olawuyi</span></td><td><a href="https://olaolu.dev">olaolu.dev</a></td><td>One screen of plain prose + a shock-contrast footer that does all the nav</td><td>Copy-as-design, footer-as-navigation</td><td><a href="../workings/olaolu-olawuyi.md">olaolu-olawuyi.md</a></td></tr>
+        <tr><td>25</td><td><span class="ref">Sam Dape</span></td><td><a href="https://github.com/emmabostian/developer-portfolios">developer-portfolios</a></td><td>One grey screen, three low-poly objects that <em>are</em> the navigation</td><td>Image-as-navigation + radical subtraction</td><td><a href="../workings/sam-dape.md">sam-dape.md</a></td></tr>
+        <tr><td>26</td><td><span class="ref">Gianmarco Cavallo</span> ⚠</td><td><a href="https://gianmarcocavallo.com">gianmarcocavallo.com</a></td><td>Bento-grid "playable toy": theme+style switchers, world clock, easter egg</td><td>Bento IA + signature interactive flourish</td><td><a href="../workings/gianmarco-cavallo.md">gianmarco-cavallo.md</a></td></tr>
+        <tr><td>27</td><td><span class="ref">Anand Sharma (aprilzero)</span> ⚠</td><td><a href="https://aprilzero.com">aprilzero.com</a></td><td>Legendary quantified-self 3D dashboard — but the live URL is now a black stub</td><td>Motion-as-craft <em>philosophy</em> (study the write-ups)</td><td><a href="../workings/anand-sharma-aprilzero.md">anand-sharma-aprilzero.md</a></td></tr>
+        <tr><td>28</td><td><span class="ref">Wei Gao</span> ⚠</td><td><a href="https://github.com/emmabostian/developer-portfolios">developer-portfolios</a></td><td>Illustrated "Fluffy Philharmonic" mascot universe — domain is dead</td><td>Mascot-as-identity (and the keep-your-domain-alive lesson)</td><td><a href="../workings/wei-gao.md">wei-gao.md</a></td></tr>
+        <tr><td>29</td><td><span class="ref">Caleb Brown</span> ⚠</td><td><a href="https://caleb-brown.dev">caleb-brown.dev</a></td><td>Unmodified Hugo "Coder" template — the <em>floor</em>, not the ceiling</td><td>What minimal-but-generic looks like (a baseline)</td><td><a href="../workings/caleb-brown.md">caleb-brown.md</a></td></tr>
+        <tr><td>30</td><td><span class="ref">Gao Hongyu</span> ⚠</td><td><a href="https://gao.show">gao.show</a></td><td>Unverifiable — domain NXDOMAIN, no archive, nothing to study</td><td>— (re-confirm URL; likely confused with romanjeanelie.com)</td><td><a href="../workings/gao-hongyu.md">gao-hongyu.md</a></td></tr>
+      </tbody>
+      <caption>⚠ = reachability caveat (down, stubbed, mirror, or template). See the teardown file.</caption>
+    </table>
+
+    <figure class="figure">
+      <img src="../workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang portfolio: sticky split-screen with a left bio column and scroll-spy navigation">
+      <figcaption><strong>Brittany Chiang ↗</strong> — the most-cloned dev portfolio on GitHub. Sticky split-screen, scroll-spy nav, cursor spotlight, accessibility treated as a feature. Clone the discipline, not the pixels.</figcaption>
+    </figure>
+
+    <figure class="figure">
+      <img src="../workings/shots/cassie-evans/01-hero.png" alt="Cassie Evans portfolio hero: hand-drawn SVG illustration with GSAP physics motion">
+      <figcaption><strong>Cassie Evans ↗</strong> — the site <em>is</em> the demo reel. GSAP physics motion and hand-drawn SVG with zero stock imagery: she performs the skill instead of describing it.</figcaption>
+    </figure>
+
+    <h2 id="tiers">3 · Tiers — why each sits where it does</h2>
+
+    <h3>S-tier — study deeply</h3>
+    <p><span class="ref">Brittany Chiang ↗</span> · <span class="ref">Cassie Evans ↗</span> · <span class="ref">Josh Comeau ↗</span> · <span class="ref">Dennis Snellenberg ↗</span> · <span class="ref">Sara Soueidan ↗</span></p>
+    <p>These are the ones to open in DevTools and dissect. Each defines a different <em>correct answer</em> to "what is a great dev portfolio":</p>
+    <ul>
+      <li><strong>Chiang</strong> = the calm-engineer layout archetype (so good it's the most-cloned on GitHub — clone the discipline, not the pixels).</li>
+      <li><strong>Cassie / Josh</strong> = "the site is the proof" — the homepage itself performs the craft, with no separate gallery needed.</li>
+      <li><strong>Dennis</strong> = how far pure motion + microinteraction polish gets you with a near-monochrome palette.</li>
+      <li><strong>Sara</strong> = the engineering-credibility route: semantic structure, a11y, and typography <em>are</em> the demo. Lowest spectacle, highest signal for a pure-engineer audience.</li>
+    </ul>
+
+    <figure class="figure">
+      <img src="../workings/shots/josh-comeau/01-hero.png" alt="Josh Comeau homepage hero with whimsical interactive demos and a polished dark-mode aesthetic">
+      <figcaption><strong>Josh Comeau ↗</strong> — the homepage is a live demo of the whimsical craft it teaches, on a modern RSC stack with correct dark-mode and perf. "Prove, don't claim."</figcaption>
+    </figure>
+
+    <h3>A-tier — strong references</h3>
+    <p><span class="ref">Henry Heffernan ↗</span> · <span class="ref">Lee Robinson ↗</span> · <span class="ref">Tim Roussilhe ↗</span> · <span class="ref">Paul Stamatiou ↗</span> · <span class="ref">Jhey Tompkins ↗</span> · <span class="ref">Adham Dannaway ↗</span> · <span class="ref">Robb Owen ↗</span> · <span class="ref">Tania Rascia ↗</span> · <span class="ref">Hakim El Hattab ↗</span></p>
+    <p>Excellent and worth borrowing from, but each is a <em>specific bet</em> rather than a universal template — copy the idea, not the whole site:</p>
+    <ul>
+      <li><strong>Henry / Tim</strong> = high-ambition WebGL/3D set pieces. Stunning, but expensive to build and maintain; steal the <em>pattern</em> (boot-gate, DOM-synced portal) before the spectacle.</li>
+      <li><strong>Lee / Hakim</strong> = the prose-first, anti-grid bet — magnificent if your writing carries it, weak if it doesn't.</li>
+      <li><strong>Paul / Robb / Tania</strong> = editorial/illustration-led craft; the differentiator is taste (custom type, bespoke line-art), not tech.</li>
+      <li><strong>Jhey / Adham</strong> = one strong idea (live status island; split-portrait concept) executed cleanly on a light stack.</li>
+    </ul>
+
+    <h3>Notable but niche</h3>
+    <p><span class="ref">Mike Hall ↗</span> · <span class="ref">Jack McDade ↗</span> · <span class="ref">Lynn Fisher ↗</span> · <span class="ref">Jesper Landberg ↗</span> · <span class="ref">Cassidy Williams ↗</span> · <span class="ref">Lou Hoebregts ↗</span> · <span class="ref">Andrei Terteci ↗</span> · <span class="ref">Manu Arora ↗</span> · <span class="ref">Pol Piella ↗</span> · <span class="ref">Olaolu Olawuyi ↗</span> · <span class="ref">Sam Dape ↗</span></p>
+    <p>Real craft, but each leans on a strong personal premise (a loud brand, a yearly CSS-art rebuild, a Swiss-type index, "look how little I can ship"). Brilliant <em>for that person</em>; risky to copy wholesale because the magic is the conviction, not a reusable mechanic. Mine them for individual moves — Mike's CSS-only theme switcher, Lynn's archive-as-flex, Olaolu's footer-as-nav, Andrei's single-gradient cohesion.</p>
+
+    <h3>Honest demotions / do-not-bother</h3>
+    <div class="callout warn">
+      <ul>
+        <li><strong>Caleb Brown</strong> — an unmodified Hugo template. Useful only as a "this is the generic floor" reference; nothing proprietary to steal. (The exact target <code>calebbrown.dev</code> was also down — 504; findings are from the live <code>caleb-brown.dev</code> twin.)</li>
+        <li><strong>Anand Sharma (aprilzero)</strong> — historically a landmark, but the <em>live</em> URL is now a black placeholder. Study the legend via his "Making of April Zero" articles and gyrosco.pe, not the dead domain.</li>
+        <li><strong>Wei Gao</strong> — genuinely charming concept, but the domain has lapsed and the site is unreachable. Its loudest lesson is operational: a portfolio is only an asset while the domain is alive.</li>
+        <li><strong>Gao Hongyu</strong> — unverifiable (NXDOMAIN, no archive). Likely a mis-filed/incorrect URL; possibly confused with <strong>romanjeanelie.com</strong>. Skip until the URL is reconfirmed.</li>
+      </ul>
+    </div>
+
+    <h2 id="patterns">4 · Patterns common to great dev portfolios</h2>
+    <p>Synthesized across all 30 teardowns. The recurring moves the best sites share:</p>
+
+    <div class="callout steal">
+      <p><strong>Hero</strong></p>
+      <ul>
+        <li>Lead with <strong>one idea, not a paragraph.</strong> A split portrait (Adham), a generative toy (Josh), a value-prop sentence (Andrei), or three paragraphs of prose (Lee) — but <em>one</em> clear thesis above the fold.</li>
+        <li><strong>The hero often <em>is</em> the proof.</strong> For motion/CSS specialists, the homepage performs the skill (Cassie, Josh, LHC). Don't describe capability you can demonstrate.</li>
+        <li><strong>Restraint reads as senior.</strong> Suppressed type scale, off-black-on-off-white, one accent — confidence signals (Lee, Sara, Manu, Jesper) recur far more than spectacle.</li>
+      </ul>
+    </div>
+
+    <div class="callout steal">
+      <p><strong>Project storytelling</strong></p>
+      <ul>
+        <li><strong>Specificity over adjectives.</strong> Dated lists of talks/shipped apps with named companies and quantified impact (Pol, Olaolu, Andrei) beat "passionate developer."</li>
+        <li><strong>Editorial wayfinding is cheap and high-signal:</strong> numbered grids (01–08), <code>NN / total</code> counters, year-tagged indexes, monospace metadata (Andrei, Tim, Jesper).</li>
+        <li><strong>Make tiles move or be real:</strong> live animating thumbnails (Hakim), actual product screenshots (Adham), or bespoke per-project illustrations (Robb) instead of abstract placeholders.</li>
+      </ul>
+    </div>
+
+    <div class="callout steal">
+      <p><strong>About / voice</strong></p>
+      <ul>
+        <li><strong>Bio as the hero, nouns as nav</strong> (Lee, Hakim, Manu, Olaolu). For content-heavy people the homepage doubles as an index/sitemap (Tania).</li>
+        <li><strong>One human touch</strong> — a hand-drawn mascot, a signature SVG, a nickname, an easter egg (Sara's owl, Jhey's avatar, Chiang's Tardis). Cheapest way to read as a person, not a template.</li>
+      </ul>
+    </div>
+
+    <div class="callout tip">
+      <p><strong>Contact</strong></p>
+      <p><strong>Low-friction, personality-laden CTAs:</strong> prefilled <code>mailto:</code> with an emoji subject (Robb), Cal.com "book a call" tile (Gianmarco), inline contextual "contact me" at the end of the bio (Olaolu). Avoid a cold form where a one-liner works.</p>
+    </div>
+
+    <div class="callout steal">
+      <p><strong>Motion budget</strong></p>
+      <ul>
+        <li><strong>Spend motion where it earns its maintenance cost.</strong> The S-tier sites either go all-in deliberately (Dennis, Cassie, Tim) or skip it entirely with taste (Sara, Lee, Manu) — almost none scatter half-baked effects.</li>
+        <li><strong>Cheap, disproportionate wins:</strong> cursor spotlight (~20 lines, Chiang), magnetic links (Dennis), View Transitions API page morphs (Lee, Gianmarco), scroll-velocity transforms (Tim). High perceived polish, low code.</li>
+        <li><strong>Concentrate the "wow":</strong> one lazy-mounted generative centerpiece (LHC) or one scripted hero transition (Henry) beats a dozen small animations.</li>
+      </ul>
+    </div>
+
+    <div class="callout steal">
+      <p><strong>Performance &amp; stack</strong></p>
+      <ul>
+        <li><strong>Static-first is the norm:</strong> Astro / Eleventy / Next static export recur constantly (Cassidy, Sara, Pol, Jhey, Gianmarco). Fast load is treated as a <em>feature</em>, often stated out loud.</li>
+        <li><strong>System fonts or one self-hosted face</strong> — zero/near-zero font payload, hierarchy from weight + scale, not many sizes (Sara, Pol, Olaolu, Mike). When custom type is used, it's <em>one</em> characterful face doing the brand work.</li>
+        <li><strong>A11y is table stakes and a selling point</strong> for engineer-audience sites: skip-link as first DOM node, real landmarks, underline-not-color links, AA contrast (Sara, Chiang, Robb, Mike).</li>
+        <li><strong>Privacy-friendly analytics</strong> (Fathom / Umami / GoatCounter / Plausible) over Google Tag Manager — on-brand for a dev audience and keeps the page light.</li>
+        <li><strong>Open-sourcing the site</strong> doubles as a code sample and credibility signal (Cassidy, Manu, Pol, Tania).</li>
+        <li><strong>Operational lesson (Wei Gao):</strong> auto-renew the domain and keep a backup deploy on a platform subdomain — a portfolio is worthless the moment the domain lapses.</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer class="ftr">
+    <div class="wide">
+      <p><a href="../PLAN.html">◆ Craft Atlas — Build Plan →</a></p>
+      <p style="margin-top:var(--s-3);color:var(--ink-dim);">Reference · <strong>Developer Portfolio Field Guide</strong>. Craft Atlas — synthesized from 80 live site teardowns.</p>
+    </div>
+  </footer>
+</body>
+</html>

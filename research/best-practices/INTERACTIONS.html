@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microinteractions &amp; Interaction Design — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* ---- page-local live-demo styles only ---- */
+
+    /* magnetic button demo */
+    .mag-stage { display:flex; gap:1.5rem; align-items:center; justify-content:center; flex-wrap:wrap; min-height:120px; }
+    .mag-btn {
+      font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; text-transform:uppercase;
+      color:var(--accent-ink); background:var(--accent); border:0; border-radius:var(--r-pill);
+      padding:.75rem 1.6rem; cursor:pointer;
+      transition: transform .35s cubic-bezier(.18,.9,.32,1.1), background .2s var(--ease);
+      will-change: transform;
+    }
+    .mag-btn .mag-label { display:inline-block; transition: transform .35s cubic-bezier(.18,.9,.32,1.1); }
+    .mag-btn:hover { background:var(--accent-soft); }
+
+    /* hover state lab */
+    .hov-grid { display:grid; gap:.6rem; }
+    .hov-row {
+      display:flex; align-items:center; justify-content:space-between; gap:1rem;
+      padding:.85rem 1rem; border:1px solid var(--line); border-radius:var(--r-2);
+      background:var(--bg-2); cursor:pointer;
+      transition: background .25s var(--ease), border-color .25s var(--ease), opacity .25s var(--ease), transform .25s var(--ease);
+    }
+    .hov-row .h-title { font-weight:600; color:var(--ink-soft); transition:color .25s var(--ease); }
+    .hov-row .h-arrow { font-family:var(--font-mono); color:var(--ink-dim); transition:transform .25s var(--ease); }
+    .hov-lab:hover .hov-row { opacity:.45; }                 /* dim all siblings… */
+    .hov-lab .hov-row:hover { opacity:1; border-color:var(--accent); transform:translateX(4px); }
+    .hov-lab .hov-row:hover .h-title { color:var(--accent); }
+    .hov-lab .hov-row:hover .h-arrow { transform:translate(3px,-3px); color:var(--accent); }
+
+    /* spotlight cursor demo */
+    .spot {
+      position:relative; overflow:hidden; min-height:160px; border-radius:var(--r-2);
+      border:1px solid var(--line); background:var(--bg-2);
+      display:flex; align-items:center; justify-content:center; text-align:center;
+    }
+    .spot::before {
+      content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
+      transition:opacity .3s var(--ease);
+      background: radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(245,166,35,.18), transparent 65%);
+    }
+    .spot:hover::before { opacity:1; }
+    .spot p { font-family:var(--font-mono); font-size:.82rem; color:var(--ink-dim); z-index:1; padding:1rem; }
+
+    /* copy-feedback microinteraction */
+    .copy-btn {
+      font-family:var(--font-mono); font-size:.78rem; letter-spacing:.03em;
+      color:var(--ink); background:var(--bg-2); border:1px solid var(--line); border-radius:var(--r-pill);
+      padding:.55rem 1.1rem; cursor:pointer; display:inline-flex; align-items:center; gap:.5rem;
+      transition: border-color .2s var(--ease), color .2s var(--ease);
+    }
+    .copy-btn:hover { border-color:var(--accent); }
+    .copy-btn.copied { color:var(--accent); border-color:var(--accent); }
+
+    /* click-and-hold demo */
+    .hold-wrap { display:flex; flex-direction:column; align-items:center; gap:.9rem; }
+    .hold-btn {
+      position:relative; overflow:hidden; isolation:isolate;
+      font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; text-transform:uppercase;
+      color:var(--ink); background:var(--bg-2); border:1px solid var(--line); border-radius:var(--r-pill);
+      padding:.8rem 1.8rem; cursor:pointer; user-select:none;
+    }
+    .hold-btn .hold-fill {
+      position:absolute; inset:0; z-index:-1; transform-origin:left center;
+      transform:scaleX(0); background:var(--accent); opacity:.9;
+    }
+    .hold-btn.holding .hold-fill { transition: transform 1s linear; transform:scaleX(1); }
+    .hold-btn.done { color:var(--accent-ink); }
+    .hold-msg { font-family:var(--font-mono); font-size:.78rem; color:var(--ink-dim); min-height:1.2em; }
+
+    .demo-hint { font-family:var(--font-mono); font-size:.8rem; color:var(--ink-dim); margin-bottom:.75rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mag-btn, .mag-btn .mag-label, .hov-row, .spot::before, .hold-btn .hold-fill { transition:none !important; }
+      .mag-btn { transform:none !important; }
+    }
+  </style>
+</head>
+<body>
+<header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="UI-DESIGN.html">UI Design</a>
+      <a href="UX.html">UX</a>
+      <a href="TYPOGRAPHY.html">Typography</a>
+      <a href="COLOR.html">Color</a>
+      <a href="STYLING.html">Styling</a>
+      <a href="MOTIONS.html">Motion</a>
+      <a href="ANIMATIONS.html">Animation</a>
+      <a href="INTERACTIONS.html">Interaction</a>
+      <a href="SPATIAL.html">3D / Spatial</a>
+      <a href="MINI-GAMES.html">Mini-Games</a>
+      <a href="STATE-MANAGEMENT.html">State</a>
+      <a href="NEXTJS.html">Meta-Framework</a>
+      <a href="../references/PORTFOLIO.html">Portfolio</a>
+      <a href="../references/TOP-LIST.html">Top List</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+<main class="wrap">
+  <span class="kicker">Craft Atlas · 09</span>
+  <h1>Microinteractions &amp; Interaction Design</h1>
+  <p class="lede">A page can look perfect frozen and still feel dead. Interaction is the conversation between pointer and pixel — the hover that confirms "yes, this is clickable," the button that leans toward your cursor, the copy that flips to "Copied," the hold that fills before it commits. This is the craft of <em>affordance</em> (telling the user what's possible) and <em>feedback</em> (confirming what just happened), garnished with <em>delight</em>. Here is how the best 80 sites make the interface feel alive under the hand.</p>
+
+  <nav class="toc" aria-label="On this page">
+    <ul>
+      <li><a href="#first-rule">1 · Affordance &amp; feedback — the two jobs</a></li>
+      <li><a href="#hover">2 · Hover states &amp; focus-by-contrast</a></li>
+      <li><a href="#cursor">3 · Custom cursors</a></li>
+      <li><a href="#magnetic">4 · Magnetic buttons</a></li>
+      <li><a href="#drag">5 · Drag, scrub &amp; physics</a></li>
+      <li><a href="#hold">6 · Click-and-hold &amp; state feedback</a></li>
+      <li><a href="#delight">7 · Delight, sound &amp; easter eggs</a></li>
+      <li><a href="#pitfalls">8 · A11y, perf &amp; the overuse trap</a></li>
+    </ul>
+  </nav>
+
+  <h2 id="first-rule">1 · Affordance &amp; feedback — the two jobs</h2>
+  <p>Every microinteraction does one of two things, and the great ones do both. <strong>Affordance</strong> signals possibility <em>before</em> you act (the cursor turns into a hand, the link underlines, the button glows). <strong>Feedback</strong> confirms the result <em>after</em> you act (the toggle slides, the row highlights, the text says "Copied"). A click with no feedback feels broken; an element with no affordance feels invisible. Everything below is a variation on these two jobs.</p>
+  <p>The cheapest, highest-signal version of this is colour-as-affordance. <span class="ref">jhey tompkins ↗</span> reserves a single hot OKLCH coral <em>strictly</em> for interactive and live elements — so the moment something is that colour, you know it does something, with zero UI chrome. <span class="ref">Linear ↗</span> goes the opposite, monochrome route: kill brand colour in the chrome so colour only ever appears <em>inside</em> the product UI, making "colour = the product." <span class="ref">Mike Hall ↗</span> proves the typographer's version — links inherit text colour and earn their affordance from <em>underline + context</em>, not default blue.</p>
+
+  <div class="callout steal">
+    <p><strong>The whole discipline in one line:</strong> tell the user what's possible (affordance), then confirm what happened (feedback) — within ~100ms, on a property that doesn't cost a layout. Everything fancier (cursors, magnetism, hold-to-confirm) is just these two jobs wearing a costume.</p>
+  </div>
+
+  <h2 id="hover">2 · Hover states &amp; focus-by-contrast</h2>
+  <p>Hover is the workhorse. The amateur move is to highlight the thing you're hovering. The senior move, seen again and again in the corpus, is <strong>focus-by-contrast</strong>: brighten the hovered item <em>and dim its siblings</em>, so attention is sculpted, not just pointed.</p>
+  <p><span class="ref">Brittany Chiang ↗</span> is the reference implementation — hovering an experience or project row turns its title teal and fades a faint card behind it, while <em>sibling rows dim slightly</em>. Her external-link arrows (<code>↗</code>) nudge up-right on hover, a tiny directional affordance. <span class="ref">Cuberto ↗</span> swaps nav labels with a vertical text-slide (a duplicated label slides up as the original slides out). <span class="ref">Aristide Benoist ↗</span> runs a "default grayscale, colour on focus" world — desaturating everything until interaction, so the active project is the only colourful thing on screen. <span class="ref">Family ↗</span> keeps it soft and bouncy to match its rounded illustration vocabulary; <span class="ref">Jesper Landberg ↗</span> ships a reusable <code>js-scale</code> hover primitive instead of bespoke per-element code.</p>
+
+  <figure class="figure">
+    <img src="../workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang's portfolio: fixed identity column left, scrolling content right, with a hovered row brightened and siblings dimmed">
+    <figcaption><strong>Brittany Chiang</strong> — a cursor-tracking radial spotlight on the dark background plus the dim-siblings-on-hover pattern. The hovered row goes teal and lifts; neighbours fade. "Quiet competence" — micro-interactions over showy scroll-jacking.</figcaption>
+  </figure>
+
+  <div class="example">
+    <p class="demo-hint">Focus-by-contrast — hover any row. Note the siblings dim, the active row leans, arrow and title go amber:</p>
+    <div class="hov-lab hov-grid">
+      <div class="hov-row"><span class="h-title">Spatial computing primer</span><span class="h-arrow">↗</span></div>
+      <div class="hov-row"><span class="h-title">Designing for the GPU</span><span class="h-arrow">↗</span></div>
+      <div class="hov-row"><span class="h-title">A field guide to easing</span><span class="h-arrow">↗</span></div>
+    </div>
+    <figcaption>Pure CSS: <code>.list:hover .row { opacity:.45 }</code> dims everyone, then <code>.row:hover</code> overrides back to full. No JS, no scroll handler.</figcaption>
+  </div>
+
+  <pre><code>/* Focus-by-contrast (the Brittany Chiang pattern) — CSS only. */
+.list:hover .row        { opacity: .45; }                 /* dim the crowd      */
+.list  .row:hover       { opacity: 1; transform: translateX(4px); }  /* spotlight one */
+.list  .row:hover .title{ color: var(--accent); }
+.row .arrow             { transition: transform .25s ease; }
+.row:hover .arrow       { transform: translate(3px, -3px); }  /* ↗ nudges away   */</code></pre>
+
+  <div class="callout tip">
+    <p><strong>Hover is a desktop-only luxury — gate it.</strong> Touch devices have no hover; a <code>:hover</code> state that "sticks" after a tap is a classic mobile bug. Wrap hover-only flourishes in <code>@media (hover: hover) and (pointer: fine)</code> so phones never inherit them, and make sure the <em>resting</em> state is already usable.</p>
+  </div>
+
+  <h2 id="cursor">3 · Custom cursors</h2>
+  <p>Replacing the OS arrow is the single loudest interaction signal a site can send — and the most over-abused. Done with intent it becomes brand identity; done thoughtlessly it adds lag and breaks affordance. The corpus splits into two schools.</p>
+  <p><strong>The signature follower.</strong> <span class="ref">Cuberto ↗</span> open-sourced its own <code>mouse-follower</code> library: a skewing, state-changing dot that morphs into text labels, scales up, and shows drag hints on hover — it <em>is</em> the Cuberto trademark. <span class="ref">Jesper Landberg ↗</span>'s calling card is a circular cursor "mask" that reveals the next project underneath and "pulls up" into a page transition. <span class="ref">Active Theory ↗</span> handles pointer feedback entirely inside its WebGL UI layer (so the CSS cursor stays <code>auto</code> while hit-testing happens in GL space).</p>
+  <p><strong>The tactile, low-cost cursor.</strong> <span class="ref">Rauno Freiberg ↗</span> uses a fine blue crosshair on the canvas that swaps to a <em>retro pixel pointing-hand</em> over interactive cards — nostalgic, and it reinforces what's clickable. <span class="ref">Brittany Chiang ↗</span> doesn't replace the cursor at all; she <em>tracks</em> it with a large radial-gradient spotlight on the dark background — cheap to build, high perceived polish, and it never interferes with affordance.</p>
+
+  <figure class="figure">
+    <img src="../workings/shots/rauno-freiberg/01-hero.png" alt="Rauno Freiberg's site: a fine blue crosshair custom cursor over a horizontal card track with a tick-ruler scrubber up top">
+    <figcaption><strong>Rauno Freiberg</strong> — the fine blue crosshair (centre) is the on-canvas custom cursor; it swaps to a retro pixel hand over actionable cards. Up top, the tick-mark ruler doubles as a drag scrubber and position counter.</figcaption>
+  </figure>
+
+  <p>The trap with a fully custom cursor is latency: if you move the element on every <code>mousemove</code>, it lags behind the real pointer and feels cheap. The fix is to <strong>lerp</strong> (linear-interpolate) the follower toward the target inside a single <code>requestAnimationFrame</code> loop, and to use <code>transform: translate3d()</code> so it runs on the compositor.</p>
+
+  <pre><code>// Smooth custom-cursor follower — lerp + rAF, compositor-only transform.
+const dot = document.querySelector('.cursor');
+let mx = 0, my = 0, cx = 0, cy = 0;      // mouse target vs. current follower
+addEventListener('pointermove', (e) => { mx = e.clientX; my = e.clientY; });
+
+function tick() {
+  cx += (mx - cx) * 0.18;                // ease toward target (the "weight")
+  cy += (my - cy) * 0.18;
+  dot.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+  requestAnimationFrame(tick);
+}
+// Only run on real pointers; leave touch + assistive tech the native cursor.
+if (matchMedia('(hover: hover) and (pointer: fine)').matches) tick();
+
+// State changes via data-attr the cursor reads (label, scale, "drag" hint):
+document.querySelectorAll('[data-cursor]').forEach((el) => {
+  el.addEventListener('pointerenter', () => dot.dataset.state = el.dataset.cursor);
+  el.addEventListener('pointerleave', () => dot.dataset.state = '');
+});</code></pre>
+
+  <div class="callout warn">
+    <p><strong>A custom cursor must never hide affordance or break a11y.</strong> If you set <code>cursor:none</code> globally and your follower lags or fails to load, the user can't tell what's clickable. Keep a real <code>cursor:pointer</code> fallback, never hijack the cursor on form fields or text-selection, and disable the whole thing for touch and reduced-motion. The cursor is the user's hand — borrow it, don't steal it.</p>
+  </div>
+
+  <h2 id="magnetic">4 · Magnetic buttons</h2>
+  <p>A magnetic element bends toward the cursor as it approaches and snaps back on exit — it makes a target feel like it <em>wants</em> to be clicked. It's one of the most-copied agency interactions, and three of our teardowns name it explicitly.</p>
+  <p><span class="ref">Cuberto ↗</span> ships magnetic pill buttons ("What we do", "Get in touch") that attract the cursor, alongside its magnetic cursor. <span class="ref">Dennis Snellenberg ↗</span> makes nav links <em>and</em> buttons magnetic (a literal <code>magnet</code> class) so they bend toward the pointer and snap back — his tactile hover feedback without even needing a custom cursor. <span class="ref">Hakim El Hattab ↗</span>, whose whole reputation is "animated, interactive and sometimes unexpected," uses magnetic pulls among his microinteraction vocabulary.</p>
+
+  <figure class="figure">
+    <img src="../workings/shots/cuberto/01-hero.png" alt="Cuberto agency hero: bold black headline on white, with a rotating circular 'contact' text-ring widget anchored bottom-right">
+    <figcaption><strong>Cuberto</strong> — magnetic pill buttons plus the persistent rotating "contact" SVG text-ring (bottom-right): a playful, always-available conversion anchor. None of Cuberto's personality survives a screenshot — which is exactly the point.</figcaption>
+  </figure>
+
+  <div class="example">
+    <p class="demo-hint">Magnetic button — move your cursor near it; the button and its label lean toward you, then snap back:</p>
+    <div class="mag-stage">
+      <button class="mag-btn" type="button" data-magnetic><span class="mag-label">Get in touch</span></button>
+    </div>
+    <figcaption>The button translates a fraction of the cursor's offset; the inner label translates a touch more for parallax depth. A springy ease-back sells the "snap."</figcaption>
+  </div>
+
+  <pre><code>// Magnetic button — translate a fraction of the cursor offset within the bounds.
+function magnetize(btn, strength = 0.35, labelStrength = 0.6) {
+  const label = btn.querySelector('.mag-label');
+  btn.addEventListener('pointermove', (e) => {
+    const r = btn.getBoundingClientRect();
+    const x = e.clientX - (r.left + r.width  / 2);   // offset from centre
+    const y = e.clientY - (r.top  + r.height / 2);
+    btn.style.transform   = `translate(${x * strength}px, ${y * strength}px)`;
+    label.style.transform = `translate(${x * labelStrength}px, ${y * labelStrength}px)`;
+  });
+  btn.addEventListener('pointerleave', () => {        // CSS transition snaps it back
+    btn.style.transform = label.style.transform = '';
+  });
+}
+if (matchMedia('(hover: hover) and (pointer: fine)').matches)
+  document.querySelectorAll('[data-magnetic]').forEach((b) => magnetize(b));</code></pre>
+
+  <div class="callout tip">
+    <p><strong>Keep <code>strength</code> under ~0.4 and the snap-back springy.</strong> Too much pull and the button outruns the cursor; too stiff a return and it feels mechanical. A <code>cubic-bezier(.18,.9,.32,1.1)</code> ease-back (slight overshoot) is what reads as "magnetic" rather than "sliding." Reserve magnetism for primary CTAs and nav — making <em>everything</em> magnetic destroys the signal.</p>
+  </div>
+
+  <h2 id="drag">5 · Drag, scrub &amp; physics</h2>
+  <p>Drag turns the pointer into a direct-manipulation handle — grab the world and throw it. The corpus uses it for galleries, scrubbers, and physics toys, almost always with <strong>inertia</strong> so a flick keeps coasting.</p>
+  <p><span class="ref">Aristide Benoist ↗</span> drives a WebGL horizontal filmstrip where scroll/drag <em>velocity</em> warps the blades (the classic "scroll velocity → vertex distortion" technique), with a tick-ruler that animates as a live position scrubber. <span class="ref">Rauno Freiberg ↗</span> makes horizontal drag through a card track the core interaction, with a draggable scrubber tied to scroll position. <span class="ref">Off Menu ↗</span> turns its portfolio into a draggable scatter field / orbit where dragging repositions thumbnails around a centre stage. <span class="ref">Cassie Evans ↗</span> and <span class="ref">Jesper Landberg ↗</span> both ship drag-based horizontal navigation (Jesper's locked against vertically-scrolling titles). <span class="ref">Things / Cultured Code ↗</span> is the counterpoint: its famous drag delight lives <em>inside the app</em>, and the marketing site deliberately doesn't fake it on the web — knowing when <em>not</em> to is also craft.</p>
+
+  <p>The native-feeling implementation uses <strong>Pointer Events</strong> (one code path for mouse, touch, and pen) with <code>setPointerCapture</code> so the drag survives leaving the element, plus a velocity-based inertia coast on release:</p>
+
+  <pre><code>// Drag-to-scroll with inertia — Pointer Events, one path for mouse + touch + pen.
+const track = document.querySelector('.track');
+let down = false, startX = 0, startScroll = 0, vel = 0, lastX = 0, raf;
+
+track.addEventListener('pointerdown', (e) => {
+  down = true; startX = lastX = e.clientX; startScroll = track.scrollLeft;
+  track.setPointerCapture(e.pointerId);            // keep events even outside the box
+  cancelAnimationFrame(raf); track.classList.add('dragging');
+});
+track.addEventListener('pointermove', (e) => {
+  if (!down) return;
+  vel = e.clientX - lastX; lastX = e.clientX;       // px since last frame = velocity
+  track.scrollLeft = startScroll - (e.clientX - startX);
+});
+track.addEventListener('pointerup', () => {
+  down = false; track.classList.remove('dragging');
+  (function coast() {                               // inertia: decay the flick
+    if (Math.abs(vel) < 0.5) return;
+    track.scrollLeft -= vel; vel *= 0.92;
+    raf = requestAnimationFrame(coast);
+  })();
+});</code></pre>
+
+  <div class="callout tip">
+    <p><strong>Make drag <em>look</em> draggable.</strong> A scatter field or filmstrip with no affordance just looks broken until someone accidentally grabs it. Swap to <code>cursor: grab</code> (then <code>grabbing</code> while held), show a ruler/scrubber or peeking next-card edge, and consider a one-time "drag" hint on the custom cursor — exactly Cuberto's drag-hint cursor state.</p>
+  </div>
+
+  <h2 id="hold">6 · Click-and-hold &amp; state feedback</h2>
+  <p>A plain click is instant and irreversible. <strong>Click-and-hold</strong> inserts a deliberate, cancellable progress window — the user presses, a fill animates, and only a completed hold commits. It's an affordance for intent (great for destructive or high-stakes actions) and a delight beat in its own right. It's also the gateway to the broader topic this section closes on: <strong>buttons that report their own state</strong>.</p>
+  <p>The everyday hero of state feedback is the <strong>copy-to-clipboard flip</strong>. <span class="ref">Rauno Freiberg ↗</span> is known for the copy-email button that flips to a "Copied" state instead of a raw <code>mailto:</code> — a tiny detail that signals care. <span class="ref">Hakim El Hattab ↗</span>'s inline <code>+++</code> expanders reveal more text in place on click, keeping the reader in flow rather than navigating away. <span class="ref">Linear ↗</span> wires up live priority pickers, label chips, and "Set priority" buttons whose press states <em>communicate product capability through touch</em>. Across the board, the rule is the same: a button must visibly acknowledge the press, then report its new state.</p>
+
+  <div class="example">
+    <p class="demo-hint">Click-and-hold to confirm — press and keep holding the button for one second:</p>
+    <div class="hold-wrap">
+      <button class="hold-btn" type="button" id="holdBtn"><span class="hold-fill"></span>Hold to delete</button>
+      <span class="hold-msg" id="holdMsg" role="status" aria-live="polite"></span>
+    </div>
+    <figcaption>Pressing starts a 1s <code>scaleX</code> fill; releasing early cancels it (no harm done). The hold completes only if you stay down — perfect for irreversible actions.</figcaption>
+  </div>
+
+  <div class="example">
+    <p class="demo-hint">Copy-to-clipboard feedback — the everyday state flip:</p>
+    <button class="copy-btn" type="button" id="copyBtn"><span id="copyLabel">hello@craft.atlas</span> <span aria-hidden="true">⧉</span></button>
+    <figcaption>On success the label swaps to "Copied" with the accent colour for ~1.5s, then reverts. Always restore the original state — feedback that never resets reads as stuck.</figcaption>
+  </div>
+
+  <pre><code>// Click-and-hold: commit only after a sustained press; cancel on early release.
+const btn = document.getElementById('holdBtn');
+const msg = document.getElementById('holdMsg');
+let timer;
+const start = () => {
+  btn.classList.add('holding');                     // CSS animates the fill (1s)
+  timer = setTimeout(() => {
+    btn.classList.add('done'); msg.textContent = 'Deleted ✓';
+  }, 1000);
+};
+const cancel = () => {
+  clearTimeout(timer);
+  if (!btn.classList.contains('done')) { btn.classList.remove('holding'); }
+};
+btn.addEventListener('pointerdown', start);
+btn.addEventListener('pointerup', cancel);
+btn.addEventListener('pointerleave', cancel);        // sliding off cancels too
+
+// Copy-to-clipboard with a temporary "Copied" state (the Rauno pattern).
+const copyBtn = document.getElementById('copyBtn');
+const label   = document.getElementById('copyLabel');
+copyBtn.addEventListener('click', async () => {
+  await navigator.clipboard.writeText(label.textContent);
+  const original = label.textContent;
+  copyBtn.classList.add('copied'); label.textContent = 'Copied';
+  setTimeout(() => { copyBtn.classList.remove('copied'); label.textContent = original; }, 1500);
+});</code></pre>
+
+  <div class="callout warn">
+    <p><strong>Hold-to-confirm needs a keyboard equivalent.</strong> A keyboard user can't "hold" a pointer — provide a focusable fallback (e.g. <kbd>Enter</kbd> opens a confirm step) and announce state changes via <code>aria-live</code> (note the <code>role="status"</code> above) so screen-reader users hear "Deleted," "Copied," etc. A microinteraction nobody-with-a-screen-reader can perceive is decoration, not feedback.</p>
+  </div>
+
+  <h2 id="delight">7 · Delight, sound &amp; easter eggs</h2>
+  <p>Once affordance and feedback are solid, <strong>delight</strong> is the surplus — the unrequested moment that makes someone smile and remember the site. The corpus is full of it, and the pattern is always the same: small, in-character, and never blocking the task.</p>
+  <p><span class="ref">Josh Comeau ↗</span> goes furthest: optional UI <em>sound</em> behind a global "Disable sounds" toggle, editable generative hero art, spring-based hover playfulness, and a footer easter egg (upside-down avatar) — the homepage <em>is</em> a live demo of his craft. <span class="ref">Brittany Chiang ↗</span> hides a Tardis time-travel easter egg that injects personality without breaking her minimalist tone. <span class="ref">jhey tompkins ↗</span> animates a blinking bear mascot and a live "now" status block (location, weather, local time, current song and game) that makes a static page feel present-tense and human. <span class="ref">Dennis Snellenberg ↗</span> seeds tiny meta-details — a live local-time clock and a multilingual greeting preloader — as personality moments. <span class="ref">Robb Owen ↗</span> earns "elegant motion design" praise with an emoji-prefilled <code>mailto:</code> (subject: <code>🤘 Hi Robb, I'd like to hire you</code>) — delight with zero backend.</p>
+
+  <div class="example">
+    <p class="demo-hint">Cursor-tracking spotlight (the Brittany Chiang flourish) — move your pointer across this box:</p>
+    <div class="spot" id="spot"><p>A radial glow follows the cursor. Cheap to build (one CSS variable per axis), high perceived polish.</p></div>
+    <figcaption>Two CSS custom properties (<code>--mx</code>, <code>--my</code>) updated on <code>pointermove</code> drive a <code>radial-gradient</code>. No library, no canvas.</figcaption>
+  </div>
+
+  <pre><code>// Cursor-tracking spotlight — two CSS vars, no library.
+const spot = document.getElementById('spot');
+spot.addEventListener('pointermove', (e) => {
+  const r = spot.getBoundingClientRect();
+  spot.style.setProperty('--mx', `${e.clientX - r.left}px`);
+  spot.style.setProperty('--my', `${e.clientY - r.top}px`);
+});
+/* CSS: background: radial-gradient(220px circle at var(--mx) var(--my), …); */</code></pre>
+
+  <div class="callout steal">
+    <p>Delight that lands shares three traits: it's <strong>discoverable, not mandatory</strong> (the user can ignore it), <strong>in-character</strong> (jhey's bear, Josh's sounds, Robb's emoji mailto — each matches its brand), and <strong>cheap to skip</strong> (toggleable sound, a fallback <code>mailto:</code>). Delight is seasoning. Solve affordance and feedback first; sprinkle delight last.</p>
+  </div>
+
+  <h2 id="pitfalls">8 · Accessibility, performance &amp; the overuse trap</h2>
+  <p>Every interaction on this page can become a liability. The discipline that separates elite work from the demo-reel is knowing the cost.</p>
+
+  <h3>Don't let interaction lock out the keyboard or screen reader</h3>
+  <p>Hover-only menus, drag-only galleries, and hold-only buttons all assume a fine pointer that many users don't have. Every interaction needs a <em>focusable, operable</em> path: <code>:focus-visible</code> states that mirror hover, keyboard alternatives for drag and hold, and <code>aria-live</code> regions so state flips ("Copied", "Deleted") are <em>heard</em>. <span class="ref">Brittany Chiang ↗</span> markets accessibility as a feature (skip-link, semantic landmarks, "opens in a new tab" labels) — and she's an a11y engineer, so it's lived, not claimed. <span class="ref">Linear ↗</span> bakes in skip-nav and proper <code>listbox/option/combobox</code> roles on its interactive replicas.</p>
+
+  <h3>Animate the cheap properties, and only on real pointers</h3>
+  <p>Custom cursors, magnets, and parallax drag all fire on <code>pointermove</code> — potentially hundreds of times a second. Keep every one of them on <code>transform</code>/<code>opacity</code> (compositor-only, no layout), batch updates inside a single <code>requestAnimationFrame</code>, and gate the whole lot behind <code>@media (hover: hover) and (pointer: fine)</code> so phones never pay for desktop flourishes.</p>
+
+  <pre><code>/* The floor: mirror every hover affordance for keyboard, and respect motion prefs. */
+.row:hover, .row:focus-visible { /* same brightened state for mouse AND keyboard */ }
+
+@media (hover: hover) and (pointer: fine) {
+  /* custom cursor, magnetic buttons, hover-spotlights live ONLY here */
+}
+@media (prefers-reduced-motion: reduce) {
+  .magnet, .cursor, .spotlight { transition: none !important; transform: none !important; }
+  /* drop magnetism, cursor lag, parallax — keep instant, legible feedback */
+}</code></pre>
+
+  <div class="callout warn">
+    <p><strong>The overuse trap is real and the corpus warns against it both ways.</strong> A custom cursor + magnetic everything + drag galleries + sound on one page is noise, not craft — each effect cancels the others' signal. <span class="ref">Things / Cultured Code ↗</span> ships an almost motion-free marketing site on purpose ("world-class can mean knowing when NOT to animate"). <span class="ref">Mike Hall ↗</span> makes the <em>absence</em> of motion the flex — CSS-only theming, no custom cursor, no scroll-jacking. <span class="ref">Lee Robinson ↗</span> deliberately ships no smooth-scroll on a reading site. Pick one or two signature interactions, execute them flawlessly, and let restraint do the rest.</p>
+  </div>
+
+  <div class="callout steal">
+    <p>The elite interaction stack, distilled: <strong>colour = affordance</strong> (one accent for "this does something") → <strong>focus-by-contrast hover</strong> (brighten one, dim the rest) → <strong>one signature flourish</strong> (custom cursor <em>or</em> magnetism <em>or</em> drag — rarely all three) → <strong>honest state feedback</strong> (copy flips, holds fill, toggles slide, announced via <code>aria-live</code>) → all of it on <code>transform</code>/<code>opacity</code>, gated to fine pointers, and collapsed under <code>prefers-reduced-motion</code>. Affordance and feedback are the job; delight is the tip.</p>
+  </div>
+</main>
+
+<footer class="ftr">
+  <div class="wrap">
+    <p><a href="../PLAN.html">← Back to the Build Plan</a></p>
+    <p style="margin-top:1rem;"><span class="brand">Craft Atlas</span> — synthesized from 80 live site teardowns.</p>
+  </div>
+</footer>
+
+<script>
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- magnetic button ----
+  if (finePointer && !reduce) {
+    document.querySelectorAll('[data-magnetic]').forEach((btn) => {
+      const label = btn.querySelector('.mag-label');
+      btn.addEventListener('pointermove', (e) => {
+        const r = btn.getBoundingClientRect();
+        const x = e.clientX - (r.left + r.width / 2);
+        const y = e.clientY - (r.top + r.height / 2);
+        btn.style.transform = `translate(${x * 0.35}px, ${y * 0.35}px)`;
+        label.style.transform = `translate(${x * 0.6}px, ${y * 0.6}px)`;
+      });
+      btn.addEventListener('pointerleave', () => {
+        btn.style.transform = '';
+        label.style.transform = '';
+      });
+    });
+  }
+
+  // ---- click-and-hold ----
+  const holdBtn = document.getElementById('holdBtn');
+  const holdMsg = document.getElementById('holdMsg');
+  let holdTimer;
+  const startHold = (e) => {
+    if (e) e.preventDefault();
+    if (holdBtn.classList.contains('done')) {        // allow a reset on re-press
+      holdBtn.classList.remove('done', 'holding');
+      holdMsg.textContent = '';
+    }
+    holdBtn.classList.add('holding');
+    holdTimer = setTimeout(() => {
+      holdBtn.classList.add('done');
+      holdMsg.textContent = 'Deleted ✓';
+    }, 1000);
+  };
+  const cancelHold = () => {
+    clearTimeout(holdTimer);
+    if (!holdBtn.classList.contains('done')) {
+      holdBtn.classList.remove('holding');
+      if (holdMsg.textContent === '') holdMsg.textContent = 'Released early — cancelled';
+    }
+  };
+  holdBtn.addEventListener('pointerdown', startHold);
+  holdBtn.addEventListener('pointerup', cancelHold);
+  holdBtn.addEventListener('pointerleave', cancelHold);
+
+  // ---- copy-to-clipboard ----
+  const copyBtn = document.getElementById('copyBtn');
+  const copyLabel = document.getElementById('copyLabel');
+  copyBtn.addEventListener('click', async () => {
+    const original = copyLabel.textContent;
+    try {
+      await navigator.clipboard.writeText(original);
+    } catch (err) {
+      // clipboard may be blocked (insecure context / permissions) — still show feedback
+    }
+    copyBtn.classList.add('copied');
+    copyLabel.textContent = 'Copied';
+    setTimeout(() => {
+      copyBtn.classList.remove('copied');
+      copyLabel.textContent = original;
+    }, 1500);
+  });
+
+  // ---- cursor spotlight ----
+  const spot = document.getElementById('spot');
+  spot.addEventListener('pointermove', (e) => {
+    const r = spot.getBoundingClientRect();
+    spot.style.setProperty('--mx', `${e.clientX - r.left}px`);
+    spot.style.setProperty('--my', `${e.clientY - r.top}px`);
+  });
+</script>
+</body>
+</html>

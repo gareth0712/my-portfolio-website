@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build Plan — Craft Atlas</title>
+  <meta name="description" content="An opinionated, concrete plan for building a world-class developer portfolio on Nuxt 4 — synthesized from 80 elite-site teardowns." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="best-practices/shared.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="PLAN.html">◆ Craft Atlas</a>
+      <a href="best-practices/UI-DESIGN.html">UI Design</a>
+      <a href="best-practices/UX.html">UX</a>
+      <a href="best-practices/TYPOGRAPHY.html">Typography</a>
+      <a href="best-practices/COLOR.html">Color</a>
+      <a href="best-practices/STYLING.html">Styling</a>
+      <a href="best-practices/MOTIONS.html">Motion</a>
+      <a href="best-practices/ANIMATIONS.html">Animation</a>
+      <a href="best-practices/INTERACTIONS.html">Interaction</a>
+      <a href="best-practices/SPATIAL.html">3D / Spatial</a>
+      <a href="best-practices/MINI-GAMES.html">Mini-Games</a>
+      <a href="best-practices/STATE-MANAGEMENT.html">State</a>
+      <a href="best-practices/NEXTJS.html">Meta-Framework</a>
+      <a href="references/PORTFOLIO.html">Portfolio</a>
+      <a href="references/TOP-LIST.html">Top List</a>
+      <a class="cta" href="PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ===================== HERO ===================== -->
+    <section class="hero">
+      <span class="kicker">The Capstone · Build Plan</span>
+      <h1>Build a portfolio that proves the pitch — on Nuxt 4.</h1>
+      <p class="lede">Eighty teardowns of the best sites on the web converge on one lesson: world-class is restraint plus one flawless signature move. This is the concrete plan to ship that, on a Vue&nbsp;3 + TypeScript stack you can actually maintain.</p>
+    </section>
+
+    <nav class="toc" aria-label="On this page">
+      <ol>
+        <li><a href="#vision">1 · Vision &amp; positioning</a></li>
+        <li><a href="#board">2 · Reference board — what to steal</a></li>
+        <li><a href="#ia">3 · Information architecture &amp; content</a></li>
+        <li><a href="#system">4 · Design system &amp; tokens</a></li>
+        <li><a href="#motion">5 · Motion &amp; interaction budget</a></li>
+        <li><a href="#tech">6 · Tech architecture (Nuxt 4)</a></li>
+        <li><a href="#budget">7 · Performance &amp; a11y budget</a></li>
+        <li><a href="#roadmap">8 · Phased build roadmap</a></li>
+      </ol>
+    </nav>
+
+    <!-- ===================== 1. VISION ===================== -->
+    <h2 id="vision">1 · Vision &amp; positioning</h2>
+
+    <p>A top-tier developer portfolio has exactly three jobs, in order: <strong>establish credibility in the first second</strong>, <strong>make the work legible and specific</strong>, and <strong>make contacting you frictionless</strong>. Everything else is decoration. Across the 80 teardowns the failure mode is always the same — sites that scatter ten half-finished effects read as junior; sites that execute <em>one</em> idea flawlessly read as senior.</p>
+
+    <div class="callout">
+      <p>The meta-pattern, stated once: <strong>restraint reads as seniority; one signature move reads as craft; specificity reads as competence.</strong> Spectacle without those three is noise.</p>
+    </div>
+
+    <h3>The chosen direction: restrained editorial + one signature interactive moment</h3>
+
+    <p>There are four defensible archetypes in the data. We pick deliberately, and reject the rest <em>for this project</em>:</p>
+
+    <table>
+      <thead>
+        <tr><th>Archetype</th><th>Exemplars</th><th>Verdict for you</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Calm editorial engineer</td>
+          <td>Brittany Chiang, Sara Soueidan, Lee Robinson, Pol Piella</td>
+          <td><strong>Adopt as the base.</strong> Highest signal-to-effort, ages well, a11y-friendly, maintainable solo.</td>
+        </tr>
+        <tr>
+          <td>The site IS the demo reel</td>
+          <td>Cassie Evans, Josh Comeau, Bruno Simon</td>
+          <td>Borrow the <em>principle</em> (prove, don't claim) via ONE moment — not a whole WebGL site.</td>
+        </tr>
+        <tr>
+          <td>Full WebGL / 3D world</td>
+          <td>Henry Heffernan, Tim Roussilhe, Lusion</td>
+          <td><strong>Reject as the whole site.</strong> Huge build + maintenance cost, real a11y/SEO tax (see §7).</td>
+        </tr>
+        <tr>
+          <td>Radical prose-first</td>
+          <td>Lee Robinson, Manu Arora, Olaolu</td>
+          <td>Only wins if your writing carries it. Mine for confidence, not as the template.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>The direction:</strong> a near-monochrome, type-led editorial layout (the calm-engineer base) with exactly <em>one</em> concentrated interactive moment that performs your craft — a generative or motion-driven hero set piece — and disciplined micro-interactions everywhere else. This is the "Cassie/Josh principle on a Chiang skeleton."</p>
+
+    <p><strong>Why this is defensible for you specifically:</strong> you are a full-stack developer, not a 3D specialist, shipping a <strong>static Nuxt 4 site to GitHub Pages</strong> <span class="ref">workings/SPEC</span>. A drivable-car WebGL world (Bruno Simon) would be a six-month project you can't maintain; a Hugo template (Caleb Brown) is the floor. The editorial-plus-one-moment direction is the only one that is simultaneously <em>achievable solo</em>, <em>maintainable</em>, <em>fast on a static host</em>, and still <em>memorable</em>. It maximizes craft-per-line-of-code.</p>
+
+    <!-- ===================== 2. REFERENCE BOARD ===================== -->
+    <h2 id="board">2 · Reference board — the 10 to emulate</h2>
+
+    <p>Not "sites we like" — sites we pulled apart at the DOM level. Each card names the <strong>one thing to borrow</strong>. Open the teardown for the how. Resist taking more than one move per site; that's how pages get noisy.</p>
+
+    <div class="grid">
+
+      <div class="card">
+        <h3>Brittany Chiang</h3>
+        <p><strong>Steal:</strong> the sticky split-screen — left rail holds name / role / nav / socials and stays pinned; right column scrolls. Scroll-spy highlights the active section. The single most-cloned dev layout for a reason.</p>
+        <p>
+          <a class="ref" href="workings/brittany-chiang.md">workings/brittany-chiang</a>
+          <a class="ref" href="best-practices/UI-DESIGN.html">UI Design</a>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Josh Comeau</h3>
+        <p><strong>Steal:</strong> "prove, don't claim" — the homepage <em>is</em> a live demo of the whimsical craft he teaches. Plus textbook dark-mode handling with zero flash. Your one signature moment should do this.</p>
+        <p>
+          <a class="ref" href="workings/josh-comeau.md">workings/josh-comeau</a>
+          <a class="ref" href="best-practices/INTERACTIONS.html">Interaction</a>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Cassie Evans</h3>
+        <p><strong>Steal:</strong> the site as demo reel — GSAP physics + hand-drawn SVG, zero stock imagery. Don't copy the whole thing; copy the conviction that <em>one</em> animated set piece can carry the brand.</p>
+        <p>
+          <a class="ref" href="workings/cassie-evans.md">workings/cassie-evans</a>
+          <a class="ref" href="best-practices/ANIMATIONS.html">Animation</a>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Dennis Snellenberg</h3>
+        <p><strong>Steal:</strong> magnetic links/buttons + page transitions — award-tier feel from motion <em>polish</em> alone, near-monochrome palette. Magnetic hover is ~20 lines for a disproportionately premium feel.</p>
+        <p>
+          <a class="ref" href="workings/dennis-snellenberg.md">workings/dennis-snellenberg</a>
+          <a class="ref" href="best-practices/MOTIONS.html">Motion</a>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Sara Soueidan</h3>
+        <p><strong>Steal:</strong> a11y &amp; semantics <em>as</em> the credibility — skip-link first, real landmarks, AA contrast, whitespace-as-hierarchy, near-zero font payload. The DOM itself is the demo for an engineer audience.</p>
+        <p>
+          <a class="ref" href="workings/sara-soueidan.md">workings/sara-soueidan</a>
+          <a class="ref" href="best-practices/UX.html">UX</a>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Rauno Freiberg</h3>
+        <p><strong>Steal:</strong> obsessive micro-interaction detail — tuned easing, "copy email" that flips to "Copied", spring physics. Restraint + small-stuff polish beats flashy WebGL. The taste signal.</p>
+        <p>
+          <a class="ref" href="workings/rauno-freiberg.md">workings/rauno-freiberg</a>
+          <a class="ref" href="best-practices/INTERACTIONS.html">Interaction</a>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Linear</h3>
+        <p><strong>Steal:</strong> the dark-mode SaaS discipline — surgical type, near-zero chrome, generous restraint. Your project case-studies can borrow its "show the real artifact, not a stock mockup" stance.</p>
+        <p>
+          <a class="ref" href="workings/linear.md">workings/linear</a>
+          <a class="ref" href="best-practices/STYLING.html">Styling</a>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Mercury</h3>
+        <p><strong>Steal:</strong> treat your "brand" like luxury — one variable/display face, cinematic near-black, a single hero object that levitates. Proof that type + palette discipline alone reads premium.</p>
+        <p>
+          <a class="ref" href="workings/mercury.md">workings/mercury</a>
+          <a class="ref" href="best-practices/TYPOGRAPHY.html">Typography</a>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Teenage Engineering</h3>
+        <p><strong>Steal:</strong> product-as-hero on a strict Swiss grid + one bold accent. The restraint-with-a-system playbook — every element earns its place; the grid does the heavy lifting.</p>
+        <p>
+          <a class="ref" href="workings/teenage-engineering.md">workings/teenage-engineering</a>
+          <a class="ref" href="best-practices/COLOR.html">Color</a>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Lee Robinson</h3>
+        <p><strong>Steal:</strong> radical reductive confidence — three paragraphs of serif prose, the nouns <em>are</em> the links. A reminder that subtraction is a senior move, not laziness. Your About can do this.</p>
+        <p>
+          <a class="ref" href="workings/lee-robinson.md">workings/lee-robinson</a>
+          <a class="ref" href="best-practices/UX.html">UX</a>
+        </p>
+      </div>
+
+    </div>
+
+    <p style="margin-top:var(--s-6)"><strong>Two more on standby</strong> if you want a specific flourish: <a class="ref" href="workings/jhey-tompkins.md">workings/jhey-tompkins</a> for a live "now" status island, and <a class="ref" href="workings/mike-hall-mikemai-net.md">workings/mike-hall</a> for a CSS-only multi-mode theme switcher (near-zero JS). Both are cheap, characterful single ideas.</p>
+
+    <figure class="figure">
+      <img src="workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang homepage hero — sticky left rail with name, role and nav beside a scrolling content column" loading="lazy" />
+      <figcaption><strong>Brittany Chiang</strong> — the sticky split-screen archetype. The identity rail stays pinned (left) while project/experience content scrolls past on the right. This is the skeleton to adopt.</figcaption>
+    </figure>
+
+    <figure class="figure">
+      <img src="workings/shots/josh-comeau/01-hero.png" alt="Josh Comeau homepage hero — playful, interactive, demonstrating the craft it teaches" loading="lazy" />
+      <figcaption><strong>Josh Comeau</strong> — "prove, don't claim." The homepage performs the whimsical, interactive craft rather than describing it. This is the spirit of your one signature moment.</figcaption>
+    </figure>
+
+    <figure class="figure">
+      <img src="workings/shots/rauno-freiberg/01-hero.png" alt="Rauno Freiberg homepage — restrained typographic filmstrip with tuned micro-interactions" loading="lazy" />
+      <figcaption><strong>Rauno Freiberg</strong> — restraint plus obsessive interaction detail (easing, copy-to-clipboard tells, spring physics). The taste-over-spectacle reference.</figcaption>
+    </figure>
+
+    <!-- ===================== 3. IA ===================== -->
+    <h2 id="ia">3 · Information architecture &amp; content plan</h2>
+
+    <p>Single-page-first, with content-driven sub-routes only where the writing earns them. The Nuxt 4 SPEC <span class="ref">workings/SPEC</span> already commits to a hero + content-driven section; this expands that into a complete IA without bloating the build.</p>
+
+    <h3>Page / section map</h3>
+
+    <table>
+      <thead>
+        <tr><th>Section</th><th>What it does</th><th>What to show</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hero</td>
+          <td>Credibility in 1 second + the signature moment</td>
+          <td>Name, one-line role thesis ("Full-stack developer who helps clients ship applications"), the ONE interactive set piece, a primary CTA.</td>
+        </tr>
+        <tr>
+          <td>About</td>
+          <td>The human + the proof</td>
+          <td>3–5 sentences of voice (Lee/Sara register), current focus, a "now" line. Authored in <code>content/about.md</code>.</td>
+        </tr>
+        <tr>
+          <td>Selected work</td>
+          <td>The portfolio proper</td>
+          <td>3–6 case studies, numbered (01–06), year-tagged, mono metadata. Real screenshots / live links, never abstract placeholders.</td>
+        </tr>
+        <tr>
+          <td>Experience / writing</td>
+          <td>Specificity = competence</td>
+          <td>Dated list of roles, talks, shipped apps with named companies + quantified impact. Optional blog index if you write.</td>
+        </tr>
+        <tr>
+          <td>Contact</td>
+          <td>Frictionless reach</td>
+          <td>The 3 existing icon links (Instagram, LinkedIn, email) + a "copy email" tell. No cold form where a one-liner works.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Narrative arc</h3>
+    <p>Hero (who + a spark) → About (why trust you) → Work (the evidence) → Experience (the receipts) → Contact (the close). Each section is one scroll-spy node in the right column of the Chiang layout. Wayfinding is editorial: numbered grids, <code>NN / total</code> counters, year tags, monospace metadata — cheap, high-signal, and on-brand for a dev audience.</p>
+
+    <div class="callout steal">
+      <p><strong>Project case-study template</strong> — author each as one <code>content/work/&lt;slug&gt;.md</code> with frontmatter. Render with <code>&lt;ContentRenderer&gt;</code>. Fields:</p>
+      <pre><code>---
+title: "Realtime Chat App"
+slug: "chat-app"
+year: 2025
+role: "Full-stack · solo"
+stack: ["Vue 3", "WebSocket", "Postgres"]
+cover: "/work/chat-app/cover.webp"
+live: "https://…"
+repo: "https://github.com/…"
+order: 1
+---
+
+**Problem** — one sentence on what was broken / needed.
+**Approach** — 2–3 sentences, the key technical decision (and the trade-off).
+**Outcome** — quantified: "cut p95 latency 280ms→40ms", "1.2k MAU".
+**Artifact** — a real screenshot or an embedded live demo, not a mockup.</code></pre>
+      <p>Keep it to four beats: Problem / Approach / Outcome / Artifact. Specificity over adjectives — "passionate developer" is worth nothing; "cut latency 7×" is worth everything.</p>
+    </div>
+
+    <!-- ===================== 4. DESIGN SYSTEM ===================== -->
+    <h2 id="system">4 · Design system &amp; tokens</h2>
+
+    <p>One face for display, system stack for body, one accent. The discipline matters more than the values. Define tokens once as CSS custom properties (or Tailwind v4 <code>@theme</code>, since the SPEC uses <code>@nuxt/ui</code> 4 on Tailwind v4) and never hardcode again. See <a class="ref" href="best-practices/TYPOGRAPHY.html">Typography</a>, <a class="ref" href="best-practices/COLOR.html">Color</a>, and <a class="ref" href="best-practices/STYLING.html">Styling</a>.</p>
+
+    <h3>Type scale</h3>
+    <p>Fluid <code>clamp()</code> scale, hierarchy from <strong>weight + size</strong>, not from many sizes. Your existing NeuzeitGro + Quicksand stack carries over <span class="ref">workings/SPEC</span> — treat NeuzeitGro as the one characterful display face doing the brand work; keep the body stack near-system for payload.</p>
+    <pre><code>/* tokens.css — type */
+--font-display: "NeuzeitGro", Georgia, serif;   /* hero + headings */
+--font-body:    "Quicksand", system-ui, sans-serif;
+--font-mono:    "JetBrains Mono", ui-monospace, monospace; /* metadata */
+
+--step--1: clamp(0.80rem, 0.76rem + 0.18vw, 0.875rem);
+--step-0:  clamp(1.00rem, 0.95rem + 0.22vw, 1.125rem);  /* body */
+--step-3:  clamp(1.80rem, 1.45rem + 1.70vw, 3.05rem);   /* section h */
+--step-4:  clamp(2.30rem, 1.70rem + 2.90vw, 4.40rem);   /* hero */</code></pre>
+    <p>Apply aggressive negative tracking on the oversized hero (<code>letter-spacing: -0.025em</code>) — the recurring "premium type" tell across Mercury, Vercel, Robin Noguier.</p>
+
+    <h3>Color</h3>
+    <p>Near-monochrome base + <strong>one</strong> accent. Your current cosmic/dark-orchid background gives you a natural dark base; pick a single accent that survives both modes (dark-mode toggle is a real SPEC feature). Light-mode and dark-mode are two token sets behind <code>@nuxtjs/color-mode</code>.</p>
+    <pre><code>--bg: #0b0c0e; --surface: #16191e; --line: #23272e;
+--ink: #e9eaec; --ink-soft: #b7bcc4; --ink-dim: #888f9a;
+--accent: #f5a623;            /* exactly one — see Dept/Ramp/Nike */
+/* AA contrast is non-negotiable; verify every pair (see §7) */</code></pre>
+
+    <h3>Spacing &amp; motion tokens</h3>
+    <pre><code>--s-1:.25rem --s-2:.5rem --s-3:.75rem --s-4:1rem --s-5:1.5rem --s-6:2rem --s-7:3rem
+--r-2:8px --r-3:12px --r-pill:999px
+--ease: cubic-bezier(0.22, 0.61, 0.36, 1);   /* one signature easing */
+--dur-fast: 180ms; --dur-base: 320ms; --dur-slow: 600ms;</code></pre>
+    <p>One easing curve used everywhere is itself a coherence signal (Andrei Terteci's "one gradient" lesson, applied to motion).</p>
+
+    <!-- ===================== 5. MOTION BUDGET ===================== -->
+    <h2 id="motion">5 · Motion &amp; interaction budget</h2>
+
+    <p>The single highest-leverage decision in the whole build: <strong>spend the wow on ONE thing, stay disciplined everywhere else.</strong> See <a class="ref" href="best-practices/MOTIONS.html">Motion</a>, <a class="ref" href="best-practices/ANIMATIONS.html">Animation</a>, <a class="ref" href="best-practices/INTERACTIONS.html">Interaction</a>.</p>
+
+    <h3>The one signature moment — pick A or B</h3>
+    <div class="grid">
+      <div class="card">
+        <h4>A · Particle / generative hero (low-risk)</h4>
+        <p>Evolve the existing <code>@tsparticles/vue3</code> cobweb into the signature — cursor-reactive links that bend toward the pointer, a tasteful constellation that <em>responds</em>. You already have the dependency in the SPEC; this is incremental, degrades gracefully, and stays cheap. <strong>Recommended starting point.</strong></p>
+      </div>
+      <div class="card">
+        <h4>B · Scroll-driven hero set piece (higher ceiling)</h4>
+        <p>Lenis smooth scroll + GSAP ScrollTrigger pinning a hero that transforms as you scroll (à la Apple's scrub, scaled down). Higher craft ceiling, higher build + perf + a11y cost. Choose only if you'll invest the polish — a half-done scroll effect is worse than none.</p>
+      </div>
+    </div>
+
+    <h3>Restraint everywhere else — the cheap, disproportionate wins</h3>
+    <ul>
+      <li><strong>Magnetic nav links/buttons</strong> (Dennis) — ~20 lines, premium feel. <a class="ref" href="workings/dennis-snellenberg.md">workings/dennis-snellenberg</a></li>
+      <li><strong>Copy-email tell</strong> (Rauno) — button flips to "Copied ✓". <a class="ref" href="workings/rauno-freiberg.md">workings/rauno-freiberg</a></li>
+      <li><strong>Scroll-spy active-section nav</strong> (Chiang) — <code>IntersectionObserver</code>, no library.</li>
+      <li><strong>View Transitions</strong> for route changes — Nuxt 4 has built-in support (see §6); eliminates navigation flash for near-zero code.</li>
+      <li><strong>Section reveal on scroll</strong> — a single fade-up with <code>@vueuse/motion</code>, one easing, short distance. No staggered confetti.</li>
+    </ul>
+
+    <div class="callout warn">
+      <p><strong>Perf &amp; reduced-motion guardrails (non-negotiable):</strong></p>
+      <ul>
+        <li>Wrap every non-essential animation in <code>@media (prefers-reduced-motion: reduce)</code> → reduce to opacity-only or none. Lenis must be disabled under reduced-motion.</li>
+        <li>Particles/WebGL only inside <code>&lt;ClientOnly&gt;</code>, lazy-mounted, paused when offscreen / tab hidden (<code>visibilitychange</code>).</li>
+        <li>Animate only <code>transform</code> and <code>opacity</code> (compositor-friendly). Never animate layout properties.</li>
+        <li>Budget: the signature moment must not push <strong>INP &gt; 200ms</strong> or drop the hero below 60fps on a mid-tier laptop.</li>
+      </ul>
+    </div>
+
+    <!-- ===================== 6. TECH ===================== -->
+    <h2 id="tech">6 · Tech architecture — Nuxt 4 specifics</h2>
+
+    <p>Stack is fixed by the rebuild SPEC <span class="ref">workings/SPEC</span>: Nuxt 4.4 (<code>app/</code> dir), full TypeScript, <code>@nuxt/ui</code> 4 (Tailwind v4), Pinia 3, <code>@nuxt/content</code> 3, <code>@nuxt/fonts</code>, <code>@vite-pwa/nuxt</code>, Vitest 4, pnpm, static export to GitHub Pages. The plan below maps the design decisions onto that stack. See <a class="ref" href="best-practices/NEXTJS.html">Meta-Framework</a> and <a class="ref" href="best-practices/STATE-MANAGEMENT.html">State</a>.</p>
+
+    <h3>Rendering strategy</h3>
+    <p><strong>SSG / prerender.</strong> <code>ssr: true</code> + full prerender → static HTML to <code>.output/public</code>, deployed to <code>gareth0712.github.io</code>. This is correct: a portfolio is content-stable, and static-first is the universal norm across the dev-portfolio teardowns (Astro / Eleventy / Next export recur constantly). Fast first paint is treated as a <em>feature</em>.</p>
+    <pre><code>// nuxt.config.ts
+export default defineNuxtConfig({
+  ssr: true,
+  nitro: { prerender: { crawlLinks: true, routes: ['/'] } },
+  experimental: { viewTransition: true },   // page-morph, near-zero code
+  modules: [
+    '@nuxt/ui', '@nuxt/content', '@nuxt/fonts',
+    '@pinia/nuxt', '@vite-pwa/nuxt',
+  ],
+})</code></pre>
+
+    <h3>Content (Nuxt Content 3)</h3>
+    <p>About + each case study live in <code>content/</code> as markdown, queried via <code>queryCollection</code> and rendered with <code>&lt;ContentRenderer&gt;</code>. Define a typed collection in <code>content.config.ts</code> so frontmatter is type-safe — work items get the schema from §3.</p>
+
+    <h3>Image &amp; font optimization</h3>
+    <ul>
+      <li><strong>Fonts:</strong> <code>@nuxt/fonts</code> for Quicksand (auto self-host + preload + <code>font-display: swap</code>); NeuzeitGro carried over as a local <code>@font-face</code> .ttf — subset it to Latin and preload only the hero weight to protect LCP.</li>
+      <li><strong>Images:</strong> add <code>@nuxt/image</code> for case-study covers → WebP/AVIF, responsive <code>srcset</code>, lazy below the fold, explicit width/height to kill CLS. The cosmic background should be a sized, compressed asset, not a raw JPG.</li>
+    </ul>
+
+    <h3>Motion libraries</h3>
+    <table>
+      <thead><tr><th>Need</th><th>Pick</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Smooth scroll</td><td>Lenis (only if signature B)</td><td>Disable under reduced-motion. Skip entirely if you choose signature A.</td></tr>
+        <tr><td>Scroll-scrub / timeline</td><td>GSAP + ScrollTrigger</td><td>Only for signature B. Heavyweight — justify it.</td></tr>
+        <tr><td>Reveal / micro-motion</td><td><code>@vueuse/motion</code></td><td>Vue-native, tiny, declarative <code>v-motion</code>. Default choice for the 90% case.</td></tr>
+        <tr><td>Page transitions</td><td>Nuxt View Transitions</td><td>Built-in; no extra dependency.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>State (Pinia 3)</h3>
+    <p>Keep it minimal — a portfolio barely needs global state. One <code>useThemeStore</code> for the dark-mode preference (bound to <code>@nuxtjs/color-mode</code>, persisted), per the SPEC. Resist adding stores for things that are local component state. See <a class="ref" href="best-practices/STATE-MANAGEMENT.html">State</a>.</p>
+
+    <div class="callout tip">
+      <p><strong>Next.js equivalent</strong> (since the plan is meant to be reusable): Nuxt SSG → Next <code>output: 'export'</code> / SSG; Nuxt Content → <code>next-mdx-remote</code> or Contentlayer; <code>@nuxt/image</code> → <code>next/image</code>; <code>@nuxt/fonts</code> → <code>next/font</code>; Pinia → Zustand; View Transitions → the Next App Router View Transitions API; <code>@vueuse/motion</code> → Framer Motion. The architecture is identical; only the bindings change.</p>
+    </div>
+
+    <!-- ===================== 7. BUDGET ===================== -->
+    <h2 id="budget">7 · Performance &amp; accessibility budget</h2>
+
+    <h3>Core Web Vitals targets</h3>
+    <table>
+      <thead><tr><th>Metric</th><th>Target</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td>LCP</td><td>&lt; 1.5s (good: &lt; 2.5s)</td><td>Static HTML, preloaded hero font, sized hero image, no render-blocking JS.</td></tr>
+        <tr><td>INP</td><td>&lt; 200ms</td><td>Keep main thread free; lazy-mount the signature moment; debounce magnetic/scroll handlers.</td></tr>
+        <tr><td>CLS</td><td>&lt; 0.1</td><td>Explicit width/height on all media; <code>font-display: swap</code> with a matched fallback metric.</td></tr>
+        <tr><td>JS payload</td><td>&lt; 120KB gz initial</td><td>No GSAP/Lenis unless signature B; tree-shake; particles in a deferred chunk.</td></tr>
+        <tr><td>Lighthouse</td><td>95+ all four</td><td>Run in CI; treat a regression as a build failure.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Accessibility checklist</h3>
+    <ul>
+      <li>Skip-link as the first focusable DOM node (Sara/Chiang). Real landmarks: <code>header / main / nav / footer</code>.</li>
+      <li>Every interactive element keyboard-reachable with a visible <code>:focus-visible</code> ring. Magnetic effects must not trap or hide focus.</li>
+      <li>AA contrast on every text/background pair, <strong>in both themes</strong> — verify, don't assume.</li>
+      <li>Links distinguishable without color (underline or weight), not color alone.</li>
+      <li>Respect <code>prefers-reduced-motion</code> globally (§5). Canvas/particles get an <code>aria-hidden</code> + a real text DOM underneath.</li>
+      <li>Alt text on every meaningful image; decorative covers <code>alt=""</code>.</li>
+      <li>Semantic heading order (one <code>h1</code>, no skipped levels) — also your SEO backbone.</li>
+    </ul>
+
+    <div class="callout warn">
+      <p><strong>The honest trade-off we saw across the teardowns.</strong> WebGL-heavy sites (Bruno Simon, Henry Heffernan, Tim Roussilhe, Lusion) are stunning but pay a real tax: weak SEO (content lives in a canvas crawlers can't read), fragile a11y (you must hand-build a parallel DOM, as Henry does), heavy payloads, and ongoing maintenance. <span class="ref">workings/henry-heffernan</span> The calm-engineer base sidesteps all of it — your content is real HTML, indexable and accessible by default, and the one signature moment is an <em>enhancement layered on top</em>, never the load-bearing structure. That's the whole reason for the chosen direction in §1.</p>
+    </div>
+
+    <!-- ===================== 8. ROADMAP ===================== -->
+    <h2 id="roadmap">8 · Phased build roadmap</h2>
+
+    <p>Three phases, shippable at the end of each. Don't build the signature moment first — get a fast, accessible, complete site live, <em>then</em> layer the wow. A half-built portfolio with a fancy hero is worse than a complete plain one.</p>
+
+    <h3>Phase 1 · MVP — complete, fast, accessible (the foundation)</h3>
+    <ul>
+      <li>Scaffold Nuxt 4 + TS + tokens (§4) per the SPEC's T1/T2. Migrate fonts, background, favicons.</li>
+      <li>Build the Chiang split-screen shell: sticky identity rail + scrolling content column.</li>
+      <li>All five sections from §3 with <em>real content</em> — About + ≥3 case studies authored in <code>content/</code>.</li>
+      <li>Dark-mode toggle (real, persisted) + the 3 contact links with copy-email tell.</li>
+      <li>Hit the §7 budget: Lighthouse 95+, AA contrast both themes, skip-link, semantic landmarks.</li>
+      <li>Deploy static to GitHub Pages via the fixed Actions workflow. <strong>Ship it.</strong></li>
+    </ul>
+
+    <h3>Phase 2 · The signature moment</h3>
+    <ul>
+      <li>Pick A (cursor-reactive particle hero) or B (scroll-scrub set piece) from §5 — A recommended.</li>
+      <li>Lazy-mount inside <code>&lt;ClientOnly&gt;</code>; pause offscreen / tab-hidden; full reduced-motion fallback.</li>
+      <li>Re-verify the budget — the moment must not regress LCP/INP/CLS or 60fps.</li>
+    </ul>
+
+    <h3>Phase 3 · Polish — the micro-interaction layer</h3>
+    <ul>
+      <li>Magnetic nav links/buttons (Dennis). Scroll-spy active-section highlight (Chiang).</li>
+      <li>Nuxt View Transitions on route changes. <code>@vueuse/motion</code> section reveals, one easing.</li>
+      <li>One human touch — a signature SVG, an easter egg, a live "now" line (Jhey).</li>
+      <li>Final pass: cross-browser, mobile, Lighthouse, axe a11y audit, real-device check.</li>
+    </ul>
+
+    <h3>Execution checklist</h3>
+    <pre><code>PHASE 1 — MVP (ship)
+[ ] Nuxt 4 + TS scaffold, tokens.css, fonts/bg migrated
+[ ] Sticky split-screen shell (Chiang) responsive
+[ ] About + 3 case studies in content/ (Problem/Approach/Outcome/Artifact)
+[ ] Dark-mode toggle (persisted) + 3 contacts + copy-email tell
+[ ] Skip-link, landmarks, AA contrast both themes
+[ ] Lighthouse 95+ ; LCP <1.5s ; CLS <0.1
+[ ] Static build -> GitHub Pages deploy green
+
+PHASE 2 — Signature moment
+[ ] Pick A (particles) or B (scroll) ; one only
+[ ] ClientOnly + lazy + offscreen-pause + reduced-motion fallback
+[ ] Budget re-verified (no INP/LCP/fps regression)
+
+PHASE 3 — Polish
+[ ] Magnetic links + scroll-spy nav
+[ ] View Transitions + @vueuse/motion reveals (one easing)
+[ ] One human touch (SVG / easter egg / "now" line)
+[ ] Cross-browser + mobile + axe audit pass</code></pre>
+
+    <div class="callout">
+      <p><strong>The one sentence to remember.</strong> Build the calm, fast, accessible editorial site first — that alone beats 90% of dev portfolios — then spend your entire motion budget on a single moment that proves you can do the thing you say you can do. Restraint, one signature, specificity. Everything in this plan serves those three.</p>
+    </div>
+
+  </main>
+
+  <footer class="ftr">
+    <div class="wrap">
+      <p><span class="brand">◆ Craft Atlas</span> — Build Plan</p>
+      <p>Synthesized from 80 first-hand teardowns in <a href="workings/">workings/</a>. Start with <a href="TOP-LIST.md">TOP-LIST</a> and the <a href="PORTFOLIO.md">developer-portfolio field guide</a>. Stack grounded in the Nuxt 4 rebuild <span class="ref">workings/SPEC</span>.</p>
+      <p>Guides: <a href="best-practices/UI-DESIGN.html">UI Design</a> · <a href="best-practices/UX.html">UX</a> · <a href="best-practices/TYPOGRAPHY.html">Typography</a> · <a href="best-practices/COLOR.html">Color</a> · <a href="best-practices/STYLING.html">Styling</a> · <a href="best-practices/MOTIONS.html">Motion</a> · <a href="best-practices/ANIMATIONS.html">Animation</a> · <a href="best-practices/INTERACTIONS.html">Interaction</a> · <a href="best-practices/SPATIAL.html">3D / Spatial</a> · <a href="best-practices/MINI-GAMES.html">Mini-Games</a> · <a href="best-practices/STATE-MANAGEMENT.html">State</a> · <a href="best-practices/NEXTJS.html">Meta-Framework</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
