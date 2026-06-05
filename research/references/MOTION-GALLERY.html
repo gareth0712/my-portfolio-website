@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Motion Reel — Craft Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,wght@0,400;0,560;1,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../best-practices/shared.css">
+  <style>
+    /* ---- page-local: keep clip media tidy ---- */
+    .clip { aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--r-2); border: 1px solid var(--line); background: var(--bg-1); box-shadow: var(--shadow-1); }
+    .clip img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .card .figure { margin: 0; }
+    .card .figure figcaption { text-align: left; margin-top: var(--s-3); }
+    .card .links { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); font-family: var(--font-mono); font-size: var(--step--1); }
+    .card h3 { display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Best practices">
+      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a href="../best-practices/UI-DESIGN.html">UI Design</a>
+      <a href="../best-practices/UX.html">UX</a>
+      <a href="../best-practices/TYPOGRAPHY.html">Typography</a>
+      <a href="../best-practices/COLOR.html">Color</a>
+      <a href="../best-practices/STYLING.html">Styling</a>
+      <a href="../best-practices/MOTIONS.html">Motion</a>
+      <a href="../best-practices/ANIMATIONS.html">Animation</a>
+      <a href="../best-practices/INTERACTIONS.html">Interaction</a>
+      <a href="../best-practices/SPATIAL.html">3D / Spatial</a>
+      <a href="../best-practices/MINI-GAMES.html">Mini-Games</a>
+      <a href="../best-practices/STATE-MANAGEMENT.html">State</a>
+      <a href="../best-practices/NEXTJS.html">Meta-Framework</a>
+      <a href="PORTFOLIO.html">Portfolio</a>
+      <a href="TOP-LIST.html">Top List</a>
+      <a href="MOTION-GALLERY.html" aria-current="page">Motion Reel</a>
+      <a class="cta" href="../PLAN.html">Build Plan →</a>
+    </nav>
+  </header>
+
+  <main class="wide">
+    <p class="kicker">CRAFT ATLAS · MOTION REEL</p>
+    <h1>Motion Reel</h1>
+    <p class="lede">Twelve short loops captured live from the best motion sites on the web — roughly ten seconds each, recorded straight off the running experience. Every one is here because motion never survives a static screenshot: the scroll-scrubbed 3D, the magnetic cursors, the blur-to-focus type, the physics. A still frame shows you the layout; these clips show you the craft.</p>
+
+    <div class="callout tip">
+      <p>The animated <strong>GIF</strong> of each clip is shown inline (it is committed to the repo and plays everywhere). A matching <strong>HD WebM</strong> source sits next to it for local high-quality viewing — it is gitignored, so the "HD WebM ↗" link only resolves on a local checkout.</p>
+    </div>
+
+    <div class="grid">
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/igloo-inc.gif" alt="Igloo Inc motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch the igloo <strong>assemble as you scroll</strong> — blocks grow and brighten from a loose pile into a glowing domed structure, with chromatic aberration and emissive ice glow applied globally because the UI itself renders inside WebGL.</figcaption>
+        </figure>
+        <h3>Igloo Inc <span class="ref">Igloo Inc ↗</span></h3>
+        <div class="links">
+          <a href="https://www.igloo.inc/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/igloo-inc.md">Teardown</a>
+          <a href="../workings/clips/igloo-inc.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/active-theory.gif" alt="Active Theory motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch the <strong>GPU particle field drift and bloom</strong> around a single glowing logo orb — the scene never stops moving, and nav/type are rendered as GL geometry so the HydraBloom glow lands on everything uniformly.</figcaption>
+        </figure>
+        <h3>Active Theory <span class="ref">Active Theory ↗</span></h3>
+        <div class="links">
+          <a href="https://activetheory.net/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/active-theory.md">Teardown</a>
+          <a href="../workings/clips/active-theory.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/lusion.gif" alt="Lusion motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch the <strong>physics-driven connector cluster</strong> react to the pointer with springy momentum and live shadows, while scroll acts as a camera advancing one continuous 3D story — note the dark framed canvas on a light background for max render contrast.</figcaption>
+        </figure>
+        <h3>Lusion <span class="ref">Lusion ↗</span></h3>
+        <div class="links">
+          <a href="https://lusion.co/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/lusion.md">Teardown</a>
+          <a href="../workings/clips/lusion.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/obys-agency.gif" alt="Obys Agency motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch the <strong>tri-column synchronized scroll</strong> — name list, media, and metadata advance as one timeline through a fixed "viewfinder" bracket, and grid tiles bloom from contained stills into full-bleed WebGL video on hover.</figcaption>
+        </figure>
+        <h3>Obys Agency <span class="ref">Obys Agency ↗</span></h3>
+        <div class="links">
+          <a href="https://obys.agency/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/obys-agency.md">Teardown</a>
+          <a href="../workings/clips/obys-agency.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/cuberto.gif" alt="Cuberto motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch Cuberto's signature <strong>skewing, magnetic custom cursor</strong> morph and pull toward pill buttons, plus white↔black section flips via rounded clip-path masks — all riding Lenis smooth scroll.</figcaption>
+        </figure>
+        <h3>Cuberto <span class="ref">Cuberto ↗</span></h3>
+        <div class="links">
+          <a href="https://cuberto.com/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/cuberto.md">Teardown</a>
+          <a href="../workings/clips/cuberto.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/locomotive.gif" alt="Locomotive motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch the <strong>giant-serif work list reveal media on hover</strong> with cursor-tracked imagery and animating hairline rules, all over Lenis inertia scroll and a hand-rolled <code>is-loaded</code>/<code>is-scrolling-up</code> state machine on <code>&lt;html&gt;</code>.</figcaption>
+        </figure>
+        <h3>Locomotive <span class="ref">Locomotive ↗</span></h3>
+        <div class="links">
+          <a href="https://locomotive.ca/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/locomotive.md">Teardown</a>
+          <a href="../workings/clips/locomotive.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/hello-monday.gif" alt="Hello Monday motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch the <strong>hero headline cycle its disciplines</strong> as an animated word-swap, while the asymmetric staggered work grid fades and translates in on inertia scroll — and the "days until Monday" counter ticks as a live brand gag.</figcaption>
+        </figure>
+        <h3>Hello Monday <span class="ref">Hello Monday ↗</span></h3>
+        <div class="links">
+          <a href="https://www.hellomonday.com/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/hello-monday.md">Teardown</a>
+          <a href="../workings/clips/hello-monday.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/bruno-simon.gif" alt="Bruno Simon motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch the <strong>drivable, physics-engine car</strong> (Rapier) bounce, flip, and collide across a diegetic 3D world where the site map <em>is</em> the navigation — suspension, honks, and emergent achievements all baked in.</figcaption>
+        </figure>
+        <h3>Bruno Simon <span class="ref">Bruno Simon ↗</span></h3>
+        <div class="links">
+          <a href="https://bruno-simon.com/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/bruno-simon.md">Teardown</a>
+          <a href="../workings/clips/bruno-simon.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/unseen-studio.gif" alt="Unseen Studio motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch <strong>scroll pan the camera through a fixed-stage 3D world</strong> rather than scrolling the DOM, with GSAP-tweened reveals and 3D-rendered headline type floating in the scene over a tight two-color palette.</figcaption>
+        </figure>
+        <h3>Unseen Studio <span class="ref">Unseen Studio ↗</span></h3>
+        <div class="links">
+          <a href="https://unseen.co/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/unseen-studio.md">Teardown</a>
+          <a href="../workings/clips/unseen-studio.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/studio-freight-darkroom.gif" alt="Studio Freight / Darkroom motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch the <strong>instant animated full-site recolor</strong> (dark/light/red/simple theme swap) plus Lenis smooth scroll, scroll-reactive therma headlines, and flickering ASCII terminal corners framing the viewport.</figcaption>
+        </figure>
+        <h3>Studio Freight / Darkroom <span class="ref">Darkroom ↗</span></h3>
+        <div class="links">
+          <a href="https://darkroom.engineering/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/studio-freight-darkroom.md">Teardown</a>
+          <a href="../workings/clips/studio-freight-darkroom.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/refokus.gif" alt="Refokus motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch the signature <strong>blur-to-focus scroll typography</strong> — statement lines render heavily Gaussian-blurred and sharpen as you scroll ("we make people feel them") — alongside a per-character staggered headline reveal driven by GSAP ScrollTrigger.</figcaption>
+        </figure>
+        <h3>Refokus <span class="ref">Refokus ↗</span></h3>
+        <div class="links">
+          <a href="https://refokus.com/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/refokus.md">Teardown</a>
+          <a href="../workings/clips/refokus.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <figure class="figure">
+          <div class="clip"><img src="../workings/clips/basement-studio.gif" alt="Basement Studio motion clip" loading="lazy" style="width:100%;height:auto"></div>
+          <figcaption>Watch the <strong>staged loader composite into a real-time 3D "basement" hero</strong>, then the "Scroll to Explore" scrollytelling reveals fire — with a custom cursor replacing the native pointer and the WebGL kept off-main-thread for 60fps.</figcaption>
+        </figure>
+        <h3>Basement Studio <span class="ref">Basement Studio ↗</span></h3>
+        <div class="links">
+          <a href="https://basement.studio/" target="_blank" rel="noopener">Live site ↗</a>
+          <a href="../workings/basement-studio.md">Teardown</a>
+          <a href="../workings/clips/basement-studio.webm">HD WebM ↗</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="ftr">
+    <div class="wide">
+      <p><a href="../PLAN.html">◆ Craft Atlas — Build Plan →</a></p>
+      <p style="margin-top:var(--s-3);color:var(--ink-dim);">Motion Reel · 12 live captures. Craft Atlas — synthesized from 80 live site teardowns.</p>
+    </div>
+  </footer>
+</body>
+</html>
