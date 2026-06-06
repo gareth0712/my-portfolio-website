@@ -31,6 +31,7 @@ Rebuild the 248-LOC Nuxt 2.15 SPA as a clean **Nuxt 4 + full TypeScript** static
 | Framework | nuxt 2.15 | **nuxt 4.4** (`app/` dir, SSG `ssr:true` + prerender) |
 | Language | JS + partial TS | **full TS**, `<script setup lang="ts">` |
 | UI | @nuxtjs/vuetify (Vuetify 2) | **@nuxt/ui 4** (Tailwind v4); icons `i-mdi-*` via `@iconify-json/mdi` |
+| Styling | SCSS rules + Vuetify | **Tailwind v4 utility classes** (`class="..."`) everywhere. Custom CSS kept ONLY for what utilities can't express: `@font-face` (NeuzeitGro), particles bg-image, `appear` keyframes |
 | Particles | particles-bg-vue (Vue 2) | **@tsparticles/vue3 4** + `@tsparticles/slim`, in `<ClientOnly>` |
 | State | Vuex | **Pinia 3** (`@pinia/nuxt`) |
 | Dark mode | dead `darkMode` flag | **real toggle** — `@nuxtjs/color-mode` (bundled w/ @nuxt/ui) as theming engine, Pinia store holds the preference + drives the toggle button |
@@ -69,7 +70,7 @@ app/
     ParticlesBg.client.vue # tsparticles cobweb wrapper
     ThemeToggle.vue        # dark-mode button -> useThemeStore
     AboutSection.vue       # ContentRenderer of content/about.md
-  assets/css/main.scss     # font stack + reset (no Vuetify)
+  assets/css/main.css      # Tailwind entry (@import "tailwindcss") + @font-face + keyframes (no Vuetify/SCSS)
   assets/fonts/neuzeitGro/ # .ttf + @font-face (carried over)
   stores/theme.ts          # Pinia: darkMode pref
 content/about.md           # real markdown content
