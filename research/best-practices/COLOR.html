@@ -6,65 +6,493 @@
   <title>Color — Craft Atlas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,wght@0,400;0,560;1,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ---- page-local LIVE DEMO styling only ---- */
-    .swatch-row { display: flex; flex-wrap: wrap; gap: 0; border-radius: var(--r-2); overflow: hidden; border: 1px solid var(--line); }
-    .swatch { flex: 1 1 0; min-width: 64px; aspect-ratio: 1 / 1; display: flex; align-items: flex-end; padding: 6px; font-family: var(--font-mono); font-size: 0.62rem; }
-    /* OKLCH ramp — fixed hue, lightness steps. Even perceptual steps. */
-    .ramp .s1 { background: oklch(0.22 0.05 265); color: #cdd3ff; }
-    .ramp .s2 { background: oklch(0.34 0.08 265); color: #d7dcff; }
-    .ramp .s3 { background: oklch(0.46 0.11 265); color: #fff; }
-    .ramp .s4 { background: oklch(0.58 0.14 265); color: #fff; }
-    .ramp .s5 { background: oklch(0.70 0.15 265); color: #1a1205; }
-    .ramp .s6 { background: oklch(0.82 0.10 265); color: #1a1205; }
-    .ramp .s7 { background: oklch(0.92 0.05 265); color: #1a1205; }
+    /* =========================================================================
+       COLOR — Craft Atlas 04 / 13
+       Art direction: "Chromatic Lab". Color is the subject. A near-black ink
+       canvas turns every swatch into a lit specimen; an OKLCH spectrum bar is
+       the spine of the page; gradients run hot edge to edge; the prose is a
+       quiet wide-grotesk so the color does the talking. This is the most
+       saturated page of the set — by design.
+       All CSS is local. No shared.css dependency.
+       ========================================================================= */
+
+    :root {
+      /* ---- canvas: a near-black tinted faintly violet, never pure #000 ---- */
+      --ink-0:   oklch(0.16 0.018 285);   /* page */
+      --ink-1:   oklch(0.20 0.022 285);   /* raised surface */
+      --ink-2:   oklch(0.245 0.026 285);  /* card / panel */
+      --ink-3:   oklch(0.30 0.030 285);   /* control */
+      --line:    oklch(0.34 0.030 285);
+      --line-soft: oklch(0.27 0.026 285);
+
+      /* ---- text on dark, off-white never #fff (halation) ---- */
+      --paper:   oklch(0.96 0.006 285);
+      --paper-2: oklch(0.86 0.010 285);
+      --paper-3: oklch(0.70 0.014 285);
+      --paper-4: oklch(0.56 0.016 285);
+
+      /* ---- the spectrum: the page's living vocabulary ---- */
+      --c-violet:  oklch(0.66 0.20 285);
+      --c-blue:    oklch(0.68 0.18 255);
+      --c-cyan:    oklch(0.78 0.14 200);
+      --c-green:   oklch(0.80 0.18 150);
+      --c-lime:    oklch(0.90 0.21 124);
+      --c-amber:   oklch(0.80 0.16 75);
+      --c-coral:   oklch(0.72 0.20 35);
+      --c-magenta: oklch(0.68 0.24 350);
+
+      /* ---- accent of record (this page spends violet→lime) ---- */
+      --accent:     var(--c-violet);
+      --accent-ink: oklch(0.16 0.018 285);
+      --accent-glow: oklch(0.66 0.20 285 / 0.35);
+
+      --r-1: 8px; --r-2: 14px; --r-3: 22px; --r-pill: 999px;
+      --s-1: 4px; --s-2: 8px; --s-3: 14px; --s-4: 22px; --s-5: 34px; --s-6: 56px; --s-7: 88px;
+
+      --font-sans: 'Space Grotesk', system-ui, sans-serif;
+      --font-serif: 'Fraunces', Georgia, serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --ease: cubic-bezier(0.32, 0.72, 0, 1);
+      --maxw: 1180px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+    body {
+      margin: 0;
+      background: var(--ink-0);
+      color: var(--paper-2);
+      font-family: var(--font-sans);
+      font-size: 1.0625rem;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    /* prismatic field bleeding behind the whole page — the "color is energy" mood */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(50% 40% at 12% 0%, oklch(0.66 0.20 285 / 0.18), transparent 70%),
+        radial-gradient(45% 38% at 92% 8%, oklch(0.72 0.20 35 / 0.14), transparent 70%),
+        radial-gradient(60% 50% at 78% 96%, oklch(0.80 0.18 150 / 0.10), transparent 70%);
+    }
+    /* fine film grain so the chroma reads as lit, not flat */
+    body::after {
+      content: "";
+      position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    main, header, footer { position: relative; z-index: 2; }
+
+    a { color: inherit; }
+    :focus-visible {
+      outline: 2px solid var(--c-lime);
+      outline-offset: 3px;
+      border-radius: 3px;
+    }
+
+    /* ---------------------------------------------------------------- NAV */
+    .site-header {
+      position: sticky; top: 0; z-index: 40;
+      background: oklch(0.16 0.018 285 / 0.72);
+      backdrop-filter: blur(16px) saturate(1.4);
+      -webkit-backdrop-filter: blur(16px) saturate(1.4);
+      border-bottom: 1px solid var(--line-soft);
+    }
+    /* the live spectrum spine — color literally edges the page */
+    .site-header::after {
+      content: ""; display: block; height: 3px;
+      background: linear-gradient(90deg in oklch,
+        var(--c-violet), var(--c-blue), var(--c-cyan), var(--c-green),
+        var(--c-lime), var(--c-amber), var(--c-coral), var(--c-magenta));
+    }
+    .site-nav {
+      max-width: var(--maxw); margin: 0 auto;
+      display: flex; align-items: center; gap: 2px;
+      padding: 12px clamp(16px, 4vw, 32px);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .site-nav::-webkit-scrollbar { display: none; }
+    .site-nav a {
+      flex: 0 0 auto;
+      text-decoration: none;
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--paper-3);
+      padding: 7px 12px; border-radius: var(--r-pill);
+      white-space: nowrap;
+      transition: color 0.25s var(--ease), background 0.25s var(--ease);
+    }
+    .site-nav a:hover { color: var(--paper); background: var(--ink-2); }
+    .site-nav a.brand {
+      font-family: var(--font-serif); font-weight: 600; font-style: italic;
+      font-size: 1.02rem; color: var(--paper);
+      margin-right: 6px; padding-left: 4px;
+    }
+    .site-nav a.brand:hover { background: transparent; }
+    .site-nav a.cta {
+      margin-left: auto;
+      color: var(--accent-ink);
+      background: linear-gradient(120deg in oklch, var(--c-lime), var(--c-cyan));
+      font-weight: 600;
+    }
+    .site-nav a.cta:hover { filter: brightness(1.08); color: var(--accent-ink); }
+
+    /* ---------------------------------------------------------------- LAYOUT */
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(16px, 4vw, 32px); }
+    main.wrap { padding-bottom: var(--s-7); }
+
+    /* ---------------------------------------------------------------- HERO */
+    .hero {
+      padding: clamp(48px, 9vw, 96px) 0 clamp(36px, 6vw, 64px);
+      position: relative;
+    }
+    .kicker {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink-0);
+      background: linear-gradient(110deg in oklch, var(--c-amber), var(--c-coral));
+      padding: 6px 14px; border-radius: var(--r-pill);
+    }
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: clamp(2.6rem, 7.5vw, 5.4rem);
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+      margin: clamp(20px, 3vw, 32px) 0 0;
+      color: var(--paper);
+      max-width: 16ch;
+    }
+    .hero h1 .spend {
+      font-style: italic;
+      background: linear-gradient(100deg in oklch,
+        var(--c-violet), var(--c-magenta), var(--c-coral), var(--c-amber), var(--c-lime));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      padding-bottom: 0.08em;
+    }
+    .lede {
+      margin: clamp(20px, 3vw, 28px) 0 0;
+      font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+      line-height: 1.6;
+      color: var(--paper-3);
+      max-width: 60ch;
+    }
+
+    /* ---------------------------------------------------------------- TOC */
+    .toc {
+      margin: clamp(36px, 5vw, 56px) 0 clamp(40px, 6vw, 64px);
+      border: 1px solid var(--line-soft);
+      border-radius: var(--r-3);
+      background: var(--ink-1);
+      padding: clamp(20px, 3vw, 30px);
+    }
+    .toc h2 {
+      font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--paper-4); margin: 0 0 var(--s-4);
+    }
+    .toc ol {
+      list-style: none; margin: 0; padding: 0;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 2px;
+      counter-reset: toc;
+    }
+    .toc li { counter-increment: toc; }
+    .toc a {
+      display: flex; align-items: baseline; gap: 12px;
+      text-decoration: none;
+      padding: 11px 14px; border-radius: var(--r-2);
+      color: var(--paper-2); font-size: 0.92rem;
+      transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease);
+    }
+    .toc a::before {
+      content: counter(toc, decimal-leading-zero);
+      font-family: var(--font-mono); font-size: 0.74rem; font-weight: 600;
+      background: linear-gradient(120deg in oklch, var(--c-violet), var(--c-cyan));
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+    }
+    .toc a:hover { background: var(--ink-2); color: var(--paper); transform: translateX(3px); }
+
+    /* ---------------------------------------------------------------- TYPE FLOW */
+    h2[id] {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: clamp(1.7rem, 3.6vw, 2.7rem);
+      line-height: 1.1; letter-spacing: -0.015em;
+      color: var(--paper);
+      margin: clamp(56px, 8vw, 96px) 0 var(--s-4);
+      scroll-margin-top: 90px;
+      position: relative;
+      padding-top: var(--s-5);
+    }
+    h2[id]::before {
+      content: "";
+      position: absolute; top: 0; left: 0;
+      width: 64px; height: 4px; border-radius: var(--r-pill);
+      background: linear-gradient(90deg in oklch, var(--c-violet), var(--c-lime));
+    }
+    h3 {
+      font-family: var(--font-sans); font-weight: 600;
+      font-size: clamp(1.15rem, 2vw, 1.4rem);
+      color: var(--paper); margin: var(--s-6) 0 var(--s-3); letter-spacing: -0.01em;
+    }
+    h4 {
+      font-family: var(--font-mono); font-weight: 600;
+      font-size: 0.82rem; letter-spacing: 0.06em;
+      color: var(--c-cyan); margin: var(--s-5) 0 var(--s-3);
+      text-transform: uppercase;
+    }
+    p { margin: 0 0 var(--s-4); max-width: 68ch; }
+    strong { color: var(--paper); font-weight: 600; }
+    em { color: var(--paper); }
+    ul { max-width: 68ch; padding-left: 0; list-style: none; margin: 0 0 var(--s-4); }
+    ul li {
+      position: relative; padding-left: 26px; margin-bottom: var(--s-3);
+    }
+    ul li::before {
+      content: ""; position: absolute; left: 4px; top: 0.62em;
+      width: 9px; height: 9px; border-radius: 2px;
+      background: linear-gradient(135deg in oklch, var(--c-lime), var(--c-cyan));
+    }
+
+    code {
+      font-family: var(--font-mono); font-size: 0.85em;
+      background: var(--ink-2); color: var(--c-cyan);
+      padding: 0.12em 0.42em; border-radius: 5px;
+      border: 1px solid var(--line-soft);
+    }
+    .ref {
+      font-weight: 600; color: var(--c-amber);
+      white-space: nowrap; cursor: default;
+      border-bottom: 1px dashed oklch(0.80 0.16 75 / 0.4);
+    }
+
+    pre {
+      background: oklch(0.13 0.016 285);
+      border: 1px solid var(--line-soft);
+      border-radius: var(--r-2);
+      padding: var(--s-4) var(--s-5);
+      overflow-x: auto;
+      margin: var(--s-4) 0 var(--s-5);
+      position: relative;
+    }
+    pre::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg in oklch, var(--c-violet), var(--c-cyan), var(--c-lime));
+      border-radius: var(--r-2) var(--r-2) 0 0;
+    }
+    pre code {
+      background: none; border: none; padding: 0;
+      color: var(--paper-2); font-size: 0.82rem; line-height: 1.75;
+      display: block;
+    }
+
+    /* ---------------------------------------------------------------- CALLOUTS */
+    .callout {
+      border-radius: var(--r-3);
+      padding: var(--s-4) var(--s-5);
+      margin: var(--s-5) 0;
+      border: 1px solid var(--line);
+      background: var(--ink-1);
+      position: relative;
+      overflow: hidden;
+    }
+    .callout::before {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+    }
+    .callout p:last-child, .callout ul:last-child, .callout ul li:last-child { margin-bottom: 0; }
+    .callout p:first-child { margin-top: 0; }
+    .callout.steal::before { background: linear-gradient(180deg in oklch, var(--c-lime), var(--c-green)); }
+    .callout.tip::before   { background: linear-gradient(180deg in oklch, var(--c-cyan), var(--c-blue)); }
+    .callout.warn::before  { background: linear-gradient(180deg in oklch, var(--c-amber), var(--c-coral)); }
+    .callout.steal { background: linear-gradient(120deg, oklch(0.90 0.21 124 / 0.06), transparent 60%); }
+    .callout.warn  { background: linear-gradient(120deg, oklch(0.72 0.20 35 / 0.07), transparent 60%); }
+    .callout strong:first-child { color: var(--paper); }
+
+    /* ---------------------------------------------------------------- FIGURES */
+    .figure {
+      margin: var(--s-5) 0;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--r-3);
+      overflow: hidden;
+      background: var(--ink-1);
+      padding: var(--s-2);
+    }
+    .figure img {
+      width: 100%; height: auto; display: block;
+      border-radius: calc(var(--r-3) - var(--s-2));
+      border: 1px solid var(--line-soft);
+    }
+    figcaption {
+      font-size: 0.85rem; color: var(--paper-3); line-height: 1.55;
+      padding: var(--s-3) var(--s-4) var(--s-2);
+      max-width: 72ch;
+    }
+    .figure figcaption strong { color: var(--c-amber); }
+
+    /* ---------------------------------------------------------------- LIVE DEMOS */
+    .example {
+      margin: var(--s-5) 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      background: var(--ink-1);
+      padding: var(--s-5);
+    }
+    .example figcaption { padding: var(--s-3) 0 0; max-width: 72ch; }
+
+    /* swatch row */
+    .swatch-row {
+      display: flex; flex-wrap: wrap; gap: 0;
+      border-radius: var(--r-2); overflow: hidden;
+      border: 1px solid var(--line);
+    }
+    .swatch {
+      flex: 1 1 0; min-width: 64px; aspect-ratio: 1 / 1;
+      display: flex; align-items: flex-end; padding: 8px;
+      font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600;
+      transition: flex-grow 0.4s var(--ease);
+    }
+    .swatch-row:hover .swatch { flex-grow: 0.5; }
+    .swatch-row .swatch:hover { flex-grow: 2.6; }
+    @media (prefers-reduced-motion: reduce) {
+      .swatch, .swatch-row:hover .swatch, .swatch-row .swatch:hover { transition: none; flex-grow: 1; }
+    }
+
+    /* OKLCH single-hue ramp */
+    .ramp .s1 { background: oklch(0.22 0.05 285); color: oklch(0.85 0.06 285); }
+    .ramp .s2 { background: oklch(0.34 0.08 285); color: oklch(0.90 0.06 285); }
+    .ramp .s3 { background: oklch(0.46 0.11 285); color: #fff; }
+    .ramp .s4 { background: oklch(0.58 0.14 285); color: #fff; }
+    .ramp .s5 { background: oklch(0.70 0.16 285); color: oklch(0.16 0.02 285); }
+    .ramp .s6 { background: oklch(0.82 0.10 285); color: oklch(0.16 0.02 285); }
+    .ramp .s7 { background: oklch(0.92 0.05 285); color: oklch(0.16 0.02 285); }
+
+    /* full spectrum specimen strip */
+    .spectrum-strip {
+      display: grid; grid-template-columns: repeat(8, 1fr);
+      border-radius: var(--r-2); overflow: hidden; border: 1px solid var(--line);
+    }
+    .spectrum-strip > div {
+      aspect-ratio: 1 / 1.4;
+      display: flex; align-items: flex-end; padding: 8px;
+      font-family: var(--font-mono); font-size: 0.58rem; font-weight: 600;
+      color: oklch(0.16 0.02 285);
+      transition: transform 0.4s var(--ease);
+    }
+    .spectrum-strip > div:hover { transform: translateY(-6px); }
+    @media (prefers-reduced-motion: reduce) { .spectrum-strip > div:hover { transform: none; } }
+    .sp-v { background: var(--c-violet); color: #fff; }
+    .sp-b { background: var(--c-blue); color: #fff; }
+    .sp-c { background: var(--c-cyan); }
+    .sp-g { background: var(--c-green); }
+    .sp-l { background: var(--c-lime); }
+    .sp-a { background: var(--c-amber); }
+    .sp-o { background: var(--c-coral); color: #fff; }
+    .sp-m { background: var(--c-magenta); color: #fff; }
 
     /* theme-token live toggle */
     .theme-card {
-      --t-bg: #0b0c0e; --t-surface: #16191e; --t-ink: #e9eaec; --t-accent: #f5a623; --t-line: #23272e;
+      --t-bg: oklch(0.16 0.018 285); --t-surface: oklch(0.24 0.026 285);
+      --t-ink: oklch(0.94 0.01 285); --t-accent: var(--c-lime); --t-line: oklch(0.32 0.03 285);
       background: var(--t-bg); color: var(--t-ink);
       border: 1px solid var(--t-line); border-radius: var(--r-3);
       padding: var(--s-5); transition: all 0.4s var(--ease);
     }
+    @media (prefers-reduced-motion: reduce) { .theme-card { transition: none; } }
     .theme-card[data-theme="light"] {
-      --t-bg: #fffdf7; --t-surface: #f3efe4; --t-ink: #1a1a1a; --t-accent: #533afd; --t-line: #e3ddcd;
+      --t-bg: oklch(0.985 0.01 95); --t-surface: oklch(0.95 0.015 95);
+      --t-ink: oklch(0.22 0.02 285); --t-accent: var(--c-violet); --t-line: oklch(0.88 0.015 95);
     }
     .theme-card[data-theme="dim"] {
-      --t-bg: #201819; --t-surface: #2c2122; --t-ink: #efe6dc; --t-accent: #dfc78e; --t-line: #3a2d2e;
+      --t-bg: oklch(0.24 0.02 35); --t-surface: oklch(0.30 0.024 35);
+      --t-ink: oklch(0.92 0.02 75); --t-accent: var(--c-amber); --t-line: oklch(0.36 0.03 35);
     }
-    .theme-card .tc-surface { background: var(--t-surface); border: 1px solid var(--t-line); border-radius: var(--r-2); padding: var(--s-4); margin-top: var(--s-3); }
-    .theme-card .tc-cta { display: inline-block; margin-top: var(--s-3); background: var(--t-accent); color: var(--t-bg); font-weight: 600; font-family: var(--font-sans); padding: 0.4em 1em; border-radius: var(--r-pill); font-size: 0.85rem; }
+    .theme-card .tc-surface { background: var(--t-surface); border: 1px solid var(--t-line); border-radius: var(--r-2); padding: var(--s-4); margin-top: var(--s-3); font-size: 0.92rem; }
+    .theme-card .tc-cta { display: inline-block; margin-top: var(--s-3); background: var(--t-accent); color: var(--t-bg); font-weight: 600; font-family: var(--font-sans); padding: 0.5em 1.1em; border-radius: var(--r-pill); font-size: 0.85rem; }
     .theme-switch { display: flex; gap: var(--s-2); margin-bottom: var(--s-4); flex-wrap: wrap; }
     .theme-switch button {
-      font-family: var(--font-mono); font-size: 0.72rem; cursor: pointer;
-      background: var(--bg-3); color: var(--ink-soft); border: 1px solid var(--line);
-      border-radius: var(--r-pill); padding: 0.35em 0.9em;
+      font-family: var(--font-mono); font-size: 0.74rem; font-weight: 500; cursor: pointer;
+      background: var(--ink-3); color: var(--paper-2); border: 1px solid var(--line);
+      border-radius: var(--r-pill); padding: 0.42em 1em;
+      transition: background 0.25s var(--ease), color 0.25s var(--ease);
     }
-    .theme-switch button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+    .theme-switch button:hover { background: var(--ink-2); }
+    .theme-switch button[aria-pressed="true"] {
+      background: linear-gradient(120deg in oklch, var(--c-lime), var(--c-cyan));
+      color: var(--ink-0); border-color: transparent;
+    }
 
     /* contrast demo */
-    .contrast-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: var(--s-3); }
+    .contrast-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: var(--s-3); }
     .ct { border-radius: var(--r-2); padding: var(--s-4); font-weight: 600; }
-    .ct small { display: block; font-family: var(--font-mono); font-weight: 500; font-size: 0.66rem; opacity: 0.85; margin-top: 0.3em; }
-    .ct.pass { background: #16191e; color: #e9eaec; border: 1px solid #2c8a5f; }
-    .ct.fail { background: #16191e; color: #5f6671; border: 1px solid #b8503a; }
-    .ct.passlow { background: #f5a623; color: #1a1205; border: 1px solid #2c8a5f; }
+    .ct small { display: block; font-family: var(--font-mono); font-weight: 500; font-size: 0.66rem; opacity: 0.9; margin-top: 0.4em; }
+    .ct.pass { background: oklch(0.24 0.026 285); color: oklch(0.94 0.01 285); border: 1px solid var(--c-green); }
+    .ct.fail { background: oklch(0.24 0.026 285); color: oklch(0.46 0.02 285); border: 1px solid var(--c-coral); }
+    .ct.passlow { background: var(--c-lime); color: oklch(0.16 0.02 124); border: 1px solid oklch(0.55 0.14 150); }
 
     /* accent-as-reward hover demo */
     .reward-btn {
       font-family: var(--font-sans); font-weight: 600; cursor: pointer;
-      background: var(--bg-3); color: var(--ink-soft);
+      background: var(--ink-3); color: var(--paper-2);
       border: 1px solid var(--line); border-radius: var(--r-pill);
-      padding: 0.6em 1.4em; transition: background 0.25s var(--ease), color 0.25s var(--ease), box-shadow 0.25s var(--ease), transform 0.12s var(--ease);
+      padding: 0.7em 1.5em; font-size: 0.95rem;
+      transition: background 0.3s var(--ease), color 0.3s var(--ease), box-shadow 0.3s var(--ease), transform 0.12s var(--ease);
     }
-    .reward-btn:hover { background: var(--accent); color: var(--accent-ink); box-shadow: 0 0 0 4px var(--accent-glow), 0 8px 30px rgba(245,166,35,0.25); }
+    .reward-btn:hover {
+      background: linear-gradient(120deg in oklch, var(--c-lime), var(--c-cyan));
+      color: var(--ink-0);
+      box-shadow: 0 0 0 4px oklch(0.90 0.21 124 / 0.22), 0 10px 34px oklch(0.90 0.21 124 / 0.28);
+    }
     .reward-btn:active { transform: translateY(1px); }
+    @media (prefers-reduced-motion: reduce) { .reward-btn { transition: background 0.01s, color 0.01s; } }
 
-    .grad-strip { height: 84px; border-radius: var(--r-2); border: 1px solid var(--line); }
+    /* gradient strips */
+    .grad-strip { height: 88px; border-radius: var(--r-2); border: 1px solid var(--line); }
     .grad-srgb { background: linear-gradient(90deg, #533afd, #f5a623); }
-    .grad-oklch { background: linear-gradient(90deg in oklch, #533afd, #f5a623); }
+    .grad-oklch { background: linear-gradient(90deg in oklch, oklch(0.55 0.22 285), oklch(0.80 0.16 75)); }
+    .grad-note { font-family: var(--font-mono); font-size: 0.7rem; color: var(--paper-4); margin: 6px 0 0; }
+
+    /* scroll reveal */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ---------------------------------------------------------------- FOOTER */
+    .ftr {
+      border-top: 1px solid var(--line-soft);
+      margin-top: var(--s-7);
+      padding: var(--s-6) 0;
+      background: var(--ink-1);
+    }
+    .ftr::before {
+      content: ""; display: block; height: 3px; margin-bottom: var(--s-6);
+      background: linear-gradient(90deg in oklch,
+        var(--c-violet), var(--c-blue), var(--c-cyan), var(--c-green),
+        var(--c-lime), var(--c-amber), var(--c-coral), var(--c-magenta));
+    }
+    .ftr a { color: var(--c-lime); text-decoration: none; font-family: var(--font-serif); font-style: italic; font-size: 1.15rem; }
+    .ftr a:hover { text-decoration: underline; }
+    .ftr p { color: var(--paper-4); }
+
+    /* ---------------------------------------------------------------- RESPONSIVE */
+    @media (max-width: 640px) {
+      body { font-size: 1rem; }
+      .toc ol { grid-template-columns: 1fr; }
+      .spectrum-strip { grid-template-columns: repeat(4, 1fr); }
+      pre { padding: var(--s-3) var(--s-4); }
+      .example { padding: var(--s-4); }
+    }
   </style>
 </head>
 <body>
@@ -74,7 +502,7 @@
       <a href="UI-DESIGN.html">UI Design</a>
       <a href="UX.html">UX</a>
       <a href="TYPOGRAPHY.html">Typography</a>
-      <a href="COLOR.html">Color</a>
+      <a href="COLOR.html" aria-current="page">Color</a>
       <a href="STYLING.html">Styling</a>
       <a href="MOTIONS.html">Motion</a>
       <a href="ANIMATIONS.html">Animation</a>
@@ -93,61 +521,76 @@
   <main class="wrap">
     <div class="hero">
       <span class="kicker">Craft Atlas · 04 / Color</span>
-      <h1>Color is a budget, not a box of crayons.</h1>
+      <h1>Color is a <span class="spend">budget</span>, not a box of crayons.</h1>
       <p class="lede">The best sites we tore down spend almost nothing on color — one disciplined accent, a deep neutral canvas, and a single saturated reward. Restraint is the technique. Here is how 80 teardowns actually do it.</p>
+
+      <div class="example" aria-hidden="true" style="margin-top: clamp(28px,4vw,40px);">
+        <div class="spectrum-strip">
+          <div class="sp-v">285°</div>
+          <div class="sp-b">255°</div>
+          <div class="sp-c">200°</div>
+          <div class="sp-g">150°</div>
+          <div class="sp-l">124°</div>
+          <div class="sp-a">75°</div>
+          <div class="sp-o">35°</div>
+          <div class="sp-m">350°</div>
+        </div>
+        <figcaption>This page's full vocabulary — eight OKLCH hues at even lightness. You will see almost none of them used at once. That is the whole lesson.</figcaption>
+      </div>
     </div>
 
-    <nav class="toc" aria-label="On this page">
+    <nav class="toc reveal" aria-label="On this page">
+      <h2>On this page</h2>
       <ol>
-        <li><a href="#thesis">1 · The one-accent thesis</a></li>
-        <li><a href="#neutral">2 · The neutral canvas: dark vs light</a></li>
-        <li><a href="#palette">3 · Building a palette in OKLCH</a></li>
-        <li><a href="#contrast">4 · Contrast &amp; WCAG, non-negotiable</a></li>
-        <li><a href="#accent">5 · Accent strategy: make color mean something</a></li>
-        <li><a href="#gradients">6 · Gradients done right</a></li>
-        <li><a href="#wayfinding">7 · Color as wayfinding &amp; reward</a></li>
-        <li><a href="#theming">8 · Theming with CSS variables</a></li>
-        <li><a href="#checklist">9 · The steal-this checklist</a></li>
+        <li><a href="#thesis">The one-accent thesis</a></li>
+        <li><a href="#neutral">The neutral canvas: dark vs light</a></li>
+        <li><a href="#palette">Building a palette in OKLCH</a></li>
+        <li><a href="#contrast">Contrast &amp; WCAG, non-negotiable</a></li>
+        <li><a href="#accent">Accent strategy: make color mean something</a></li>
+        <li><a href="#gradients">Gradients done right</a></li>
+        <li><a href="#wayfinding">Color as wayfinding &amp; reward</a></li>
+        <li><a href="#theming">Theming with CSS variables</a></li>
+        <li><a href="#checklist">The steal-this checklist</a></li>
       </ol>
     </nav>
 
-    <h2 id="thesis">1 · The one-accent thesis</h2>
-    <p>If there is a single lesson across the teardowns, it is this: <strong>elite sites use one accent color, and they spend it like money.</strong> The discipline of a single hue is the brand.</p>
-    <p><span class="ref">Ramp ↗</span> is the purest case: a pure-white editorial canvas, near-black text, and exactly <em>one</em> color — an acid lime-green (<code>oklch(0.92 0.20 124)</code>, roughly <code>#CDFF00</code>) used <strong>only</strong> on primary CTAs. No gradients, no glass, no secondary hues. <span class="ref">Brittany Chiang ↗</span> runs a two-color system — slate-900 plus a single teal-300 accent that does triple duty as link-hover, tech-pill tint, and the spotlight glow color. <span class="ref">Mercury ↗</span> reserves its indigo <code>#5266EB</code> almost entirely for the "Open account" button, so the accent literally <em>means</em> "convert." <span class="ref">Linear ↗</span> keeps its marketing chrome effectively monochrome and lets color appear only inside product mockups — issue-priority swatches and label chips.</p>
+    <h2 id="thesis" class="reveal">The one-accent thesis</h2>
+    <p class="reveal">If there is a single lesson across the teardowns, it is this: <strong>elite sites use one accent color, and they spend it like money.</strong> The discipline of a single hue is the brand.</p>
+    <p class="reveal"><span class="ref">Ramp ↗</span> is the purest case: a pure-white editorial canvas, near-black text, and exactly <em>one</em> color — an acid lime-green (<code>oklch(0.92 0.20 124)</code>, roughly <code>#CDFF00</code>) used <strong>only</strong> on primary CTAs. No gradients, no glass, no secondary hues. <span class="ref">Brittany Chiang ↗</span> runs a two-color system — slate-900 plus a single teal-300 accent that does triple duty as link-hover, tech-pill tint, and the spotlight glow color. <span class="ref">Mercury ↗</span> reserves its indigo <code>#5266EB</code> almost entirely for the "Open account" button, so the accent literally <em>means</em> "convert." <span class="ref">Linear ↗</span> keeps its marketing chrome effectively monochrome and lets color appear only inside product mockups — issue-priority swatches and label chips.</p>
 
-    <div class="callout steal">
+    <div class="callout steal reveal">
       <p><strong>The accent-as-currency rule.</strong> Pick one accent. Then ask of every colored pixel: "what is this color buying me?" If the answer is "decoration," delete it. Ramp, Mercury, and Brittany Chiang all prove that one color, spent only on the thing that matters, reads as <em>more</em> confident than a five-color palette.</p>
     </div>
 
-    <figure class="figure">
+    <figure class="figure reveal">
       <img src="../workings/shots/ramp/01-hero.png" alt="Ramp homepage hero: black text on white with a single acid-lime CTA button">
       <figcaption><strong>Ramp ↗</strong> — one accent, spent once. The acid-lime appears <em>only</em> on the primary CTA. Black-on-white everywhere else means the eye snaps straight to the one place color lives.</figcaption>
     </figure>
 
-    <h2 id="neutral">2 · The neutral canvas: dark vs light</h2>
-    <p>Before the accent comes the canvas, and the canvas is almost never pure <code>#000</code> or pure <code>#fff</code>. The teardowns split into two disciplined camps.</p>
+    <h2 id="neutral" class="reveal">The neutral canvas: dark vs light</h2>
+    <p class="reveal">Before the accent comes the canvas, and the canvas is almost never pure <code>#000</code> or pure <code>#fff</code>. The teardowns split into two disciplined camps.</p>
 
-    <h3>Dark canvases tint toward a hue</h3>
-    <p>Nobody serious ships <code>#000000</code> as a body background unless it is doing a specific job. <span class="ref">Linear ↗</span> uses <code>rgb(8,9,10)</code> — a near-black that is fractionally warm. <span class="ref">Stripe Press ↗</span> goes further: a deep brown-maroon <code>rgb(32,24,25)</code> that "feels like a dim library or leather binding," paired with a brass-gold link color. The tint gives the dark theme a <em>temperature</em> instead of a void.</p>
-    <p>The exceptions prove the rule. <span class="ref">Teenage Engineering ↗</span> <em>does</em> use pure <code>rgb(0,0,0)</code> sitewide — deliberately — because the black turns every product photo into a spotlit studio object and supplies the accent <em>from the products themselves</em> (orange lamp glow, a red record button, colored vinyl). The brand restrains its own palette so product color reads as the accent. <span class="ref">Basement Studio ↗</span> does the same with a lit 3D scene as the only warmth.</p>
+    <h3 class="reveal">Dark canvases tint toward a hue</h3>
+    <p class="reveal">Nobody serious ships <code>#000000</code> as a body background unless it is doing a specific job. <span class="ref">Linear ↗</span> uses <code>rgb(8,9,10)</code> — a near-black that is fractionally warm. <span class="ref">Stripe Press ↗</span> goes further: a deep brown-maroon <code>rgb(32,24,25)</code> that "feels like a dim library or leather binding," paired with a brass-gold link color. The tint gives the dark theme a <em>temperature</em> instead of a void.</p>
+    <p class="reveal">The exceptions prove the rule. <span class="ref">Teenage Engineering ↗</span> <em>does</em> use pure <code>rgb(0,0,0)</code> sitewide — deliberately — because the black turns every product photo into a spotlit studio object and supplies the accent <em>from the products themselves</em> (orange lamp glow, a red record button, colored vinyl). The brand restrains its own palette so product color reads as the accent. <span class="ref">Basement Studio ↗</span> does the same with a lit 3D scene as the only warmth.</p>
 
-    <figure class="figure">
+    <figure class="figure reveal">
       <img src="../workings/shots/teenage-engineering/01-hero.png" alt="Teenage Engineering homepage: pure black canvas with spotlit product photography">
       <figcaption><strong>Teenage Engineering ↗</strong> — pure black is a <em>spotlight</em>, not a default. The UI has no chromatic accent; color enters entirely through lit product photography against the void.</figcaption>
     </figure>
 
-    <h3>Light canvases warm the white</h3>
-    <p>Light sites that feel premium rarely sit on cold <code>#FFFFFF</code>. <span class="ref">Arc Browser ↗</span> bases on a butter-cream <code>rgb(255,252,236)</code> — "this warmth is a key differentiator from cold SaaS sites." <span class="ref">Things ↗</span> uses a pale blue-gray <code>rgb(242,245,247)</code> for an Apple-frosted softness; <span class="ref">Family ↗</span> and <span class="ref">Lusion ↗</span> use warm off-white / pale-lavender shells. The handful that <em>do</em> commit to true white — <span class="ref">Apple ↗</span>, <span class="ref">Ramp ↗</span>, <span class="ref">Vercel ↗</span> — do it for maximum gallery contrast, letting product photography carry all the color.</p>
+    <h3 class="reveal">Light canvases warm the white</h3>
+    <p class="reveal">Light sites that feel premium rarely sit on cold <code>#FFFFFF</code>. <span class="ref">Arc Browser ↗</span> bases on a butter-cream <code>rgb(255,252,236)</code> — "this warmth is a key differentiator from cold SaaS sites." <span class="ref">Things ↗</span> uses a pale blue-gray <code>rgb(242,245,247)</code> for an Apple-frosted softness; <span class="ref">Family ↗</span> and <span class="ref">Lusion ↗</span> use warm off-white / pale-lavender shells. The handful that <em>do</em> commit to true white — <span class="ref">Apple ↗</span>, <span class="ref">Ramp ↗</span>, <span class="ref">Vercel ↗</span> — do it for maximum gallery contrast, letting product photography carry all the color.</p>
 
-    <div class="callout tip">
-      <p><strong>Pro tip — never use the absolutes for surfaces.</strong> Reserve <code>#000</code> and <code>#fff</code> for the rare spotlight effect (TE, Apple's black hero tiles). For everyday surfaces, nudge the canvas a few points off the extreme and a few degrees toward a hue. Our own <code>shared.css</code> uses <code>--bg: #0b0c0e</code>, not black.</p>
+    <div class="callout tip reveal">
+      <p><strong>Pro tip — never use the absolutes for surfaces.</strong> Reserve <code>#000</code> and <code>#fff</code> for the rare spotlight effect (TE, Apple's black hero tiles). For everyday surfaces, nudge the canvas a few points off the extreme and a few degrees toward a hue. This very page sits on <code>oklch(0.16 0.018 285)</code> — a near-black tinted faintly violet, not <code>#000</code>.</p>
     </div>
 
-    <h2 id="palette">3 · Building a palette in OKLCH</h2>
-    <p>Once you have a canvas and an accent, you need <em>steps</em> — surface tiers, hover states, dimmed text. The modern way to generate them is <strong>OKLCH</strong>, a perceptually-uniform color space now supported in every evergreen browser. Notably, <span class="ref">Ramp ↗</span>'s teardown shows its computed colors already in <code>lab()</code> space (<code>lab(92.1 -20.5 84.8)</code> for the lime) — the elite stacks have already moved past hex.</p>
-    <p>Why OKLCH beats HSL: in HSL, holding lightness fixed and rotating hue produces wildly different <em>perceived</em> brightness (yellow looks far lighter than blue at the same <code>L</code>). OKLCH fixes this — equal <code>L</code> means equal perceived lightness. So you can build a ramp by stepping <em>only</em> lightness and get visually even swatches:</p>
+    <h2 id="palette" class="reveal">Building a palette in OKLCH</h2>
+    <p class="reveal">Once you have a canvas and an accent, you need <em>steps</em> — surface tiers, hover states, dimmed text. The modern way to generate them is <strong>OKLCH</strong>, a perceptually-uniform color space now supported in every evergreen browser. Notably, <span class="ref">Ramp ↗</span>'s teardown shows its computed colors already in <code>lab()</code> space (<code>lab(92.1 -20.5 84.8)</code> for the lime) — the elite stacks have already moved past hex.</p>
+    <p class="reveal">Why OKLCH beats HSL: in HSL, holding lightness fixed and rotating hue produces wildly different <em>perceived</em> brightness (yellow looks far lighter than blue at the same <code>L</code>). OKLCH fixes this — equal <code>L</code> means equal perceived lightness. So you can build a ramp by stepping <em>only</em> lightness and get visually even swatches:</p>
 
-    <div class="example ramp">
+    <div class="example ramp reveal">
       <div class="swatch-row">
         <div class="swatch s1">.22</div>
         <div class="swatch s2">.34</div>
@@ -157,12 +600,12 @@
         <div class="swatch s6">.82</div>
         <div class="swatch s7">.92</div>
       </div>
-      <figcaption>A single-hue ramp built by stepping only OKLCH lightness (hue 265, chroma tapered at the extremes). Each step is a perceptually even jump — usable as surface tiers, borders, and text tints from one declaration set.</figcaption>
+      <figcaption>A single-hue ramp built by stepping only OKLCH lightness (hue 285, chroma tapered at the extremes). Each step is a perceptually even jump — usable as surface tiers, borders, and text tints from one declaration set. <em>Hover a swatch to expand it.</em></figcaption>
     </div>
 
     <pre><code>:root {
   /* Define the accent ONCE as hue + chroma, derive the ramp by lightness. */
-  --accent-h: 265;          /* indigo */
+  --accent-h: 285;          /* violet */
   --accent-c: 0.15;
 
   --accent-900: oklch(0.22 0.05 var(--accent-h));  /* deep surface tint */
@@ -177,19 +620,19 @@
 .btn:hover  { background: oklch(from var(--accent-500) calc(l + 0.06) c h); }
 .btn:active { background: oklch(from var(--accent-500) calc(l - 0.04) c h); }</code></pre>
 
-    <div class="callout tip">
+    <div class="callout tip reveal">
       <p><strong>relative color syntax</strong> (<code>oklch(from var(--x) calc(l + 0.06) c h)</code>) lets you compute hover/active/disabled states <em>from</em> the base token. One source of truth — change the accent hue and every state follows. No more drifting "almost-the-same" hover colors scattered across a stylesheet.</p>
     </div>
 
-    <h2 id="contrast">4 · Contrast &amp; WCAG, non-negotiable</h2>
-    <p>WCAG 2.x sets the floor: <strong>4.5:1</strong> for body text, <strong>3:1</strong> for large text (≥24px, or ≥19px bold) and meaningful UI/graphics. The sites that nail this do it on purpose. <span class="ref">Sara Soueidan ↗</span> — an accessibility specialist — keeps links black (differentiated by underline, not hue) <em>"so color is never the sole signifier,"</em> guaranteeing AAA contrast everywhere. <span class="ref">Obys Agency ↗</span> and <span class="ref">Cuberto ↗</span> get AAA-grade legibility for free by going near-monochrome black-on-white.</p>
-    <p>And the cautionary tales are just as instructive. <span class="ref">Arc Browser ↗</span>'s cream canvas plus grey sub-copy is flagged as "the one accessibility soft spot." <span class="ref">Gucci ↗</span> and <span class="ref">Bottega Veneta ↗</span> show the classic luxury risk: text overlaid on campaign photography drops below threshold the moment the image behind it gets bright.</p>
+    <h2 id="contrast" class="reveal">Contrast &amp; WCAG, non-negotiable</h2>
+    <p class="reveal">WCAG 2.x sets the floor: <strong>4.5:1</strong> for body text, <strong>3:1</strong> for large text (≥24px, or ≥19px bold) and meaningful UI/graphics. The sites that nail this do it on purpose. <span class="ref">Sara Soueidan ↗</span> — an accessibility specialist — keeps links black (differentiated by underline, not hue) <em>"so color is never the sole signifier,"</em> guaranteeing AAA contrast everywhere. <span class="ref">Obys Agency ↗</span> and <span class="ref">Cuberto ↗</span> get AAA-grade legibility for free by going near-monochrome black-on-white.</p>
+    <p class="reveal">And the cautionary tales are just as instructive. <span class="ref">Arc Browser ↗</span>'s cream canvas plus grey sub-copy is flagged as "the one accessibility soft spot." <span class="ref">Gucci ↗</span> and <span class="ref">Bottega Veneta ↗</span> show the classic luxury risk: text overlaid on campaign photography drops below threshold the moment the image behind it gets bright.</p>
 
-    <div class="example">
+    <div class="example reveal">
       <div class="contrast-grid">
-        <div class="ct pass">Body on surface<small>#e9eaec / #16191e — 13.4:1 · AAA</small></div>
-        <div class="ct passlow">Ink on accent<small>#1a1205 / #f5a623 — 9.8:1 · AAA</small></div>
-        <div class="ct fail">Dim grey on dark<small>#5f6671 / #16191e — 2.4:1 · FAILS</small></div>
+        <div class="ct pass">Body on surface<small>13.4:1 · AAA</small></div>
+        <div class="ct passlow">Ink on accent<small>9.8:1 · AAA</small></div>
+        <div class="ct fail">Dim grey on dark<small>2.4:1 · FAILS</small></div>
       </div>
       <figcaption>The middle tile is why Ramp puts <em>black</em> text on its lime CTA, not white — dark-on-saturated often beats white-on-saturated. The right tile (faint grey) is fine for decorative hairlines, never for text you must read.</figcaption>
     </div>
@@ -211,41 +654,41 @@
   :root { --ink-dim: #b7bcc4; --line: #3a4049; }
 }</code></pre>
 
-    <div class="callout warn">
+    <div class="callout warn reveal">
       <p><strong>Pitfall — color as the <em>only</em> signal.</strong> ~8% of men have a color-vision deficiency. A red "error" border that looks identical to a grey idle border to them is broken. Pair every color signal with a second channel: an icon, an underline (Sara Soueidan), a label, or a shape. WCAG 1.4.1 requires it.</p>
     </div>
 
-    <h2 id="accent">5 · Accent strategy: make color mean something</h2>
-    <p>The strongest accent systems assign the color a <em>job</em> so consistent that users learn it. <span class="ref">Family ↗</span> keeps its entire UI neutral and lets the <em>illustrations</em> carry all the color — but green is the one functional hue that escapes the artwork, used for eyebrows and feature checkmarks ("Watch Any Wallet ✓"), signalling "go / positive / safe." <span class="ref">Mercury ↗</span>'s indigo only ever appears on the convert action. <span class="ref">Stripe ↗</span> reserves its electric indigo <code>#533AFD</code> for filled buttons and links — the one interactive color on an otherwise calm page.</p>
-    <p>Contrast this with sites where color is <em>material</em>, not meaning: <span class="ref">Active Theory ↗</span> floods a black canvas with a full prismatic particle spectrum (yellow→orange→red→blue→violet) — color <em>is</em> the motion, the energy field. That works because the whole brand is "luminous energy." For a portfolio or SaaS, pick the Family/Mercury model: one accent, one meaning.</p>
+    <h2 id="accent" class="reveal">Accent strategy: make color mean something</h2>
+    <p class="reveal">The strongest accent systems assign the color a <em>job</em> so consistent that users learn it. <span class="ref">Family ↗</span> keeps its entire UI neutral and lets the <em>illustrations</em> carry all the color — but green is the one functional hue that escapes the artwork, used for eyebrows and feature checkmarks ("Watch Any Wallet ✓"), signalling "go / positive / safe." <span class="ref">Mercury ↗</span>'s indigo only ever appears on the convert action. <span class="ref">Stripe ↗</span> reserves its electric indigo <code>#533AFD</code> for filled buttons and links — the one interactive color on an otherwise calm page.</p>
+    <p class="reveal">Contrast this with sites where color is <em>material</em>, not meaning: <span class="ref">Active Theory ↗</span> floods a black canvas with a full prismatic particle spectrum (yellow→orange→red→blue→violet) — color <em>is</em> the motion, the energy field. That works because the whole brand is "luminous energy." For a portfolio or SaaS, pick the Family/Mercury model: one accent, one meaning.</p>
 
-    <h2 id="gradients">6 · Gradients done right</h2>
-    <p>Most teardown sites use <strong>no gradients at all</strong> — Ramp, Rauno, Sara Soueidan, Bottega, Obys all explicitly forgo them. When gradients <em>do</em> appear at this tier, they follow rules.</p>
-    <ul>
+    <h2 id="gradients" class="reveal">Gradients done right</h2>
+    <p class="reveal">Most teardown sites use <strong>no gradients at all</strong> — Ramp, Rauno, Sara Soueidan, Bottega, Obys all explicitly forgo them. When gradients <em>do</em> appear at this tier, they follow rules.</p>
+    <ul class="reveal">
       <li><strong>The gradient is the brand, or it's a whisper — nothing in between.</strong> <span class="ref">Stripe ↗</span> makes its diagonal orange→coral→magenta→violet→blue mesh ribbon the <em>entire</em> hero identity. <span class="ref">Vercel ↗</span> goes the opposite way: a subtle warm-orange→cool-teal spectrum bleeding up behind the hero CTAs as fine line-art rays — "restrained, almost watermark-like, not a hero gradient wash."</li>
       <li><strong>Confine loud gradients to UI surfaces, never the page.</strong> <span class="ref">Linear ↗</span>'s gradients are "whisper-soft and confined to UI surfaces (timeline bars fade to translucent), never loud hero gradients."</li>
       <li><strong>Interpolate in OKLCH to kill the grey dead-zone.</strong> A naive sRGB gradient between two saturated hues passes through a muddy desaturated middle. The <code>in oklch</code> keyword keeps chroma up across the blend.</li>
     </ul>
 
-    <div class="example">
+    <div class="example reveal">
       <div class="grad-strip grad-srgb"></div>
-      <p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--ink-dim);margin:6px 0 0;">↑ sRGB — note the muddy desaturated middle</p>
+      <p class="grad-note">↑ sRGB — note the muddy desaturated middle</p>
       <div class="grad-strip grad-oklch" style="margin-top:14px;"></div>
-      <p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--ink-dim);margin:6px 0 0;">↑ <code>in oklch</code> — chroma stays high edge to edge</p>
+      <p class="grad-note">↑ <code>in oklch</code> — chroma stays high edge to edge</p>
       <figcaption>Same two stops (<code>#533afd → #f5a623</code>), two interpolation spaces. Modern CSS: <code>linear-gradient(90deg in oklch, ...)</code>.</figcaption>
     </div>
 
-    <figure class="figure">
+    <figure class="figure reveal">
       <img src="../workings/shots/stripe/01-hero.png" alt="Stripe homepage hero with its signature animated multi-hue mesh gradient ribbon">
       <figcaption><strong>Stripe ↗</strong> — when a gradient <em>is</em> the brand, commit fully: an animated, mesh-blended orange→magenta→violet→blue ribbon on a near-white navy-ink page. Everything else stays calm so the gradient owns the eye.</figcaption>
     </figure>
 
-    <h2 id="wayfinding">7 · Color as wayfinding &amp; reward</h2>
-    <p>Color does two interaction jobs beyond branding: it tells you <em>where you are</em> (wayfinding) and it pays you for acting (reward).</p>
-    <p><strong>Wayfinding:</strong> <span class="ref">Brittany Chiang ↗</span> uses her teal accent for the active-nav highlight, so the accent both decorates and orients. <span class="ref">Cuberto ↗</span> and <span class="ref">Apple ↗</span> flip whole sections light→dark→light as a <em>pacing</em> device — the theme change tells you "new chapter" before you read a word. Apple even does per-tile inversion: each marquee tile sets its own light/dark context. <span class="ref">Stripe ↗</span> drops a deliberate deep-indigo "backbone of global commerce" band mid-scroll — a tonal break that re-grabs attention.</p>
-    <p><strong>Reward:</strong> the accent's most satisfying job is the hover/press payoff. A neutral control that blooms into the accent on hover gives the click a felt reward — try it:</p>
+    <h2 id="wayfinding" class="reveal">Color as wayfinding &amp; reward</h2>
+    <p class="reveal">Color does two interaction jobs beyond branding: it tells you <em>where you are</em> (wayfinding) and it pays you for acting (reward).</p>
+    <p class="reveal"><strong>Wayfinding:</strong> <span class="ref">Brittany Chiang ↗</span> uses her teal accent for the active-nav highlight, so the accent both decorates and orients. <span class="ref">Cuberto ↗</span> and <span class="ref">Apple ↗</span> flip whole sections light→dark→light as a <em>pacing</em> device — the theme change tells you "new chapter" before you read a word. Apple even does per-tile inversion: each marquee tile sets its own light/dark context. <span class="ref">Stripe ↗</span> drops a deliberate deep-indigo "backbone of global commerce" band mid-scroll — a tonal break that re-grabs attention.</p>
+    <p class="reveal"><strong>Reward:</strong> the accent's most satisfying job is the hover/press payoff. A neutral control that blooms into the accent on hover gives the click a felt reward — try it:</p>
 
-    <div class="example">
+    <div class="example reveal">
       <button class="reward-btn" type="button">Hover me — get paid in accent</button>
       <figcaption>Idle state is quiet neutral; hover spends the accent (fill + glow ring). This is the Mercury/Ramp pattern at the micro scale — color is the reward for engaging.</figcaption>
     </div>
@@ -259,17 +702,17 @@
   box-shadow: 0 0 0 4px var(--accent-glow), 0 8px 30px rgba(245,166,35,.25);
 }</code></pre>
 
-    <h2 id="theming">8 · Theming with CSS variables</h2>
-    <p>Every multi-theme site in the set is <strong>token-driven</strong>. <span class="ref">Josh Comeau ↗</span> — who literally wrote the canonical "Perfect Dark Mode" article — ships a "flicker-free, persisted, theme-token driven" dark mode. The recipe: define semantic tokens once, swap their <em>values</em> per theme via a <code>data-theme</code> attribute on the root, and let every component read the token. <span class="ref">Vercel ↗</span> and <span class="ref">Sara Soueidan ↗</span> both signal their theming layer through a root <code>data-theme</code> attribute.</p>
+    <h2 id="theming" class="reveal">Theming with CSS variables</h2>
+    <p class="reveal">Every multi-theme site in the set is <strong>token-driven</strong>. <span class="ref">Josh Comeau ↗</span> — who literally wrote the canonical "Perfect Dark Mode" article — ships a "flicker-free, persisted, theme-token driven" dark mode. The recipe: define semantic tokens once, swap their <em>values</em> per theme via a <code>data-theme</code> attribute on the root, and let every component read the token. <span class="ref">Vercel ↗</span> and <span class="ref">Sara Soueidan ↗</span> both signal their theming layer through a root <code>data-theme</code> attribute.</p>
 
-    <div class="example">
+    <div class="example reveal">
       <div class="theme-switch" role="group" aria-label="Theme">
         <button type="button" data-set="dark" aria-pressed="true">dark</button>
         <button type="button" data-set="light" aria-pressed="false">light (Stripe-ish)</button>
         <button type="button" data-set="dim" aria-pressed="false">dim (Stripe Press)</button>
       </div>
       <div class="theme-card" id="themeCard" data-theme="dark">
-        <strong style="font-family:var(--font-serif);font-size:1.3rem;">Pay invoices in seconds</strong>
+        <strong style="font-family:var(--font-serif);font-size:1.35rem;font-weight:600;">Pay invoices in seconds</strong>
         <div class="tc-surface">Same markup. Only the token <em>values</em> change — the canvas tint, the accent hue, the ink, the hairline all swap from one attribute.</div>
         <span class="tc-cta">Open account →</span>
       </div>
@@ -307,7 +750,7 @@
 .card { background: var(--color-bg); color: var(--color-ink); }</code></pre>
 
     <h4>No-flash theme init (the Josh Comeau move)</h4>
-    <p>The flash of wrong theme happens when React/Vue hydrates <em>after</em> first paint. Fix it with a tiny blocking script in <code>&lt;head&gt;</code> that sets the attribute before the body renders:</p>
+    <p class="reveal">The flash of wrong theme happens when React/Vue hydrates <em>after</em> first paint. Fix it with a tiny blocking script in <code>&lt;head&gt;</code> that sets the attribute before the body renders:</p>
     <pre><code>&lt;!-- Inline in &lt;head&gt;, BEFORE your stylesheet/app. Runs synchronously. --&gt;
 &lt;script&gt;
   (function () {
@@ -317,12 +760,12 @@
   })();
 &lt;/script&gt;</code></pre>
 
-    <div class="callout warn">
+    <div class="callout warn reveal">
       <p><strong>Pitfall — theming only the background.</strong> A dark theme is not "invert the canvas." Saturated accents that pass contrast on white often fail on black, and pure-white text on pure-black causes halation (smearing) for astigmatic readers. Lift the accent's lightness for dark mode (see the OKLCH bump above) and use off-white ink, exactly like Linear's <code>rgb(247,248,248)</code> rather than <code>#fff</code>.</p>
     </div>
 
-    <h2 id="checklist">9 · The steal-this checklist</h2>
-    <div class="callout steal">
+    <h2 id="checklist" class="reveal">The steal-this checklist</h2>
+    <div class="callout steal reveal">
       <p><strong>Color discipline, distilled from 80 teardowns:</strong></p>
       <ul>
         <li><strong>One accent, spent like money</strong> — Ramp, Mercury, Brittany Chiang. Every colored pixel must buy you something.</li>
@@ -339,21 +782,37 @@
   <footer class="ftr">
     <div class="wrap">
       <p><a href="../PLAN.html">◆ Craft Atlas — Build Plan →</a></p>
-      <p style="margin-top:var(--s-3);color:var(--ink-dim);">Page 04 of 13 · <strong>Color &amp; Theme</strong>. Craft Atlas — synthesized from 80 live site teardowns.</p>
+      <p style="margin-top:var(--s-3);">Page 04 of 13 · <strong style="color:var(--paper-2);">Color &amp; Theme</strong>. Craft Atlas — synthesized from 80 live site teardowns.</p>
     </div>
   </footer>
 
   <script>
-    // page-local: theme-token toggle demo only
+    // page-local: theme-token toggle demo
     (function () {
-      const card = document.getElementById('themeCard');
-      const btns = document.querySelectorAll('.theme-switch button');
+      var card = document.getElementById('themeCard');
+      var btns = document.querySelectorAll('.theme-switch button');
       btns.forEach(function (b) {
         b.addEventListener('click', function () {
           card.setAttribute('data-theme', b.dataset.set);
           btns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
         });
       });
+    })();
+
+    // page-local: scroll-reveal (honors prefers-reduced-motion)
+    (function () {
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var els = document.querySelectorAll('.reveal');
+      if (reduce || !('IntersectionObserver' in window)) {
+        els.forEach(function (el) { el.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+      els.forEach(function (el) { io.observe(el); });
     })();
   </script>
 </body>

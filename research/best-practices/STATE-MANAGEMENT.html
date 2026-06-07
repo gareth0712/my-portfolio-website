@@ -4,55 +4,566 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>State Management — Craft Atlas</title>
+  <meta name="description" content="A field guide to client/UI state for portfolio-grade sites: when you need it, the four kinds, and React tools next to their Vue / Nuxt 4 equivalents.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ---- page-local live-demo styles only ---- */
-    .sm-grid { display:grid; gap:1.1rem; }
-    @media (min-width:720px){ .sm-2 { grid-template-columns:1fr 1fr; } }
+    /* ========================================================================
+       STATE MANAGEMENT — bespoke art direction
+       "Technical documentation, premium minimal." Code-forward, calm,
+       authoritative. Light schematic paper canvas + ink-dark editor chrome
+       for every code block. Single desaturated cyan-teal accent. Grotesk
+       display, Plex Sans body, JetBrains Mono for all code + metadata.
+       ===================================================================== */
 
-    /* decision-tree mini-diagram */
-    .tree { font-family:var(--font-mono); font-size:.8rem; line-height:1.9; color:var(--ink-soft); }
-    .tree b { color:var(--accent-soft); font-weight:600; }
-    .tree .q { color:var(--ink); }
+    :root{
+      /* --- palette: cool schematic neutrals + one teal signal --- */
+      --paper:      #f4f5f3;   /* canvas — cool bone, not warm cream */
+      --paper-2:    #ecedea;   /* recessed panels */
+      --ink:        #14181c;   /* near-black, cool */
+      --ink-soft:   #3a4149;
+      --ink-dim:    #6b7480;
+      --ink-faint:  #98a1ab;
+      --line:       #d9dcd6;
+      --line-soft:  #e6e8e4;
+
+      --accent:      #0d7d76;  /* deep teal — the one signal color */
+      --accent-2:    #0a5f59;
+      --accent-wash: #e2efed;  /* desaturated teal wash for tags */
+      --accent-ink:  #064540;
+
+      /* editor chrome (dark surface that hosts code) */
+      --code-bg:    #14181c;
+      --code-bg-2:  #1b2026;
+      --code-line:  #262d35;
+      --code-ink:   #d7dde3;
+      --code-dim:   #7b8794;
+      --code-key:   #6fd3c8;   /* keyword / accent inside code */
+      --code-str:   #c6a875;   /* string */
+      --code-com:   #5b6671;   /* comment */
+      --code-num:   #d99477;   /* number / punct */
+
+      /* spot pastels for semantic callouts (kept desaturated) */
+      --steal-bg:   #e5efe6;  --steal-ink:#2c5a36;  --steal-bar:#3f8a52;
+      --warn-bg:    #f4e9df;  --warn-ink:#8a5a2a;   --warn-bar:#c08a4f;
+      --tip-bg:     #e2edf2;  --tip-ink:#27607a;    --tip-bar:#4f97b8;
+
+      --font-disp:  "Space Grotesk", system-ui, sans-serif;
+      --font-body:  "IBM Plex Sans", system-ui, sans-serif;
+      --font-mono:  "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+      --r-1: 4px;
+      --r-2: 8px;
+      --r-3: 12px;
+      --r-pill: 999px;
+      --ease: cubic-bezier(.16,1,.3,1);
+
+      --maxw: 1240px;
+      --rail: 232px;
+    }
+
+    *,*::before,*::after{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; scroll-padding-top:5.5rem; -webkit-text-size-adjust:100%; }
+    @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+
+    body{
+      margin:0;
+      background:var(--paper);
+      color:var(--ink);
+      font-family:var(--font-body);
+      font-size:1rem;
+      line-height:1.68;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+      /* schematic blueprint grid, extremely faint */
+      background-image:
+        linear-gradient(to right, rgba(20,24,28,.022) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(20,24,28,.022) 1px, transparent 1px);
+      background-size: 30px 30px;
+      background-attachment:fixed;
+    }
+
+    a{ color:inherit; }
+    ::selection{ background:var(--accent); color:#fff; }
+
+    :focus-visible{
+      outline:2px solid var(--accent);
+      outline-offset:2px;
+      border-radius:2px;
+    }
+
+    /* ───────────────────────── top nav ───────────────────────── */
+    .site-header{
+      position:sticky; top:0; z-index:40;
+      background:rgba(244,245,243,.82);
+      backdrop-filter:blur(14px) saturate(140%);
+      -webkit-backdrop-filter:blur(14px) saturate(140%);
+      border-bottom:1px solid var(--line);
+    }
+    .site-nav{
+      max-width:var(--maxw); margin:0 auto;
+      display:flex; align-items:center; gap:.15rem; flex-wrap:wrap;
+      padding:.55rem 1.25rem;
+      font-family:var(--font-mono);
+      font-size:.72rem; letter-spacing:.01em;
+    }
+    .site-nav a{
+      text-decoration:none; color:var(--ink-dim);
+      padding:.34rem .5rem; border-radius:var(--r-1);
+      white-space:nowrap;
+      transition:color .2s var(--ease), background .2s var(--ease);
+    }
+    .site-nav a:hover{ color:var(--ink); background:var(--paper-2); }
+    .site-nav a.brand{
+      color:var(--ink); font-weight:700; font-size:.8rem;
+      letter-spacing:.02em; margin-right:.4rem;
+    }
+    .site-nav a.brand:hover{ background:transparent; color:var(--accent); }
+    .site-nav a[aria-current="page"]{
+      color:var(--accent-ink); background:var(--accent-wash); font-weight:600;
+    }
+    .site-nav a.cta{
+      margin-left:auto; color:#fff; background:var(--ink);
+      font-weight:600; padding:.36rem .85rem; border-radius:var(--r-pill);
+    }
+    .site-nav a.cta:hover{ background:var(--accent); color:#fff; }
+
+    /* ───────────────────────── layout shell ───────────────────────── */
+    .shell{
+      max-width:var(--maxw); margin:0 auto;
+      padding:0 1.25rem;
+    }
+    .layout{
+      display:grid;
+      grid-template-columns:var(--rail) minmax(0,1fr);
+      gap:3.5rem;
+      align-items:start;
+    }
+    @media (max-width:980px){
+      .layout{ grid-template-columns:1fr; gap:0; }
+    }
+
+    /* persistent left rail TOC */
+    .rail{
+      position:sticky; top:5rem;
+      align-self:start;
+      padding:1.5rem 0;
+      border-right:1px solid var(--line);
+      max-height:calc(100dvh - 6rem);
+      overflow:auto;
+    }
+    @media (max-width:980px){ .rail{ display:none; } }
+    .rail-label{
+      font-family:var(--font-mono); font-size:.65rem;
+      text-transform:uppercase; letter-spacing:.22em;
+      color:var(--ink-faint); margin:0 0 1rem;
+    }
+    .rail nav{ display:flex; flex-direction:column; }
+    .rail a{
+      display:flex; gap:.6rem; align-items:baseline;
+      text-decoration:none; color:var(--ink-dim);
+      font-size:.82rem; line-height:1.35;
+      padding:.42rem 0 .42rem .8rem;
+      border-left:2px solid var(--line-soft);
+      transition:color .2s var(--ease), border-color .2s var(--ease);
+    }
+    .rail a:hover{ color:var(--ink); }
+    .rail a .num{
+      font-family:var(--font-mono); font-size:.7rem;
+      color:var(--ink-faint); flex:0 0 auto; width:1ch;
+    }
+    .rail a[data-active="true"]{
+      color:var(--accent-ink); border-left-color:var(--accent); font-weight:600;
+    }
+    .rail a[data-active="true"] .num{ color:var(--accent); }
+
+    /* ───────────────────────── hero ───────────────────────── */
+    .content{ padding:3rem 0 5rem; min-width:0; }
+
+    .kicker{
+      display:inline-flex; align-items:center; gap:.55rem;
+      font-family:var(--font-mono); font-size:.7rem;
+      text-transform:uppercase; letter-spacing:.18em;
+      color:var(--accent-ink); background:var(--accent-wash);
+      padding:.3rem .7rem; border-radius:var(--r-pill);
+      margin:0 0 1.5rem;
+    }
+    .kicker::before{
+      content:""; width:6px; height:6px; border-radius:50%;
+      background:var(--accent);
+    }
+
+    h1{
+      font-family:var(--font-disp);
+      font-weight:700;
+      font-size:clamp(2.3rem, 1.4rem + 4.2vw, 4.1rem);
+      line-height:1.02;
+      letter-spacing:-.03em;
+      margin:0 0 1.4rem;
+      max-width:16ch;
+    }
+    h1 .hl{
+      color:var(--accent);
+      position:relative;
+    }
+
+    .lede{
+      font-size:clamp(1.08rem, 1rem + .4vw, 1.28rem);
+      line-height:1.62;
+      color:var(--ink-soft);
+      max-width:64ch;
+      margin:0 0 2.5rem;
+    }
+    .lede em{ color:var(--ink); font-style:italic; }
+    .lede code{ font-size:.92em; }
+
+    /* meta strip below hero */
+    .meta-strip{
+      display:flex; flex-wrap:wrap; gap:0;
+      border:1px solid var(--line); border-radius:var(--r-2);
+      overflow:hidden; margin:0 0 3.5rem;
+      background:var(--paper-2);
+    }
+    .meta-cell{
+      flex:1 1 140px; padding:.95rem 1.15rem;
+      border-right:1px solid var(--line);
+    }
+    .meta-cell:last-child{ border-right:0; }
+    .meta-cell dt{
+      font-family:var(--font-mono); font-size:.62rem;
+      text-transform:uppercase; letter-spacing:.16em;
+      color:var(--ink-faint); margin:0 0 .3rem;
+    }
+    .meta-cell dd{
+      margin:0; font-family:var(--font-mono); font-weight:600;
+      font-size:.86rem; color:var(--ink);
+    }
+
+    /* ───────────────────────── headings ───────────────────────── */
+    h2{
+      font-family:var(--font-disp);
+      font-weight:600;
+      font-size:clamp(1.5rem, 1.2rem + 1.2vw, 2.1rem);
+      letter-spacing:-.02em;
+      line-height:1.12;
+      margin:4.5rem 0 1.1rem;
+      padding-top:1.6rem;
+      border-top:1px solid var(--line);
+      scroll-margin-top:5.5rem;
+      display:flex; align-items:baseline; gap:.9rem;
+    }
+    h2 .sn{
+      font-family:var(--font-mono); font-weight:500;
+      font-size:.85rem; color:var(--accent);
+      flex:0 0 auto;
+      border:1px solid var(--accent); border-radius:var(--r-1);
+      padding:.1rem .45rem; line-height:1.4;
+      transform:translateY(-.15em);
+    }
+    h3{
+      font-family:var(--font-disp); font-weight:600;
+      font-size:1.06rem; letter-spacing:-.01em;
+      margin:0 0 .55rem; color:var(--ink);
+    }
+
+    p{ margin:0 0 1.15rem; max-width:68ch; }
+    .content > p,
+    .content > h2,
+    .content > .lede{ max-width:none; }
+    .content > p{ max-width:68ch; }
+
+    em{ font-style:italic; color:var(--ink); }
+    strong{ font-weight:600; color:var(--ink); }
+
+    /* inline code */
+    code{
+      font-family:var(--font-mono);
+      font-size:.84em;
+      background:var(--paper-2);
+      border:1px solid var(--line);
+      border-radius:var(--r-1);
+      padding:.08em .4em;
+      color:var(--accent-ink);
+      word-break:break-word;
+    }
+
+    /* ───────────────────────── reference chips ───────────────────────── */
+    .ref{
+      font-family:var(--font-mono);
+      font-size:.78em;
+      font-weight:500;
+      color:var(--accent-ink);
+      background:var(--accent-wash);
+      border-radius:var(--r-1);
+      padding:.04em .42em;
+      white-space:nowrap;
+      cursor:default;
+      transition:background .2s var(--ease);
+    }
+    .ref:hover{ background:#d3e8e5; }
+
+    /* ───────────────────────── cards / archetype grid ───────────────────────── */
+    .grid{
+      display:grid; gap:1px;
+      grid-template-columns:repeat(auto-fit, minmax(240px,1fr));
+      background:var(--line);
+      border:1px solid var(--line);
+      border-radius:var(--r-2);
+      overflow:hidden;
+      margin:1.6rem 0 2rem;
+    }
+    .card{
+      background:var(--paper);
+      padding:1.5rem 1.4rem;
+      transition:background .25s var(--ease);
+    }
+    .card:hover{ background:var(--paper-2); }
+    .card h3{ margin-bottom:.5rem; }
+    .card h3::before{
+      content:""; display:inline-block;
+      width:7px; height:7px; margin-right:.55rem;
+      background:var(--accent); border-radius:1px;
+      transform:rotate(45deg) translateY(-1px);
+    }
+    .card p{ font-size:.92rem; color:var(--ink-soft); margin:0; }
+
+    /* ───────────────────────── tables ───────────────────────── */
+    .table-wrap{
+      overflow-x:auto;
+      border:1px solid var(--line);
+      border-radius:var(--r-2);
+      margin:1.6rem 0 2rem;
+      background:var(--paper);
+    }
+    table{
+      width:100%; border-collapse:collapse;
+      font-size:.88rem; min-width:560px;
+    }
+    thead th{
+      text-align:left;
+      font-family:var(--font-mono); font-weight:600;
+      font-size:.66rem; text-transform:uppercase; letter-spacing:.1em;
+      color:var(--ink-dim);
+      padding:.8rem 1rem;
+      background:var(--paper-2);
+      border-bottom:1px solid var(--line);
+      white-space:nowrap;
+    }
+    tbody td{
+      padding:.78rem 1rem;
+      border-bottom:1px solid var(--line-soft);
+      vertical-align:top;
+      color:var(--ink-soft);
+    }
+    tbody tr:last-child td{ border-bottom:0; }
+    tbody tr:hover td{ background:var(--paper-2); }
+    tbody td b{ color:var(--ink); font-weight:600; }
+    table code{ font-size:.82em; }
+
+    /* ───────────────────────── code blocks (editor chrome) ───────────────────────── */
+    pre{
+      margin:1.4rem 0;
+      background:var(--code-bg);
+      border:1px solid var(--code-line);
+      border-radius:var(--r-2);
+      overflow:hidden;
+      box-shadow:0 1px 0 rgba(20,24,28,.04), 0 8px 28px -18px rgba(20,24,28,.35);
+    }
+    pre::before{
+      content:"";
+      display:block;
+      height:2.3rem;
+      background:var(--code-bg-2);
+      border-bottom:1px solid var(--code-line);
+      /* faux window controls */
+      background-image:
+        radial-gradient(circle, #4a525c 4px, transparent 4.5px),
+        radial-gradient(circle, #3a424c 4px, transparent 4.5px),
+        radial-gradient(circle, #2e353e 4px, transparent 4.5px);
+      background-repeat:no-repeat;
+      background-position:14px center, 32px center, 50px center;
+    }
+    pre code{
+      display:block;
+      font-family:var(--font-mono);
+      font-size:.82rem;
+      line-height:1.7;
+      color:var(--code-ink);
+      background:transparent;
+      border:0;
+      padding:1.15rem 1.3rem 1.35rem;
+      overflow-x:auto;
+      white-space:pre;
+      -webkit-text-fill-color:currentColor;
+    }
+    pre code::selection,
+    pre code ::selection{ background:rgba(111,211,200,.3); color:#fff; }
+
+    /* paired code (React | Vue) */
+    .sm-grid{ display:grid; gap:1.1rem; }
+    @media (min-width:760px){ .sm-2{ grid-template-columns:1fr 1fr; } }
+    .sm-grid > div{ min-width:0; }
+
+    /* code label */
+    .pill-state{
+      display:inline-flex; align-items:center; gap:.45rem;
+      font-family:var(--font-mono); font-size:.66rem; font-weight:600;
+      text-transform:uppercase; letter-spacing:.1em;
+      color:var(--ink-dim);
+      padding:.28rem .6rem;
+      border:1px solid var(--line);
+      border-radius:var(--r-pill);
+      background:var(--paper);
+      margin:0 0 .55rem;
+    }
+    .pill-state::before{
+      content:""; width:6px; height:6px; border-radius:50%;
+      background:var(--accent);
+    }
+
+    /* ───────────────────────── callouts ───────────────────────── */
+    .callout{
+      border-radius:var(--r-2);
+      padding:1.15rem 1.3rem 1.15rem 1.5rem;
+      margin:1.8rem 0;
+      border:1px solid var(--line);
+      border-left:3px solid var(--ink-dim);
+      background:var(--paper);
+      font-size:.94rem;
+    }
+    .callout strong:first-child{
+      display:block; margin-bottom:.4rem;
+      font-family:var(--font-disp); font-weight:600; font-size:1rem;
+    }
+    .callout p{ margin:0; max-width:none; }
+    .callout ol,.callout ul{ margin:.5rem 0 0; padding-left:1.2rem; }
+    .callout li{ margin-bottom:.5rem; }
+    .callout li:last-child{ margin-bottom:0; }
+    .callout li b{ color:var(--ink); }
+
+    .callout.steal{ background:var(--steal-bg); border-left-color:var(--steal-bar); }
+    .callout.steal strong:first-child{ color:var(--steal-ink); }
+    .callout.warn{ background:var(--warn-bg); border-left-color:var(--warn-bar); }
+    .callout.warn strong:first-child{ color:var(--warn-ink); }
+    .callout.tip{ background:var(--tip-bg); border-left-color:var(--tip-bar); }
+    .callout.tip strong:first-child{ color:var(--tip-ink); }
+
+    /* ───────────────────────── example / demo frame ───────────────────────── */
+    .example{
+      border:1px solid var(--line);
+      border-radius:var(--r-2);
+      padding:1.3rem;
+      margin:1.8rem 0;
+      background:
+        repeating-linear-gradient(135deg, transparent 0 11px, rgba(13,125,118,.03) 11px 12px),
+        var(--paper);
+    }
+
+    /* decision tree mini-diagram */
+    .tree{
+      font-family:var(--font-mono); font-size:.82rem; line-height:2;
+      color:var(--ink-soft);
+    }
+    .tree .q{ color:var(--ink); }
+    .tree b{ color:var(--accent-ink); font-weight:600; }
+    .tree .arrow{ color:var(--ink-faint); padding:0 .35rem; }
 
     /* live scroll-spy demo */
-    .spy { display:grid; grid-template-columns: 9rem 1fr; gap:1rem; }
-    .spy-nav { position:sticky; top:1rem; align-self:start; display:flex; flex-direction:column; gap:.35rem; }
-    .spy-link {
-      font-family:var(--font-mono); font-size:.72rem; letter-spacing:.06em; text-transform:uppercase;
-      color:var(--ink-dim); padding:.3rem 0 .3rem .8rem; border-left:2px solid var(--line);
-      transition: color .25s var(--ease), border-color .25s var(--ease);
+    .spy{ display:grid; grid-template-columns:8.5rem 1fr; gap:1rem; }
+    @media (max-width:520px){ .spy{ grid-template-columns:1fr; } }
+    .spy-nav{
+      display:flex; flex-direction:column; gap:.3rem;
+      align-self:start;
+    }
+    .spy-link{
+      font-family:var(--font-mono); font-size:.7rem; letter-spacing:.04em;
+      text-transform:uppercase; color:var(--ink-dim);
+      padding:.32rem 0 .32rem .75rem;
+      border-left:2px solid var(--line);
       text-decoration:none;
+      transition:color .2s var(--ease), border-color .2s var(--ease);
     }
-    .spy-link[data-active="true"] { color:var(--accent-soft); border-color:var(--accent); }
-    .spy-body { display:grid; gap:.7rem; }
-    .spy-sec {
-      min-height:8.5rem; padding:1.1rem; border:1px solid var(--line); border-radius:var(--r-2);
-      background:var(--bg-2); display:flex; align-items:center; justify-content:center;
-      font-family:var(--font-serif); font-size:var(--step-1); color:var(--ink-soft);
+    .spy-link[data-active="true"]{ color:var(--accent-ink); border-left-color:var(--accent); font-weight:600; }
+    .spy-scroll{
+      max-height:14rem; overflow:auto;
+      border:1px solid var(--line); border-radius:var(--r-2);
+      background:var(--paper-2);
+      padding:.5rem;
     }
-    .spy-scroll { max-height:15rem; overflow:auto; border:1px solid var(--line-soft); border-radius:var(--r-2); padding:.5rem; }
+    .spy-body{ display:grid; gap:.6rem; }
+    .spy-sec{
+      min-height:8rem; padding:1rem;
+      border:1px solid var(--line); border-radius:var(--r-1);
+      background:var(--paper);
+      display:flex; align-items:center; justify-content:center;
+      font-family:var(--font-disp); font-weight:600; font-size:1.3rem;
+      color:var(--ink-dim);
+    }
 
     /* persisted theme-token toggle demo */
-    .toggle-demo { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
-    .swatch-card {
-      flex:1; min-width:180px; padding:1.2rem; border-radius:var(--r-3);
-      background: var(--demo-bg, #16191e); color: var(--demo-ink, #e9eaec);
-      border:1px solid var(--line); transition: background .35s var(--ease), color .35s var(--ease);
-      font-family:var(--font-serif);
+    .toggle-demo{ display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+    .swatch-card{
+      flex:1; min-width:200px; padding:1.3rem; border-radius:var(--r-2);
+      background:var(--demo-bg, #14181c); color:var(--demo-ink, #d7dde3);
+      border:1px solid var(--line);
+      transition:background .35s var(--ease), color .35s var(--ease);
+      font-family:var(--font-disp); font-size:.96rem; line-height:1.45;
     }
-    .demo-btn {
-      font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em; text-transform:uppercase;
-      color:var(--accent-ink); background:var(--accent); border:0; border-radius:var(--r-pill);
-      padding:.45rem 1rem; cursor:pointer;
+    .demo-btn{
+      font-family:var(--font-mono); font-size:.7rem; font-weight:600;
+      letter-spacing:.05em; text-transform:uppercase;
+      color:#fff; background:var(--ink); border:0;
+      border-radius:var(--r-1); padding:.5rem 1rem; cursor:pointer;
+      transition:background .2s var(--ease), transform .12s var(--ease);
     }
-    .demo-btn:hover { background:var(--accent-soft); }
-    .pill-state {
-      font-family:var(--font-mono); font-size:.72rem; color:var(--ink-dim);
-      padding:.25rem .6rem; border:1px solid var(--line); border-radius:var(--r-pill);
+    .demo-btn:hover{ background:var(--accent); }
+    .demo-btn:active{ transform:scale(.97); }
+
+    /* ───────────────────────── figures ───────────────────────── */
+    .figure{
+      margin:2rem 0;
+      border:1px solid var(--line);
+      border-radius:var(--r-2);
+      overflow:hidden;
+      background:var(--paper);
+    }
+    .figure img{
+      display:block; width:100%; height:auto;
+      border-bottom:1px solid var(--line);
+    }
+    .figure figcaption{
+      padding:.9rem 1.15rem;
+      font-size:.82rem; line-height:1.55;
+      color:var(--ink-dim);
+    }
+    .figure figcaption .ref{ font-size:.8em; }
+
+    /* ───────────────────────── footer ───────────────────────── */
+    .ftr{
+      margin-top:5rem; padding-top:2rem;
+      border-top:1px solid var(--line);
+      font-size:.88rem; color:var(--ink-dim);
+    }
+    .ftr a{ color:var(--accent-ink); text-decoration:underline; text-underline-offset:2px; }
+    .ftr a:hover{ color:var(--accent); }
+    .ftr p{ margin:0 0 .4rem; max-width:none; }
+    .ftr p:last-child{ font-family:var(--font-mono); font-size:.74rem; color:var(--ink-faint); }
+
+    /* ───────────────────────── scroll-reveal ───────────────────────── */
+    .reveal{ opacity:0; transform:translateY(14px); }
+    .reveal.in{
+      opacity:1; transform:none;
+      transition:opacity .6s var(--ease), transform .6s var(--ease);
+    }
+    @media (prefers-reduced-motion: reduce){
+      .reveal{ opacity:1 !important; transform:none !important; }
+      .reveal.in{ transition:none; }
+    }
+
+    @media (max-width:520px){
+      .site-nav{ font-size:.68rem; }
+      .content{ padding:2rem 0 3.5rem; }
     }
   </style>
 </head>
@@ -70,7 +581,7 @@
       <a href="INTERACTIONS.html">Interaction</a>
       <a href="SPATIAL.html">3D / Spatial</a>
       <a href="MINI-GAMES.html">Mini-Games</a>
-      <a href="STATE-MANAGEMENT.html">State</a>
+      <a href="STATE-MANAGEMENT.html" aria-current="page">State</a>
       <a href="NEXTJS.html">Meta-Framework</a>
       <a href="../references/PORTFOLIO.html">Portfolio</a>
       <a href="../references/TOP-LIST.html">Top List</a>
@@ -79,113 +590,143 @@
     </nav>
   </header>
 
-<main class="wrap">
-  <p class="kicker">Craft Atlas · Client &amp; UI State</p>
-  <h1>State Management for portfolio-grade sites</h1>
-  <p class="lede">
-    Most beautiful sites need almost no state. The reference-grade ones treat state like a precious
-    resource: a scroll-spy flag, a persisted theme token, one WebGL scene enum — not a Redux galaxy.
-    This page maps <em>when</em> you actually need state, the four kinds you'll meet (local, global,
-    server, URL), and shows the React tools (Zustand / Jotai / Context) next to their Vue / Nuxt 4
-    equivalents (Pinia / <code>useState</code> / <code>useAsyncData</code>) — because our project is Nuxt 4.
-  </p>
+<div class="shell">
+  <div class="layout">
 
-  <nav class="toc" aria-label="On this page">
-    <a href="#need">1 · Do you even need it?</a>
-    <a href="#four">2 · The four kinds of state</a>
-    <a href="#local">3 · Local first</a>
-    <a href="#global">4 · Global: Zustand ↔ Pinia</a>
-    <a href="#server">5 · Server state &amp; useAsyncData</a>
-    <a href="#url">6 · URL as state</a>
-    <a href="#anim">7 · Animation &amp; scene state</a>
-    <a href="#persist">8 · Persistence done right</a>
-    <a href="#cheat">9 · Cheat sheet</a>
-  </nav>
+    <!-- ───────────────── persistent left rail TOC ───────────────── -->
+    <aside class="rail" aria-label="On this page">
+      <p class="rail-label">On this page</p>
+      <nav id="railNav">
+        <a href="#need"    data-target="need"><span class="num">1</span> Do you even need it?</a>
+        <a href="#four"    data-target="four"><span class="num">2</span> The four kinds</a>
+        <a href="#local"   data-target="local"><span class="num">3</span> Local first</a>
+        <a href="#global"  data-target="global"><span class="num">4</span> Zustand ↔ Pinia</a>
+        <a href="#server"  data-target="server"><span class="num">5</span> Server state</a>
+        <a href="#url"     data-target="url"><span class="num">6</span> URL as state</a>
+        <a href="#anim"    data-target="anim"><span class="num">7</span> Animation &amp; scene</a>
+        <a href="#persist" data-target="persist"><span class="num">8</span> Persistence</a>
+        <a href="#cheat"   data-target="cheat"><span class="num">9</span> Cheat sheet</a>
+      </nav>
+    </aside>
 
-  <div class="callout steal">
-    <strong>Steal these five.</strong>
-    <ol>
-      <li><b>Default to none.</b> <span class="ref">Brittany Chiang ↗</span>'s reference dev portfolio runs its entire active-section nav on one IntersectionObserver — no store at all.</li>
-      <li><b>Local before global.</b> A toggle that only one component reads is <code>useState</code> / <code>ref</code>, full stop.</li>
-      <li><b>Server state is not client state.</b> Cache it (<code>useAsyncData</code> / TanStack Query), don't dump it in a store.</li>
-      <li><b>URL is free global state.</b> Filters, tabs, open-project — put them in the query string and they survive refresh + share.</li>
-      <li><b>One store, sliced.</b> When you do reach for global, it's a single tiny Zustand/Pinia store with selectors — not five context providers nested like an onion.</li>
-    </ol>
-  </div>
+    <!-- ───────────────── main content ───────────────── -->
+    <main class="content">
+      <p class="kicker">Craft Atlas · Client &amp; UI State</p>
+      <h1>State management for <span class="hl">portfolio-grade</span> sites</h1>
+      <p class="lede">
+        Most beautiful sites need almost no state. The reference-grade ones treat state like a precious
+        resource: a scroll-spy flag, a persisted theme token, one WebGL scene enum — not a Redux galaxy.
+        This page maps <em>when</em> you actually need state, the four kinds you'll meet (local, global,
+        server, URL), and shows the React tools (Zustand / Jotai / Context) next to their Vue / Nuxt 4
+        equivalents (Pinia / <code>useState</code> / <code>useAsyncData</code>) — because our project is Nuxt 4.
+      </p>
 
-  <!-- ───────────────────────── 1 ───────────────────────── -->
-  <h2 id="need">1 · Do you even need it?</h2>
-  <p>
-    Be honest about your site's shape. A portfolio is usually one of three archetypes, and each lives
-    at a different point on the state spectrum:
-  </p>
+      <dl class="meta-strip reveal">
+        <div class="meta-cell">
+          <dt>Stack</dt>
+          <dd>React ↔ Nuxt 4</dd>
+        </div>
+        <div class="meta-cell">
+          <dt>Kinds of state</dt>
+          <dd>Local · Global · Server · URL</dd>
+        </div>
+        <div class="meta-cell">
+          <dt>Default reach</dt>
+          <dd>None → local → URL</dd>
+        </div>
+        <div class="meta-cell">
+          <dt>Sourced from</dt>
+          <dd>80 teardowns</dd>
+        </div>
+      </dl>
 
-  <div class="grid">
-    <div class="card">
-      <h3>Editorial / scroll site</h3>
-      <p><span class="ref">Lee Robinson ↗</span>, <span class="ref">Brittany Chiang ↗</span>, <span class="ref">Arc ↗</span>. Mostly static content. The only "state" is <em>which section is in view</em> and a theme preference. Zero global store needed — derive everything from scroll + the URL.</p>
-    </div>
-    <div class="card">
-      <h3>App-flavoured marketing</h3>
-      <p><span class="ref">Linear ↗</span>, <span class="ref">Stripe ↗</span>, <span class="ref">Family ↗</span>. Live interactive replicas, tabs, command menus. Here you have real local UI state (open tab, selected agent, dismissed banner) but it stays component-scoped.</p>
-    </div>
-    <div class="card">
-      <h3>Experiential / WebGL</h3>
-      <p><span class="ref">Igloo Inc ↗</span>, <span class="ref">Bruno Simon ↗</span>, <span class="ref">Active Theory ↗</span>. One global "scene state machine" (current district, loaded?, audio on?, achievements unlocked) drives the whole canvas. This is the one archetype that genuinely earns a store.</p>
-    </div>
-  </div>
+      <div class="callout steal reveal">
+        <strong>Steal these five.</strong>
+        <ol>
+          <li><b>Default to none.</b> <span class="ref">Brittany Chiang ↗</span>'s reference dev portfolio runs its entire active-section nav on one IntersectionObserver — no store at all.</li>
+          <li><b>Local before global.</b> A toggle that only one component reads is <code>useState</code> / <code>ref</code>, full stop.</li>
+          <li><b>Server state is not client state.</b> Cache it (<code>useAsyncData</code> / TanStack Query), don't dump it in a store.</li>
+          <li><b>URL is free global state.</b> Filters, tabs, open-project — put them in the query string and they survive refresh + share.</li>
+          <li><b>One store, sliced.</b> When you do reach for global, it's a single tiny Zustand/Pinia store with selectors — not five context providers nested like an onion.</li>
+        </ol>
+      </div>
 
-  <div class="callout warn">
-    <strong>Pitfall — premature global state.</strong> Reaching for Pinia/Zustand on a brochure site is the
-    most common over-engineering tell. If a value is read by exactly one component, it is local state.
-    A store you add "just in case" becomes a dumping ground that nukes your tree-shaking and makes every
-    render a debugging session.
-  </div>
+      <!-- ───────────────────────── 1 ───────────────────────── -->
+      <h2 id="need"><span class="sn">01</span> Do you even need it?</h2>
+      <p>
+        Be honest about your site's shape. A portfolio is usually one of three archetypes, and each lives
+        at a different point on the state spectrum:
+      </p>
 
-  <!-- ───────────────────────── 2 ───────────────────────── -->
-  <h2 id="four">2 · The four kinds of state (name them, then they're easy)</h2>
-  <p>
-    Ninety percent of "state management is hard" disappears the moment you stop treating all state as
-    one bucket. There are four, each with a different home:
-  </p>
+      <div class="grid reveal">
+        <div class="card">
+          <h3>Editorial / scroll site</h3>
+          <p><span class="ref">Lee Robinson ↗</span>, <span class="ref">Brittany Chiang ↗</span>, <span class="ref">Arc ↗</span>. Mostly static content. The only "state" is <em>which section is in view</em> and a theme preference. Zero global store needed — derive everything from scroll + the URL.</p>
+        </div>
+        <div class="card">
+          <h3>App-flavoured marketing</h3>
+          <p><span class="ref">Linear ↗</span>, <span class="ref">Stripe ↗</span>, <span class="ref">Family ↗</span>. Live interactive replicas, tabs, command menus. Here you have real local UI state (open tab, selected agent, dismissed banner) but it stays component-scoped.</p>
+        </div>
+        <div class="card">
+          <h3>Experiential / WebGL</h3>
+          <p><span class="ref">Igloo Inc ↗</span>, <span class="ref">Bruno Simon ↗</span>, <span class="ref">Active Theory ↗</span>. One global "scene state machine" (current district, loaded?, audio on?, achievements unlocked) drives the whole canvas. This is the one archetype that genuinely earns a store.</p>
+        </div>
+      </div>
 
-  <table>
-    <thead>
-      <tr><th>Kind</th><th>Lives where</th><th>Examples</th><th>React tool</th><th>Vue / Nuxt 4 tool</th></tr>
-    </thead>
-    <tbody>
-      <tr><td><b>Local UI</b></td><td>The component</td><td>menu open, hover, input value, current tab</td><td><code>useState</code> / <code>useReducer</code></td><td><code>ref</code> / <code>reactive</code></td></tr>
-      <tr><td><b>Global UI</b></td><td>A shared store</td><td>theme, audio on/off, WebGL scene, cart</td><td>Zustand / Jotai / Context</td><td>Pinia / <code>useState()</code> composable</td></tr>
-      <tr><td><b>Server</b></td><td>A cache, not a store</td><td>projects list, GitHub stars, MDX posts</td><td>TanStack Query / RSC</td><td><code>useAsyncData</code> / <code>useFetch</code></td></tr>
-      <tr><td><b>URL</b></td><td>The address bar</td><td>filter, tab, page, open project, search</td><td><code>useSearchParams</code></td><td><code>useRoute</code> / <code>useRouter</code></td></tr>
-    </tbody>
-  </table>
+      <div class="callout warn reveal">
+        <strong>Pitfall — premature global state.</strong>
+        <p>Reaching for Pinia/Zustand on a brochure site is the
+        most common over-engineering tell. If a value is read by exactly one component, it is local state.
+        A store you add "just in case" becomes a dumping ground that nukes your tree-shaking and makes every
+        render a debugging session.</p>
+      </div>
 
-  <div class="example" aria-hidden="true">
-    <p class="pill-state" style="margin-bottom:.8rem;">decision tree · pick the home before the tool</p>
-    <div class="tree">
-      <span class="q">Is it derived from props/scroll/URL?</span> → <b>don't store it, compute it</b><br>
-      <span class="q">Does only one component read it?</span> → <b>local (useState / ref)</b><br>
-      <span class="q">Does it come from the network?</span> → <b>server cache (useAsyncData / Query)</b><br>
-      <span class="q">Should it survive refresh / be shareable?</span> → <b>URL (query param)</b><br>
-      <span class="q">Read by many, client-only, app-wide?</span> → <b>global store (Pinia / Zustand)</b>
-    </div>
-  </div>
+      <!-- ───────────────────────── 2 ───────────────────────── -->
+      <h2 id="four"><span class="sn">02</span> The four kinds of state</h2>
+      <p>
+        Ninety percent of "state management is hard" disappears the moment you stop treating all state as
+        one bucket. There are four, each with a different home:
+      </p>
 
-  <!-- ───────────────────────── 3 ───────────────────────── -->
-  <h2 id="local">3 · Local first — most "state" never leaves the component</h2>
-  <p>
-    The cheapest, most maintainable state is the kind that never escapes one component.
-    <span class="ref">Rauno Freiberg ↗</span>'s signature copy-email button is the canonical example: a
-    button flips to a <code>"Copied"</code> label and back after a timeout — pure local state, no store,
-    no context. <span class="ref">Stripe ↗</span>'s Enterprise/Startups/Platforms tabs and accordions are
-    the same: an <code>activeTab</code> index that lives exactly where it's rendered.
-  </p>
+      <div class="table-wrap reveal">
+        <table>
+          <thead>
+            <tr><th>Kind</th><th>Lives where</th><th>Examples</th><th>React tool</th><th>Vue / Nuxt 4 tool</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><b>Local UI</b></td><td>The component</td><td>menu open, hover, input value, current tab</td><td><code>useState</code> / <code>useReducer</code></td><td><code>ref</code> / <code>reactive</code></td></tr>
+            <tr><td><b>Global UI</b></td><td>A shared store</td><td>theme, audio on/off, WebGL scene, cart</td><td>Zustand / Jotai / Context</td><td>Pinia / <code>useState()</code> composable</td></tr>
+            <tr><td><b>Server</b></td><td>A cache, not a store</td><td>projects list, GitHub stars, MDX posts</td><td>TanStack Query / RSC</td><td><code>useAsyncData</code> / <code>useFetch</code></td></tr>
+            <tr><td><b>URL</b></td><td>The address bar</td><td>filter, tab, page, open project, search</td><td><code>useSearchParams</code></td><td><code>useRoute</code> / <code>useRouter</code></td></tr>
+          </tbody>
+        </table>
+      </div>
 
-  <div class="sm-grid sm-2">
-    <div>
-      <p class="pill-state">React</p>
-      <pre><code>function CopyEmail({ email }) {
+      <div class="example reveal" aria-hidden="true">
+        <span class="pill-state">decision tree · pick the home before the tool</span>
+        <div class="tree">
+          <span class="q">Is it derived from props/scroll/URL?</span> <span class="arrow">→</span> <b>don't store it, compute it</b><br>
+          <span class="q">Does only one component read it?</span> <span class="arrow">→</span> <b>local (useState / ref)</b><br>
+          <span class="q">Does it come from the network?</span> <span class="arrow">→</span> <b>server cache (useAsyncData / Query)</b><br>
+          <span class="q">Should it survive refresh / be shareable?</span> <span class="arrow">→</span> <b>URL (query param)</b><br>
+          <span class="q">Read by many, client-only, app-wide?</span> <span class="arrow">→</span> <b>global store (Pinia / Zustand)</b>
+        </div>
+      </div>
+
+      <!-- ───────────────────────── 3 ───────────────────────── -->
+      <h2 id="local"><span class="sn">03</span> Local first</h2>
+      <p>
+        The cheapest, most maintainable state is the kind that never escapes one component.
+        <span class="ref">Rauno Freiberg ↗</span>'s signature copy-email button is the canonical example: a
+        button flips to a <code>"Copied"</code> label and back after a timeout — pure local state, no store,
+        no context. <span class="ref">Stripe ↗</span>'s Enterprise/Startups/Platforms tabs and accordions are
+        the same: an <code>activeTab</code> index that lives exactly where it's rendered.
+      </p>
+
+      <div class="sm-grid sm-2 reveal">
+        <div>
+          <span class="pill-state">React</span>
+          <pre><code>function CopyEmail({ email }) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -200,10 +741,10 @@
     &lt;/button&gt;
   );
 }</code></pre>
-    </div>
-    <div>
-      <p class="pill-state">Vue / Nuxt 4 — &lt;script setup&gt;</p>
-      <pre><code>&lt;script setup lang="ts"&gt;
+        </div>
+        <div>
+          <span class="pill-state">Vue / Nuxt 4 — &lt;script setup&gt;</span>
+          <pre><code>&lt;script setup lang="ts"&gt;
 const props = defineProps&lt;{ email: string }&gt;()
 const copied = ref(false)
 
@@ -219,57 +760,58 @@ async function copy() {
     {{ copied ? 'Copied ✓' : email }}
   &lt;/button&gt;
 &lt;/template&gt;</code></pre>
-    </div>
-  </div>
-
-  <div class="callout tip">
-    <strong>Pro tip — derive, don't store.</strong> Scroll-spy is <em>derived</em> state, not stored state.
-    <span class="ref">Brittany Chiang ↗</span> highlights the active nav item purely from an
-    IntersectionObserver — there's no <code>currentSection</code> in a store, it's read straight off the
-    DOM. The live demo below does exactly that; the active flag is a <code>data-active</code> attribute, not a variable in a store.
-  </div>
-
-  <div class="example">
-    <p class="pill-state" style="margin-bottom:.8rem;">live · IntersectionObserver scroll-spy (no store)</p>
-    <div class="spy">
-      <nav class="spy-nav" id="spyNav" aria-label="demo sections">
-        <a class="spy-link" href="#sec-intro"  data-target="sec-intro"  data-active="true">Intro</a>
-        <a class="spy-link" href="#sec-work"   data-target="sec-work">Work</a>
-        <a class="spy-link" href="#sec-about"  data-target="sec-about">About</a>
-        <a class="spy-link" href="#sec-contact"data-target="sec-contact">Contact</a>
-      </nav>
-      <div class="spy-scroll" id="spyScroll">
-        <div class="spy-body">
-          <section class="spy-sec" id="sec-intro">Intro</section>
-          <section class="spy-sec" id="sec-work">Work</section>
-          <section class="spy-sec" id="sec-about">About</section>
-          <section class="spy-sec" id="sec-contact">Contact</section>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- ───────────────────────── 4 ───────────────────────── -->
-  <h2 id="global">4 · Global state — Zustand ↔ Pinia (when you finally need it)</h2>
-  <p>
-    Global state earns its keep when one value is read by many distant components and is client-only:
-    a theme, an audio mute, a WebGL scene, a shopping cart. <span class="ref">Active Theory ↗</span> keeps
-    audio <em>off by default</em> behind a single toggle that the whole experience reads;
-    <span class="ref">Bruno Simon ↗</span>'s site is essentially a state machine — current district, 38
-    achievements, a session timer, a mute flag, a "high effects / WebGPU" performance toggle — all global,
-    because the canvas, the HUD, and the map marker all read the same source of truth.
-  </p>
+      <div class="callout tip reveal">
+        <strong>Pro tip — derive, don't store.</strong>
+        <p>Scroll-spy is <em>derived</em> state, not stored state.
+        <span class="ref">Brittany Chiang ↗</span> highlights the active nav item purely from an
+        IntersectionObserver — there's no <code>currentSection</code> in a store, it's read straight off the
+        DOM. The live demo below does exactly that; the active flag is a <code>data-active</code> attribute, not a variable in a store.</p>
+      </div>
 
-  <p>
-    For React, <strong>Zustand</strong> is the portfolio sweet spot: one tiny store, no provider, selector-based
-    subscriptions so a component only re-renders when <em>its</em> slice changes. The Nuxt 4 equivalent is
-    <strong>Pinia</strong> (or, for trivially small needs, Nuxt's built-in SSR-safe <code>useState()</code> composable).
-  </p>
+      <div class="example reveal">
+        <span class="pill-state">live · IntersectionObserver scroll-spy (no store)</span>
+        <div class="spy">
+          <nav class="spy-nav" id="spyNav" aria-label="demo sections">
+            <a class="spy-link" href="#sec-intro"  data-target="sec-intro"  data-active="true">Intro</a>
+            <a class="spy-link" href="#sec-work"   data-target="sec-work">Work</a>
+            <a class="spy-link" href="#sec-about"  data-target="sec-about">About</a>
+            <a class="spy-link" href="#sec-contact"data-target="sec-contact">Contact</a>
+          </nav>
+          <div class="spy-scroll" id="spyScroll">
+            <div class="spy-body">
+              <section class="spy-sec" id="sec-intro">Intro</section>
+              <section class="spy-sec" id="sec-work">Work</section>
+              <section class="spy-sec" id="sec-about">About</section>
+              <section class="spy-sec" id="sec-contact">Contact</section>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  <div class="sm-grid sm-2">
-    <div>
-      <p class="pill-state">React — Zustand</p>
-      <pre><code>// stores/scene.ts
+      <!-- ───────────────────────── 4 ───────────────────────── -->
+      <h2 id="global"><span class="sn">04</span> Global — Zustand ↔ Pinia</h2>
+      <p>
+        Global state earns its keep when one value is read by many distant components and is client-only:
+        a theme, an audio mute, a WebGL scene, a shopping cart. <span class="ref">Active Theory ↗</span> keeps
+        audio <em>off by default</em> behind a single toggle that the whole experience reads;
+        <span class="ref">Bruno Simon ↗</span>'s site is essentially a state machine — current district, 38
+        achievements, a session timer, a mute flag, a "high effects / WebGPU" performance toggle — all global,
+        because the canvas, the HUD, and the map marker all read the same source of truth.
+      </p>
+
+      <p>
+        For React, <strong>Zustand</strong> is the portfolio sweet spot: one tiny store, no provider, selector-based
+        subscriptions so a component only re-renders when <em>its</em> slice changes. The Nuxt 4 equivalent is
+        <strong>Pinia</strong> (or, for trivially small needs, Nuxt's built-in SSR-safe <code>useState()</code> composable).
+      </p>
+
+      <div class="sm-grid sm-2 reveal">
+        <div>
+          <span class="pill-state">React — Zustand</span>
+          <pre><code>// stores/scene.ts
 import { create } from "zustand";
 
 type Scene = "intro" | "work" | "contact";
@@ -288,10 +830,10 @@ export const useScene = create&lt;{
 
 // component — subscribes to ONE slice only
 const scene = useScene((s) =&gt; s.scene);</code></pre>
-    </div>
-    <div>
-      <p class="pill-state">Nuxt 4 — Pinia</p>
-      <pre><code>// stores/scene.ts
+        </div>
+        <div>
+          <span class="pill-state">Nuxt 4 — Pinia</span>
+          <pre><code>// stores/scene.ts
 import { defineStore } from "pinia";
 
 export const useSceneStore = defineStore("scene", () =&gt; {
@@ -307,50 +849,51 @@ export const useSceneStore = defineStore("scene", () =&gt; {
 // component
 const store = useSceneStore();
 const { scene } = storeToRefs(store); // keep reactivity</code></pre>
-    </div>
-  </div>
+        </div>
+      </div>
 
-  <p>
-    For atomic, bottom-up state (one independent value per atom, no central store object),
-    <strong>Jotai</strong> is the React option — great for many small unrelated flags. Reach for
-    <strong>Context</strong> only for genuinely static, rarely-changing values (a theme object, a locale):
-    Context has no selector mechanism, so every consumer re-renders on <em>any</em> change to the value —
-    death by a thousand re-renders if you put fast-changing state in it.
-  </p>
+      <p>
+        For atomic, bottom-up state (one independent value per atom, no central store object),
+        <strong>Jotai</strong> is the React option — great for many small unrelated flags. Reach for
+        <strong>Context</strong> only for genuinely static, rarely-changing values (a theme object, a locale):
+        Context has no selector mechanism, so every consumer re-renders on <em>any</em> change to the value —
+        death by a thousand re-renders if you put fast-changing state in it.
+      </p>
 
-  <div class="callout warn">
-    <strong>Pitfall — Context as a store.</strong> React Context is a dependency-injection channel, not a
-    state manager. Put a mouse position or scroll value in it and every consumer re-renders 60×/second.
-    Use it for theme/auth/locale; use Zustand/Jotai for anything that changes often. In Nuxt, the analogous
-    trap is shoving everything into one mega-Pinia store — slice it by domain (<code>useSceneStore</code>,
-    <code>useUiStore</code>) instead.
-  </div>
+      <div class="callout warn reveal">
+        <strong>Pitfall — Context as a store.</strong>
+        <p>React Context is a dependency-injection channel, not a
+        state manager. Put a mouse position or scroll value in it and every consumer re-renders 60×/second.
+        Use it for theme/auth/locale; use Zustand/Jotai for anything that changes often. In Nuxt, the analogous
+        trap is shoving everything into one mega-Pinia store — slice it by domain (<code>useSceneStore</code>,
+        <code>useUiStore</code>) instead.</p>
+      </div>
 
-  <div class="figure">
-    <img src="../workings/shots/bruno-simon/05-menu.png" alt="Bruno Simon's settings menu panel showing audio, effects, and controls toggles — each a globally-read flag." loading="lazy">
-    <figcaption><span class="ref">Bruno Simon ↗</span> — the settings panel exposes the global flags (audio, effects/WebGPU tier, controls) that the canvas, HUD, and map all subscribe to. One source of truth, many readers: the textbook case for a store.</figcaption>
-  </div>
+      <figure class="figure reveal">
+        <img src="../workings/shots/bruno-simon/05-menu.png" alt="Bruno Simon's settings menu panel showing audio, effects, and controls toggles — each a globally-read flag." loading="lazy">
+        <figcaption><span class="ref">Bruno Simon ↗</span> — the settings panel exposes the global flags (audio, effects/WebGPU tier, controls) that the canvas, HUD, and map all subscribe to. One source of truth, many readers: the textbook case for a store.</figcaption>
+      </figure>
 
-  <!-- ───────────────────────── 5 ───────────────────────── -->
-  <h2 id="server">5 · Server state is not client state</h2>
-  <p>
-    The biggest leverage move: stop copying network data into a global store. Projects, GitHub stars,
-    MDX blog posts, a now-playing track — that's <em>server state</em>. It has caching, revalidation,
-    loading and error phases that a plain store can't model. <span class="ref">Linear ↗</span> and
-    <span class="ref">Josh Comeau ↗</span> both ship on Next.js App Router with React Server Components,
-    so most data never touches the client store at all — it's fetched on the server and streamed in.
-  </p>
-  <p>
-    In Nuxt 4 the first-class tool is <code>useAsyncData</code> / <code>useFetch</code>: SSR-aware, deduplicated,
-    cached by key, and hydration-safe. It is the Pinia-free way to load data — and where you should put
-    99% of a portfolio's "data". Reserve TanStack Query / Pinia Colada for highly interactive client-side
-    refetch scenarios.
-  </p>
+      <!-- ───────────────────────── 5 ───────────────────────── -->
+      <h2 id="server"><span class="sn">05</span> Server state is not client state</h2>
+      <p>
+        The biggest leverage move: stop copying network data into a global store. Projects, GitHub stars,
+        MDX blog posts, a now-playing track — that's <em>server state</em>. It has caching, revalidation,
+        loading and error phases that a plain store can't model. <span class="ref">Linear ↗</span> and
+        <span class="ref">Josh Comeau ↗</span> both ship on Next.js App Router with React Server Components,
+        so most data never touches the client store at all — it's fetched on the server and streamed in.
+      </p>
+      <p>
+        In Nuxt 4 the first-class tool is <code>useAsyncData</code> / <code>useFetch</code>: SSR-aware, deduplicated,
+        cached by key, and hydration-safe. It is the Pinia-free way to load data — and where you should put
+        99% of a portfolio's "data". Reserve TanStack Query / Pinia Colada for highly interactive client-side
+        refetch scenarios.
+      </p>
 
-  <div class="sm-grid sm-2">
-    <div>
-      <p class="pill-state">React — RSC + TanStack Query</p>
-      <pre><code>// Server Component — no client state at all
+      <div class="sm-grid sm-2 reveal">
+        <div>
+          <span class="pill-state">React — RSC + TanStack Query</span>
+          <pre><code>// Server Component — no client state at all
 export default async function Projects() {
   const projects = await getProjects(); // runs on server
   return &lt;ProjectGrid projects={projects} /&gt;;
@@ -362,10 +905,10 @@ const { data, isPending, error } = useQuery({
   queryFn: () =&gt; fetch(`/api/stars/${repo}`).then(r =&gt; r.json()),
   staleTime: 60_000,
 });</code></pre>
-    </div>
-    <div>
-      <p class="pill-state">Nuxt 4 — useAsyncData</p>
-      <pre><code>&lt;script setup lang="ts"&gt;
+        </div>
+        <div>
+          <span class="pill-state">Nuxt 4 — useAsyncData</span>
+          <pre><code>&lt;script setup lang="ts"&gt;
 // SSR-rendered, cached by key, dedup'd, hydration-safe
 const { data: projects, pending, error } = await useAsyncData(
   "projects",
@@ -378,30 +921,31 @@ const { data: stars } = await useFetch(`/api/stars/${repo}`, {
   server: false,        // client-only if it's user-specific
 })
 &lt;/script&gt;</code></pre>
-    </div>
-  </div>
+        </div>
+      </div>
 
-  <div class="callout tip">
-    <strong>Pro tip — the cache key is the contract.</strong> Both <code>useAsyncData(key, …)</code> and
-    <code>useQuery({ queryKey })</code> dedupe by key. Two components asking for <code>"projects"</code> share
-    one request and one cache entry — that's your "global server state" for free, with no store to wire up.
-  </div>
+      <div class="callout tip reveal">
+        <strong>Pro tip — the cache key is the contract.</strong>
+        <p>Both <code>useAsyncData(key, …)</code> and
+        <code>useQuery({ queryKey })</code> dedupe by key. Two components asking for <code>"projects"</code> share
+        one request and one cache entry — that's your "global server state" for free, with no store to wire up.</p>
+      </div>
 
-  <!-- ───────────────────────── 6 ───────────────────────── -->
-  <h2 id="url">6 · URL as state — the most underused store on the web</h2>
-  <p>
-    The query string is a free, shareable, refresh-proof, back-button-aware global store. Anything a user
-    might want to bookmark or share belongs there: the active filter, the open tab, the selected project,
-    a search term. <span class="ref">Linear ↗</span>'s numbered chapter IA (1.0–5.0 with 1.1/1.2 sub-tabs)
-    is a natural URL-state candidate; <span class="ref">Stripe ↗</span>'s segment tabs (Enterprise / Startups /
-    Platforms) are exactly the kind of thing that should round-trip through the address bar so a teammate
-    can paste a link to the right view.
-  </p>
+      <!-- ───────────────────────── 6 ───────────────────────── -->
+      <h2 id="url"><span class="sn">06</span> URL as state</h2>
+      <p>
+        The query string is a free, shareable, refresh-proof, back-button-aware global store. Anything a user
+        might want to bookmark or share belongs there: the active filter, the open tab, the selected project,
+        a search term. <span class="ref">Linear ↗</span>'s numbered chapter IA (1.0–5.0 with 1.1/1.2 sub-tabs)
+        is a natural URL-state candidate; <span class="ref">Stripe ↗</span>'s segment tabs (Enterprise / Startups /
+        Platforms) are exactly the kind of thing that should round-trip through the address bar so a teammate
+        can paste a link to the right view.
+      </p>
 
-  <div class="sm-grid sm-2">
-    <div>
-      <p class="pill-state">React — useSearchParams</p>
-      <pre><code>"use client";
+      <div class="sm-grid sm-2 reveal">
+        <div>
+          <span class="pill-state">React — useSearchParams</span>
+          <pre><code>"use client";
 import { useSearchParams, useRouter } from "next/navigation";
 
 const params = useSearchParams();
@@ -413,10 +957,10 @@ function setTab(next) {
   p.set("tab", next);
   router.push(`?${p.toString()}`, { scroll: false });
 }</code></pre>
-    </div>
-    <div>
-      <p class="pill-state">Nuxt 4 — useRoute / useRouter</p>
-      <pre><code>&lt;script setup lang="ts"&gt;
+        </div>
+        <div>
+          <span class="pill-state">Nuxt 4 — useRoute / useRouter</span>
+          <pre><code>&lt;script setup lang="ts"&gt;
 const route = useRoute()
 const router = useRouter()
 
@@ -426,37 +970,38 @@ function setTab(next: string) {
   router.push({ query: { ...route.query, tab: next } })
 }
 &lt;/script&gt;</code></pre>
-    </div>
-  </div>
+        </div>
+      </div>
 
-  <div class="callout warn">
-    <strong>Pitfall — duplicating URL state into a store.</strong> If the open tab lives in <em>both</em> a
-    Pinia store and the URL, you now have two sources of truth that will drift. Pick one. For shareable/
-    refreshable state, the URL wins — derive everything else from <code>route.query</code> with a
-    <code>computed</code>.
-  </div>
+      <div class="callout warn reveal">
+        <strong>Pitfall — duplicating URL state into a store.</strong>
+        <p>If the open tab lives in <em>both</em> a
+        Pinia store and the URL, you now have two sources of truth that will drift. Pick one. For shareable /
+        refreshable state, the URL wins — derive everything else from <code>route.query</code> with a
+        <code>computed</code>.</p>
+      </div>
 
-  <!-- ───────────────────────── 7 ───────────────────────── -->
-  <h2 id="anim">7 · Animation &amp; scene state — keep it out of the render loop</h2>
-  <p>
-    This is where portfolios get it wrong. A 60fps scroll value or mouse position does <strong>not</strong>
-    belong in React/Vue reactive state — pumping 60 updates/second through the reconciler tanks your frame
-    budget. <span class="ref">Igloo Inc ↗</span> drives its entire scroll-scrubbed igloo assembly through a
-    GSAP timeline tied to scroll progress, and renders its UI <em>inside</em> WebGL — the reactive framework
-    never sees the per-frame values. <span class="ref">Henry Heffernan ↗</span>'s live HUD clock and the
-    camera dolly are imperative loops, not state updates.
-  </p>
-  <p>
-    The pattern: store <strong>discrete</strong> scene state reactively (which district, loaded?, audio on?),
-    but keep <strong>continuous</strong> values (scroll progress, cursor, time) in refs / mutable objects that
-    bypass reactivity. <span class="ref">Active Theory ↗</span>'s persistent GPU particle field reacts
-    continuously yet exposes only a handful of discrete nav states (Work / Contact / category) to the shell.
-  </p>
+      <!-- ───────────────────────── 7 ───────────────────────── -->
+      <h2 id="anim"><span class="sn">07</span> Animation &amp; scene state</h2>
+      <p>
+        This is where portfolios get it wrong. A 60fps scroll value or mouse position does <strong>not</strong>
+        belong in React/Vue reactive state — pumping 60 updates/second through the reconciler tanks your frame
+        budget. <span class="ref">Igloo Inc ↗</span> drives its entire scroll-scrubbed igloo assembly through a
+        GSAP timeline tied to scroll progress, and renders its UI <em>inside</em> WebGL — the reactive framework
+        never sees the per-frame values. <span class="ref">Henry Heffernan ↗</span>'s live HUD clock and the
+        camera dolly are imperative loops, not state updates.
+      </p>
+      <p>
+        The pattern: store <strong>discrete</strong> scene state reactively (which district, loaded?, audio on?),
+        but keep <strong>continuous</strong> values (scroll progress, cursor, time) in refs / mutable objects that
+        bypass reactivity. <span class="ref">Active Theory ↗</span>'s persistent GPU particle field reacts
+        continuously yet exposes only a handful of discrete nav states (Work / Contact / category) to the shell.
+      </p>
 
-  <div class="sm-grid sm-2">
-    <div>
-      <p class="pill-state">React — discrete state, continuous in a ref</p>
-      <pre><code>const scene = useScene((s) =&gt; s.scene);   // discrete → reactive
+      <div class="sm-grid sm-2 reveal">
+        <div>
+          <span class="pill-state">React — discrete state, continuous in a ref</span>
+          <pre><code>const scene = useScene((s) =&gt; s.scene);   // discrete → reactive
 const progress = useRef(0);               // continuous → NOT state
 
 useEffect(() =&gt; {
@@ -469,10 +1014,10 @@ useEffect(() =&gt; {
   raf = requestAnimationFrame(tick);
   return () =&gt; cancelAnimationFrame(raf);
 }, []);</code></pre>
-    </div>
-    <div>
-      <p class="pill-state">Nuxt / Vue — shallowRef + rAF</p>
-      <pre><code>&lt;script setup lang="ts"&gt;
+        </div>
+        <div>
+          <span class="pill-state">Nuxt / Vue — shallowRef + rAF</span>
+          <pre><code>&lt;script setup lang="ts"&gt;
 const store = useSceneStore()           // discrete → reactive
 const progress = shallowRef(0)          // bypass deep reactivity
 
@@ -484,42 +1029,43 @@ useRafFn(() =&gt; {                         // @vueuse/core
 // reduced-motion is a first-class state input
 const reduced = usePreferredReducedMotion()
 &lt;/script&gt;</code></pre>
-    </div>
-  </div>
+        </div>
+      </div>
 
-  <div class="figure">
-    <img src="../workings/shots/igloo-inc/02-mid.png" alt="Igloo Inc mid-scroll: the procedural ice igloo is partly assembled and glowing as scroll progress drives a GSAP timeline." loading="lazy">
-    <figcaption><span class="ref">Igloo Inc ↗</span> — scroll progress scrubs a GSAP timeline that assembles and brightens the igloo. The per-frame progress value never enters reactive state; only the discrete "scene" does. That's why a heavy 3D site can still hit frame budget.</figcaption>
-  </div>
+      <figure class="figure reveal">
+        <img src="../workings/shots/igloo-inc/02-mid.png" alt="Igloo Inc mid-scroll: the procedural ice igloo is partly assembled and glowing as scroll progress drives a GSAP timeline." loading="lazy">
+        <figcaption><span class="ref">Igloo Inc ↗</span> — scroll progress scrubs a GSAP timeline that assembles and brightens the igloo. The per-frame progress value never enters reactive state; only the discrete "scene" does. That's why a heavy 3D site can still hit frame budget.</figcaption>
+      </figure>
 
-  <div class="callout tip">
-    <strong>Pro tip — <code>prefers-reduced-motion</code> is state too.</strong> Treat it as a first-class
-    input to your scene store, not an afterthought. When it's on, your state machine should resolve scenes
-    instantly instead of animating between them. Both <span class="ref">Stripe ↗</span> and
-    <span class="ref">Josh Comeau ↗</span> evaluate it at runtime and branch their motion accordingly.
-  </div>
+      <div class="callout tip reveal">
+        <strong>Pro tip — <code>prefers-reduced-motion</code> is state too.</strong>
+        <p>Treat it as a first-class
+        input to your scene store, not an afterthought. When it's on, your state machine should resolve scenes
+        instantly instead of animating between them. Both <span class="ref">Stripe ↗</span> and
+        <span class="ref">Josh Comeau ↗</span> evaluate it at runtime and branch their motion accordingly.</p>
+      </div>
 
-  <!-- ───────────────────────── 8 ───────────────────────── -->
-  <h2 id="persist">8 · Persistence done right (theme = the canary)</h2>
-  <p>
-    Theme preference is the one piece of state nearly every portfolio persists — and the one most people
-    botch with a flash-of-wrong-theme (FOUC). <span class="ref">Josh Comeau ↗</span> literally wrote the
-    canonical "Perfect Dark Mode" article; his implementation is flicker-free, persisted, and theme-token
-    driven. The trick is to set the theme attribute <em>before first paint</em> via a tiny inline script,
-    so the server-rendered HTML and the persisted choice never disagree. <span class="ref">Henry Heffernan ↗</span>'s
-    OS even themes the in-world lamp and monitor from the same persisted toggle.
-  </p>
+      <!-- ───────────────────────── 8 ───────────────────────── -->
+      <h2 id="persist"><span class="sn">08</span> Persistence done right</h2>
+      <p>
+        Theme preference is the one piece of state nearly every portfolio persists — and the one most people
+        botch with a flash-of-wrong-theme (FOUC). <span class="ref">Josh Comeau ↗</span> literally wrote the
+        canonical "Perfect Dark Mode" article; his implementation is flicker-free, persisted, and theme-token
+        driven. The trick is to set the theme attribute <em>before first paint</em> via a tiny inline script,
+        so the server-rendered HTML and the persisted choice never disagree. <span class="ref">Henry Heffernan ↗</span>'s
+        OS even themes the in-world lamp and monitor from the same persisted toggle.
+      </p>
 
-  <div class="example">
-    <p class="pill-state" style="margin-bottom:.8rem;">live · token-driven theme toggle (persists to localStorage)</p>
-    <div class="toggle-demo">
-      <button class="demo-btn" id="themeBtn" type="button">Toggle theme</button>
-      <span class="pill-state" id="themeState">theme: dim</span>
-      <div class="swatch-card" id="swatch">Tokens, not hard-coded colors. Flip one variable, the whole card re-themes.</div>
-    </div>
-  </div>
+      <div class="example reveal">
+        <span class="pill-state">live · token-driven theme toggle (persists to localStorage)</span>
+        <div class="toggle-demo">
+          <button class="demo-btn" id="themeBtn" type="button">Toggle theme</button>
+          <span class="pill-state" id="themeState">theme: dim</span>
+          <div class="swatch-card" id="swatch">Tokens, not hard-coded colors. Flip one variable, the whole card re-themes.</div>
+        </div>
+      </div>
 
-  <pre><code>// Nuxt 4: useColorMode() from @nuxtjs/color-mode kills FOUC for you —
+      <pre><code>// Nuxt 4: useColorMode() from @nuxtjs/color-mode kills FOUC for you —
 // SSR-safe, persisted, with an inline head script injected automatically.
 const colorMode = useColorMode()
 colorMode.preference = "dark"   // "system" | "light" | "dark"
@@ -528,47 +1074,80 @@ colorMode.preference = "dark"   // "system" | "light" | "dark"
 // No theme value duplicated across components — every component reads
 // the cascade, so there is exactly one source of truth.</code></pre>
 
-  <div class="callout warn">
-    <strong>Pitfall — persisting too much.</strong> Don't blanket-persist a whole Zustand/Pinia store to
-    <code>localStorage</code>. Persist the <em>preferences</em> (theme, audio, reduced-motion override) and
-    nothing transient. Persisting scene/scroll/UI-open state means a user returns to a half-open menu or a
-    stale view. <span class="ref">Bruno Simon ↗</span> persists achievement progress (it <em>should</em> survive),
-    but never the car's physics position — that resets every visit by design.
+      <div class="callout warn reveal">
+        <strong>Pitfall — persisting too much.</strong>
+        <p>Don't blanket-persist a whole Zustand/Pinia store to
+        <code>localStorage</code>. Persist the <em>preferences</em> (theme, audio, reduced-motion override) and
+        nothing transient. Persisting scene/scroll/UI-open state means a user returns to a half-open menu or a
+        stale view. <span class="ref">Bruno Simon ↗</span> persists achievement progress (it <em>should</em> survive),
+        but never the car's physics position — that resets every visit by design.</p>
+      </div>
+
+      <!-- ───────────────────────── 9 ───────────────────────── -->
+      <h2 id="cheat"><span class="sn">09</span> Cheat sheet — React ↔ Nuxt 4</h2>
+      <div class="table-wrap reveal">
+        <table>
+          <thead>
+            <tr><th>Need</th><th>React / Next</th><th>Nuxt 4 / Vue</th><th>Seen in</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Component-local flag</td><td><code>useState</code></td><td><code>ref</code></td><td>Rauno copy button, Stripe tabs</td></tr>
+            <tr><td>Derived (scroll-spy)</td><td>IntersectionObserver</td><td><code>useIntersectionObserver</code></td><td>Brittany Chiang, Linear</td></tr>
+            <tr><td>Small global store</td><td>Zustand</td><td>Pinia / <code>useState()</code></td><td>Active Theory, Bruno Simon</td></tr>
+            <tr><td>Atomic global</td><td>Jotai</td><td>Pinia (per-store)</td><td>—</td></tr>
+            <tr><td>Static app-wide value</td><td>Context</td><td><code>provide</code>/<code>inject</code></td><td>theme/locale/auth</td></tr>
+            <tr><td>Server data</td><td>RSC / TanStack Query</td><td><code>useAsyncData</code> / <code>useFetch</code></td><td>Linear, Josh Comeau</td></tr>
+            <tr><td>Shareable / refreshable</td><td><code>useSearchParams</code></td><td><code>useRoute</code> / <code>useRouter</code></td><td>Stripe segments, Linear chapters</td></tr>
+            <tr><td>Per-frame scroll / cursor</td><td><code>useRef</code> + rAF</td><td><code>shallowRef</code> + <code>useRafFn</code></td><td>Igloo Inc, Henry Heffernan</td></tr>
+            <tr><td>Theme persistence</td><td>inline script + cookie</td><td><code>useColorMode()</code></td><td>Josh Comeau, Henry Heffernan</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout steal reveal">
+        <strong>The Nuxt 4 default stack for a portfolio</strong>
+        <p><code>ref</code> for local · <code>useAsyncData</code>
+        for data · <code>useRoute</code> query for shareable view · <code>useColorMode</code> for theme ·
+        <em>one</em> small Pinia store only if you build a WebGL/audio experience. You will likely never install
+        a dedicated client-state library — and that's the sign you got it right.</p>
+      </div>
+
+      <footer class="ftr">
+        <p>← Back to the <a href="../PLAN.html">Craft Atlas Build Plan</a></p>
+        <p>Craft Atlas — synthesized from 80 live site teardowns.</p>
+      </footer>
+    </main>
   </div>
-
-  <!-- ───────────────────────── 9 ───────────────────────── -->
-  <h2 id="cheat">9 · Cheat sheet — React ↔ Nuxt 4</h2>
-  <table>
-    <thead>
-      <tr><th>Need</th><th>React / Next</th><th>Nuxt 4 / Vue</th><th>Seen in</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Component-local flag</td><td><code>useState</code></td><td><code>ref</code></td><td>Rauno copy button, Stripe tabs</td></tr>
-      <tr><td>Derived (scroll-spy)</td><td>IntersectionObserver</td><td><code>useIntersectionObserver</code></td><td>Brittany Chiang, Linear</td></tr>
-      <tr><td>Small global store</td><td>Zustand</td><td>Pinia / <code>useState()</code></td><td>Active Theory, Bruno Simon</td></tr>
-      <tr><td>Atomic global</td><td>Jotai</td><td>Pinia (per-store)</td><td>—</td></tr>
-      <tr><td>Static app-wide value</td><td>Context</td><td><code>provide</code>/<code>inject</code></td><td>theme/locale/auth</td></tr>
-      <tr><td>Server data</td><td>RSC / TanStack Query</td><td><code>useAsyncData</code> / <code>useFetch</code></td><td>Linear, Josh Comeau</td></tr>
-      <tr><td>Shareable / refreshable</td><td><code>useSearchParams</code></td><td><code>useRoute</code> / <code>useRouter</code></td><td>Stripe segments, Linear chapters</td></tr>
-      <tr><td>Per-frame scroll / cursor</td><td><code>useRef</code> + rAF</td><td><code>shallowRef</code> + <code>useRafFn</code></td><td>Igloo Inc, Henry Heffernan</td></tr>
-      <tr><td>Theme persistence</td><td>inline script + cookie</td><td><code>useColorMode()</code></td><td>Josh Comeau, Henry Heffernan</td></tr>
-    </tbody>
-  </table>
-
-  <div class="callout steal">
-    <strong>The Nuxt 4 default stack for a portfolio:</strong> <code>ref</code> for local · <code>useAsyncData</code>
-    for data · <code>useRoute</code> query for shareable view · <code>useColorMode</code> for theme ·
-    <em>one</em> small Pinia store only if you build a WebGL/audio experience. You will likely never install
-    a dedicated client-state library — and that's the sign you got it right.
-  </div>
-
-  <footer class="ftr">
-    <p>← Back to the <a href="../PLAN.html">Craft Atlas Build Plan</a></p>
-    <p>Craft Atlas — synthesized from 80 live site teardowns.</p>
-  </footer>
-</main>
+</div>
 
 <script>
+  /* ---- rail TOC active-section highlight: derived state, no store ---- */
+  (function () {
+    var links = Array.prototype.slice.call(
+      document.querySelectorAll("#railNav a")
+    );
+    var sections = links
+      .map(function (a) { return document.getElementById(a.dataset.target); })
+      .filter(Boolean);
+    if (!sections.length) return;
+
+    function setActive(id) {
+      links.forEach(function (a) {
+        a.setAttribute("data-active", String(a.dataset.target === id));
+      });
+    }
+
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) setActive(e.target.id);
+        });
+      },
+      { rootMargin: "-20% 0px -70% 0px", threshold: 0 }
+    );
+    sections.forEach(function (s) { io.observe(s); });
+  })();
+
   /* ---- scroll-spy demo: derived state via IntersectionObserver, no store ---- */
   (function () {
     var root = document.getElementById("spyScroll");
@@ -610,11 +1189,11 @@ colorMode.preference = "dark"   // "system" | "light" | "dark"
     if (!btn || !card || !label) return;
 
     var themes = {
-      dim:  { bg: "#16191e", ink: "#e9eaec" },
+      dim:  { bg: "#14181c", ink: "#d7dde3" },
       lit:  { bg: "#f4efe6", ink: "#1a1205" },
-      amber:{ bg: "#1a1205", ink: "#ffce7a" }
+      teal: { bg: "#0a5f59", ink: "#e2efed" }
     };
-    var order = ["dim", "lit", "amber"];
+    var order = ["dim", "lit", "teal"];
 
     function apply(name) {
       var t = themes[name];
@@ -626,6 +1205,7 @@ colorMode.preference = "dark"   // "system" | "light" | "dark"
 
     var saved = "dim";
     try { saved = localStorage.getItem("ca-demo-theme") || "dim"; } catch (e) {}
+    if (!themes[saved]) saved = "dim";
     apply(saved);
 
     btn.addEventListener("click", function () {
@@ -633,6 +1213,29 @@ colorMode.preference = "dark"   // "system" | "light" | "dark"
       var next = order[(order.indexOf(current) + 1) % order.length];
       apply(next);
     });
+  })();
+
+  /* ---- scroll-reveal: gentle fade-up, honors reduced-motion ---- */
+  (function () {
+    var reduce = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var els = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+    if (reduce || !("IntersectionObserver" in window)) {
+      els.forEach(function (el) { el.classList.add("in"); });
+      return;
+    }
+    var io = new IntersectionObserver(
+      function (entries, obs) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+    );
+    els.forEach(function (el) { io.observe(el); });
   })();
 </script>
 </body>

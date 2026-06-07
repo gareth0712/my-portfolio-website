@@ -6,69 +6,555 @@
   <title>Styling — Craft Atlas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,560;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* --- page-local live-demo styles only --- */
+    /* ============================================================
+       STYLING — Craft Atlas 06
+       Art direction: Swiss technical minimal / engineering blueprint.
+       Visible structural grid, monospace coordinate labels, sharp
+       corners (radius 0), restrained ink-on-paper palette with a
+       single international-orange accent. Precision, not decoration.
+       ============================================================ */
 
-    /* Demo 1: token theming — flip a single custom property, watch the card re-skin */
-    .theme-demo {
-      --t-bg: #14171c;
-      --t-fg: #e9eaec;
-      --t-accent: #f5a623;
-      --t-radius: 14px;
+    :root {
+      /* ---- primitive ---- */
+      --paper:    #f4f4f1;   /* off-white drafting paper */
+      --paper-2:  #ebebe7;   /* recessed panel */
+      --ink:      #16181c;   /* near-black */
+      --ink-soft: #3a3d44;
+      --ink-dim:  #6b6f78;
+      --line:     #cfcfc8;   /* hairline grid */
+      --line-2:   #dcdcd6;
+      --accent:   #ff4d12;   /* international orange */
+      --accent-d: #d63a06;
+      --ok:       #1d7d57;
+      --warn:     #b85c00;
+
+      /* ---- semantic ---- */
+      --bg:       var(--paper);
+      --surface:  #fbfbf9;
+      --rule:     var(--line);
+
+      /* ---- type ---- */
+      --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+      --mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, monospace;
+
+      /* ---- fluid scale ---- */
+      --step--1: clamp(.74rem, .71rem + .14vw, .82rem);
+      --step-0:  clamp(.95rem, .9rem + .22vw, 1.05rem);
+      --step-1:  clamp(1.12rem, 1.02rem + .42vw, 1.4rem);
+      --step-2:  clamp(1.5rem, 1.25rem + 1vw, 2.1rem);
+      --step-3:  clamp(2.1rem, 1.6rem + 2.1vw, 3.4rem);
+      --step-4:  clamp(2.8rem, 1.9rem + 3.9vw, 5.8rem);
+
+      /* ---- rhythm ---- */
+      --s-1: .25rem; --s-2: .5rem; --s-3: .75rem; --s-4: 1rem;
+      --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem; --s-8: 4.5rem;
+      --gutter: clamp(1.1rem, 4vw, 3.5rem);
+      --maxw: 1240px;
+      --ease: cubic-bezier(.2, .7, .2, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { color-scheme: light; -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: var(--step-0);
+      line-height: 1.62;
+      font-feature-settings: "ss01", "cv05";
+      -webkit-font-smoothing: antialiased;
+      /* faint blueprint grid baked into the page itself */
+      background-image:
+        linear-gradient(to right,  rgba(22,24,28,.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(22,24,28,.035) 1px, transparent 1px);
+      background-size: 64px 64px;
+      background-position: -1px -1px;
+    }
+
+    a { color: inherit; }
+    code, pre, kbd { font-family: var(--mono); }
+
+    .wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+
+    ::selection { background: var(--accent); color: #fff; }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* ============================================================
+       HEADER / NAV  — fixed technical rail
+       ============================================================ */
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: color-mix(in srgb, var(--paper) 86%, transparent);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--ink);
+    }
+    .site-nav {
+      display: flex; align-items: stretch; flex-wrap: wrap;
+      max-width: var(--maxw); margin-inline: auto;
+      padding-inline: var(--gutter);
+      gap: 0;
+    }
+    .site-nav a {
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: .72rem;
+      letter-spacing: .02em;
+      color: var(--ink-soft);
+      padding: .9rem .7rem;
+      display: inline-flex; align-items: center;
+      border-right: 1px solid var(--line-2);
+      transition: color .15s var(--ease), background .15s var(--ease);
+      white-space: nowrap;
+    }
+    .site-nav a:hover { color: var(--ink); background: var(--paper-2); }
+    .site-nav a[aria-current="page"] {
+      color: var(--accent);
+      background: var(--surface);
+      box-shadow: inset 0 -2px 0 var(--accent);
+    }
+    .site-nav .brand {
+      font-weight: 700; color: var(--ink);
+      padding-inline: 0 1rem;
+      border-right: 1px solid var(--ink);
+      margin-right: .2rem;
+    }
+    .site-nav .brand:hover { background: transparent; color: var(--accent); }
+    .site-nav .cta {
+      margin-left: auto;
+      background: var(--ink); color: var(--paper);
+      border-right: none; font-weight: 600;
+    }
+    .site-nav .cta:hover { background: var(--accent); color: #fff; }
+
+    /* ============================================================
+       MASTHEAD
+       ============================================================ */
+    main { display: block; }
+
+    .masthead {
+      border-bottom: 1px solid var(--ink);
+      padding-block: clamp(2.5rem, 5vw, 5rem) clamp(2rem, 4vw, 3.5rem);
+      position: relative;
+    }
+    .meta-row {
+      display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-5);
+      font-family: var(--mono); font-size: var(--step--1);
+      color: var(--ink-dim); text-transform: uppercase; letter-spacing: .12em;
+      margin-bottom: var(--s-6);
+    }
+    .meta-row span { display: inline-flex; align-items: center; gap: .5ch; }
+    .meta-row b { color: var(--accent); font-weight: 600; }
+
+    .masthead h1 {
+      font-size: var(--step-4);
+      line-height: .95;
+      letter-spacing: -.03em;
+      font-weight: 800;
+      margin: 0 0 var(--s-5);
+      max-width: 16ch;
+      text-wrap: balance;
+    }
+    .masthead h1 .em { color: var(--accent); }
+    .lede {
+      font-size: var(--step-1);
+      line-height: 1.5;
+      color: var(--ink-soft);
+      max-width: 62ch;
+      margin: 0;
+      font-weight: 400;
+    }
+    .lede code { background: var(--paper-2); padding: .08em .4em; font-size: .85em; border: 1px solid var(--line-2); }
+
+    /* corner crop-marks on masthead — drafting registration look */
+    .masthead::before, .masthead::after {
+      content: ""; position: absolute; width: 14px; height: 14px;
+      border: 1px solid var(--ink-dim); pointer-events: none;
+    }
+    .masthead::before { top: 1.4rem; right: var(--gutter); border-left: 0; border-bottom: 0; }
+    .masthead::after  { bottom: 1.4rem; right: var(--gutter); border-left: 0; border-top: 0; }
+
+    /* ============================================================
+       LAYOUT — content + sticky TOC rail
+       ============================================================ */
+    .doc {
       display: grid;
-      gap: var(--s-4);
       grid-template-columns: 1fr;
+      gap: 0;
+    }
+    @media (min-width: 940px) {
+      .doc { grid-template-columns: 230px 1fr; }
+    }
+
+    /* TOC */
+    .toc {
+      border-bottom: 1px solid var(--ink);
+      padding-block: var(--s-5);
+    }
+    @media (min-width: 940px) {
+      .toc {
+        border-bottom: 0;
+        border-right: 1px solid var(--ink);
+        position: sticky; top: 49px; align-self: start;
+        height: calc(100dvh - 49px);
+        overflow-y: auto;
+        padding-block: var(--s-6);
+        padding-right: var(--s-5);
+      }
+    }
+    .toc-label {
+      font-family: var(--mono); font-size: .68rem; text-transform: uppercase;
+      letter-spacing: .2em; color: var(--ink-dim); margin: 0 0 var(--s-4);
+    }
+    .toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; }
+    .toc li { counter-increment: toc; }
+    .toc a {
+      display: flex; gap: .6rem; align-items: baseline;
+      text-decoration: none; color: var(--ink-soft);
+      font-size: .82rem; line-height: 1.35;
+      padding: .5rem 0;
+      border-top: 1px solid var(--line-2);
+      transition: color .15s var(--ease), padding-left .2s var(--ease);
+    }
+    .toc li:last-child a { border-bottom: 1px solid var(--line-2); }
+    .toc a::before {
+      content: counter(toc, decimal-leading-zero);
+      font-family: var(--mono); font-size: .68rem; color: var(--accent);
+      flex: none;
+    }
+    .toc a:hover, .toc a.active { color: var(--ink); padding-left: .35rem; }
+
+    /* content column */
+    .content {
+      padding-block: var(--s-6) var(--s-8);
+      min-width: 0;
+    }
+    @media (min-width: 940px) {
+      .content { padding-left: clamp(1.5rem, 3vw, 3.5rem); padding-block-start: var(--s-7); }
+    }
+
+    /* ============================================================
+       SECTIONS / TYPOGRAPHY
+       ============================================================ */
+    section[id] { scroll-margin-top: 70px; }
+
+    .sec-head {
+      display: flex; align-items: baseline; gap: var(--s-4);
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: var(--s-3);
+      margin: var(--s-8) 0 var(--s-5);
+    }
+    section:first-of-type .sec-head { margin-top: 0; }
+    .sec-no {
+      font-family: var(--mono); font-size: var(--step-1); font-weight: 600;
+      color: var(--accent); flex: none; line-height: 1;
+    }
+    h2 {
+      font-size: var(--step-2); line-height: 1.05; letter-spacing: -.02em;
+      font-weight: 700; margin: 0;
+    }
+    h2 code { font-size: .85em; background: var(--paper-2); padding: .04em .3em; border: 1px solid var(--line-2); }
+
+    h3 {
+      font-size: var(--step-1); letter-spacing: -.01em; font-weight: 600;
+      margin: var(--s-6) 0 var(--s-3);
+      display: flex; align-items: center; gap: .6rem;
+    }
+    h3::before {
+      content: "›"; color: var(--accent); font-family: var(--mono); font-weight: 700;
+    }
+    h3 code { background: var(--paper-2); padding: .04em .35em; font-size: .9em; border: 1px solid var(--line-2); }
+
+    p { margin: 0 0 var(--s-4); max-width: 70ch; }
+    .content > p, .content > section > p { color: var(--ink-soft); }
+
+    p code, li code, figcaption code, caption code {
+      font-family: var(--mono); font-size: .86em;
+      background: var(--paper-2); color: var(--ink);
+      padding: .08em .4em; border: 1px solid var(--line-2);
+    }
+    strong { color: var(--ink); font-weight: 600; }
+    em { font-style: italic; }
+
+    ul { margin: 0 0 var(--s-5); padding: 0; list-style: none; max-width: 70ch; }
+    ul li {
+      position: relative; padding-left: 1.5rem; margin-bottom: var(--s-3);
+      color: var(--ink-soft);
+    }
+    ul li::before {
+      content: "—"; position: absolute; left: 0; top: 0;
+      color: var(--accent); font-family: var(--mono);
+    }
+
+    /* .ref site citation chips */
+    .ref {
+      font-family: var(--mono); font-size: .78em;
+      color: var(--ink); white-space: nowrap;
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: 1px;
+      cursor: default;
+    }
+
+    /* ============================================================
+       CODE BLOCKS — engineering listing
+       ============================================================ */
+    pre {
+      background: var(--ink);
+      color: #e9e9e4;
+      border: 1px solid var(--ink);
+      margin: 0 0 var(--s-5);
+      padding: var(--s-5) var(--s-5) var(--s-5) 0;
+      overflow-x: auto;
+      font-size: .82rem; line-height: 1.65;
+      position: relative;
+      counter-reset: ln;
+    }
+    pre::before {
+      content: "CSS";
+      position: absolute; top: 0; right: 0;
+      font-family: var(--mono); font-size: .62rem; letter-spacing: .2em;
+      color: var(--paper); background: var(--accent);
+      padding: .25em .7em;
+    }
+    pre code { display: block; padding-left: 3.2rem; white-space: pre; }
+    /* line-number gutter rule */
+    pre code::before {
+      content: ""; position: absolute; left: 2.4rem; top: 0; bottom: 0;
+      width: 1px; background: rgba(255,255,255,.12);
+    }
+
+    /* ============================================================
+       CALLOUTS — bordered engineering notes
+       ============================================================ */
+    .callout {
+      border: 1px solid var(--ink);
+      border-left-width: 4px;
+      padding: var(--s-5);
+      margin: 0 0 var(--s-5);
+      background: var(--surface);
+      position: relative;
+    }
+    .callout p { margin: 0; max-width: none; color: var(--ink-soft); }
+    .callout::before {
+      font-family: var(--mono); font-size: .62rem; letter-spacing: .2em;
+      text-transform: uppercase; font-weight: 600;
+      display: block; margin-bottom: var(--s-3);
+    }
+    .callout.steal { border-left-color: var(--accent); }
+    .callout.steal::before { content: "▣ Steal this"; color: var(--accent); }
+    .callout.tip { border-left-color: var(--ok); }
+    .callout.tip::before { content: "✓ Tip"; color: var(--ok); }
+    .callout.warn { border-left-color: var(--warn); }
+    .callout.warn::before { content: "△ Pitfall"; color: var(--warn); }
+
+    /* ============================================================
+       TABLE — spec grid
+       ============================================================ */
+    .table-scroll { overflow-x: auto; margin: 0 0 var(--s-5); border: 1px solid var(--ink); }
+    table {
+      border-collapse: collapse; width: 100%;
+      font-size: var(--step--1); min-width: 540px;
+    }
+    thead th {
+      text-align: left; font-family: var(--mono);
+      font-size: .68rem; text-transform: uppercase; letter-spacing: .12em;
+      color: var(--paper); background: var(--ink);
+      padding: .7rem .9rem; font-weight: 500;
+    }
+    tbody td {
+      padding: .7rem .9rem; vertical-align: top;
+      border-top: 1px solid var(--line-2);
+      color: var(--ink-soft);
+    }
+    tbody tr:nth-child(odd) td { background: color-mix(in srgb, var(--paper-2) 40%, transparent); }
+    tbody td:first-child { color: var(--ink); font-weight: 600; }
+    tbody td code { font-size: .9em; }
+    caption {
+      caption-side: bottom; text-align: left;
+      padding: .8rem .9rem; font-size: var(--step--1);
+      color: var(--ink-dim); border-top: 1px solid var(--ink);
+      background: var(--surface);
+    }
+
+    /* ============================================================
+       FIGURES
+       ============================================================ */
+    .figure {
+      margin: var(--s-6) 0;
+      border: 1px solid var(--ink);
+      background: var(--surface);
+    }
+    .figure img {
+      display: block; width: 100%; height: auto;
+      border-bottom: 1px solid var(--line-2);
+      filter: saturate(.92);
+    }
+    figcaption {
+      padding: var(--s-4);
+      font-size: var(--step--1); line-height: 1.5; color: var(--ink-dim);
+    }
+    figcaption strong { color: var(--ink); }
+
+    /* ============================================================
+       LIVE DEMO PANELS
+       ============================================================ */
+    .example {
+      border: 1px solid var(--ink);
+      background:
+        repeating-linear-gradient(45deg, transparent 0 9px, rgba(22,24,28,.018) 9px 10px),
+        var(--surface);
+      padding: var(--s-5);
+      margin: var(--s-5) 0;
+      position: relative;
+    }
+    .example::before {
+      content: "LIVE";
+      position: absolute; top: 0; left: 0;
+      font-family: var(--mono); font-size: .58rem; letter-spacing: .25em;
+      color: var(--surface); background: var(--ink);
+      padding: .25em .7em;
+    }
+    .example { padding-top: calc(var(--s-5) + 1.1rem); }
+    .demo-note {
+      margin: 0 0 var(--s-3); font-family: var(--mono);
+      font-size: var(--step--1); color: var(--ink-dim);
+    }
+    .caption {
+      margin: var(--s-4) 0 0; font-size: var(--step--1);
+      color: var(--ink-dim); line-height: 1.5;
+    }
+    .caption b { color: var(--accent); }
+
+    /* Demo 1: token theming */
+    .theme-demo {
+      display: grid; gap: var(--s-4); grid-template-columns: 1fr;
     }
     @media (min-width: 620px) { .theme-demo { grid-template-columns: 1fr 220px; align-items: start; } }
     .skin {
-      background: var(--t-bg);
-      color: var(--t-fg);
-      border: 1px solid color-mix(in srgb, var(--t-accent) 30%, transparent);
+      --t-bg: #14171c; --t-fg: #e9eaec; --t-accent: #ff4d12; --t-radius: 0px;
+      background: var(--t-bg); color: var(--t-fg);
+      border: 1px solid color-mix(in srgb, var(--t-accent) 45%, transparent);
       border-radius: var(--t-radius);
       padding: var(--s-5);
       transition: background .35s var(--ease), color .35s var(--ease),
                   border-radius .35s var(--ease), border-color .35s var(--ease);
     }
+    .skin h4 { color: var(--t-fg); margin: 0; font-size: var(--step-1); letter-spacing: -.01em; }
+    .skin p { color: inherit; opacity: .82; }
     .skin .pill {
       display: inline-block; margin-top: var(--s-3);
-      background: var(--t-accent); color: #1a1205;
-      font-family: var(--font-mono); font-size: .8rem; font-weight: 600;
-      padding: .35em .8em; border-radius: 999px;
+      background: var(--t-accent); color: #fff;
+      font-family: var(--mono); font-size: .76rem; font-weight: 600;
+      padding: .35em .8em;
     }
-    .skin h4 { color: var(--t-fg); margin: 0; }
-    .theme-controls { display: grid; gap: var(--s-3); }
-    .theme-controls label { font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink-dim); display: grid; gap: var(--s-1); }
-    .theme-controls input[type="color"] { width: 100%; height: 34px; background: none; border: 1px solid var(--line); border-radius: var(--r-1); cursor: pointer; }
+    .theme-controls { display: grid; gap: var(--s-4); }
+    .theme-controls label {
+      font-family: var(--mono); font-size: var(--step--1); color: var(--ink-dim);
+      display: grid; gap: var(--s-2);
+    }
+    .theme-controls input[type="color"] {
+      width: 100%; height: 36px; background: none;
+      border: 1px solid var(--ink); padding: 2px; cursor: pointer;
+    }
     .theme-controls input[type="range"] { width: 100%; accent-color: var(--accent); }
     .swatch-row { display: flex; gap: var(--s-2); flex-wrap: wrap; }
     .swatch-row button {
-      font-family: var(--font-mono); font-size: .72rem; cursor: pointer;
-      color: var(--ink-soft); background: var(--bg-2); border: 1px solid var(--line);
-      border-radius: 999px; padding: .3em .7em; transition: border-color .15s var(--ease), color .15s var(--ease);
+      font-family: var(--mono); font-size: .72rem; cursor: pointer;
+      color: var(--ink); background: var(--surface);
+      border: 1px solid var(--ink); padding: .35em .7em;
+      transition: background .15s var(--ease), color .15s var(--ease);
     }
-    .swatch-row button:hover { color: var(--ink); border-color: var(--accent); }
+    .swatch-row button:hover { background: var(--ink); color: var(--paper); }
 
-    /* Demo 2: :has() parent-aware styling — no JS class toggling */
+    /* Demo 2: :has() field */
     .has-demo .field {
-      border: 1px solid var(--line);
-      border-radius: var(--r-2);
+      border: 1px solid var(--ink);
       padding: var(--s-4);
-      background: var(--bg-2);
-      transition: border-color .2s var(--ease), background .2s var(--ease);
+      background: var(--surface);
+      transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
     }
-    .has-demo .field label { font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink-dim); display: block; margin-bottom: var(--s-2); }
+    .has-demo .field label {
+      font-family: var(--mono); font-size: var(--step--1); color: var(--ink-dim);
+      display: block; margin-bottom: var(--s-2);
+    }
     .has-demo .field input {
-      width: 100%; background: var(--bg); color: var(--ink);
-      border: 1px solid var(--line); border-radius: var(--r-1);
-      padding: .5em .7em; font-family: var(--font-sans); font-size: var(--step-0);
+      width: 100%; background: var(--paper); color: var(--ink);
+      border: 1px solid var(--line); padding: .55em .7em;
+      font-family: var(--mono); font-size: var(--step-0);
     }
-    /* the magic: the FIELD reacts to the state of the INPUT inside it */
-    .has-demo .field:has(input:focus) { border-color: var(--accent); background: var(--bg-3); }
-    .has-demo .field:has(input:not(:placeholder-shown):invalid) { border-color: var(--warn); }
-    .has-demo .field:has(input:not(:placeholder-shown):valid) { border-color: var(--tip); }
-    .has-demo .hint { font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink-dim); margin-top: var(--s-3); }
+    .has-demo .field input::placeholder { color: var(--ink-dim); }
+    .has-demo .field:has(input:focus) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+    .has-demo .field:has(input:not(:placeholder-shown):invalid) { border-color: var(--warn); box-shadow: inset 0 0 0 1px var(--warn); }
+    .has-demo .field:has(input:not(:placeholder-shown):valid) { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+    .has-demo .hint {
+      font-family: var(--mono); font-size: var(--step--1); color: var(--ink-dim);
+      margin-top: var(--s-3);
+    }
+
+    /* ============================================================
+       CHECKLIST GRID — bordered specimen tiles
+       ============================================================ */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+      gap: 0;
+      border: 1px solid var(--ink);
+      margin: 0 0 var(--s-5);
+    }
+    .card {
+      padding: var(--s-5);
+      border-right: 1px solid var(--line-2);
+      border-bottom: 1px solid var(--line-2);
+      background: var(--surface);
+      transition: background .2s var(--ease);
+      counter-increment: chk;
+      position: relative;
+    }
+    .grid { counter-reset: chk; }
+    .card::before {
+      content: counter(chk, decimal-leading-zero);
+      font-family: var(--mono); font-size: .64rem; color: var(--accent);
+      letter-spacing: .15em; display: block; margin-bottom: var(--s-3);
+    }
+    .card:hover { background: var(--paper-2); }
+    .card h4 { margin: 0 0 var(--s-2); font-size: var(--step-0); letter-spacing: -.01em; }
+    .card p { margin: 0; font-size: var(--step--1); color: var(--ink-soft); max-width: none; }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .ftr {
+      border-top: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+      padding-block: var(--s-7);
+    }
+    .ftr .wrap { display: grid; gap: var(--s-3); }
+    .ftr a { color: var(--paper); text-decoration: none; }
+    .ftr a:hover { color: var(--accent); }
+    .ftr .brand { font-weight: 700; font-size: var(--step-1); }
+    .ftr p { margin: 0; max-width: none; font-family: var(--mono); font-size: var(--step--1); color: #b9b9b2; }
+    .ftr p:first-child { color: var(--paper); }
+
+    /* ============================================================
+       MOTION — scroll reveal, honoring reduced-motion
+       ============================================================ */
+    .reveal { opacity: 0; transform: translateY(14px); }
+    .reveal.in { opacity: 1; transform: none; transition: opacity .6s var(--ease), transform .6s var(--ease); }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+    html { scroll-behavior: smooth; }
   </style>
 </head>
 <body>
@@ -94,32 +580,50 @@
     </nav>
   </header>
 
-  <main class="wrap">
-    <p class="kicker">Craft Atlas · 06</p>
-    <h1>Styling &amp; CSS Architecture</h1>
-    <p class="lede">Great-looking sites are not built from clever one-off CSS. They are built from a small, ruthlessly consistent token system, then re-skinned with a single variable. Across 80 teardowns the same skeleton recurs: design tokens at the root, fluid <code>clamp()</code> everywhere, and modern selectors (<code>:has()</code>, container queries, subgrid) doing the work JavaScript used to.</p>
-
-    <nav class="toc" aria-label="On this page">
-      <ol>
-        <li><a href="#tokens">1 · Design tokens: one source of truth</a></li>
-        <li><a href="#tailwind-vs-vars">2 · Tailwind v4 vs raw CSS variables</a></li>
-        <li><a href="#fluid">3 · Fluid &amp; responsive without breakpoints</a></li>
-        <li><a href="#modern">4 · Modern CSS: :has(), container queries, subgrid</a></li>
-        <li><a href="#components">5 · Component styling &amp; cascade layers</a></li>
-        <li><a href="#theming">6 · Theming: dark mode &amp; live re-skinning</a></li>
-        <li><a href="#performance">7 · CSS performance budget</a></li>
-        <li><a href="#checklist">8 · The styling checklist</a></li>
-      </ol>
-    </nav>
-
-    <div class="callout steal">
-      <p><strong>The one move:</strong> Define every color, space, radius, and type step as a CSS custom property on <code>:root</code>, then compose <em>everything</em> from those tokens. <span class="ref">Vercel ↗</span> ships an entire site from the Geist token system; <span class="ref">Stripe ↗</span> drives its variable font and fluid scale the same way. When a token is the single source of truth, a redesign is a find-and-replace, not a rewrite.</p>
+  <main>
+    <div class="masthead">
+      <div class="wrap">
+        <div class="meta-row">
+          <span>FILE · <b>06 / 13</b></span>
+          <span>SECTION · CSS&nbsp;ARCHITECTURE</span>
+          <span>SOURCE · 80&nbsp;TEARDOWNS</span>
+          <span>UNIT · TOKEN</span>
+        </div>
+        <h1>Styling &amp; <span class="em">CSS</span> Architecture</h1>
+        <p class="lede">Great-looking sites are not built from clever one-off CSS. They are built from a small, ruthlessly consistent token system, then re-skinned with a single variable. Across 80 teardowns the same skeleton recurs: design tokens at the root, fluid <code>clamp()</code> everywhere, and modern selectors (<code>:has()</code>, container queries, subgrid) doing the work JavaScript used to.</p>
+      </div>
     </div>
 
-    <h2 id="tokens">1 · Design tokens: one source of truth</h2>
-    <p>A design token is a named value — <code>--accent</code>, <code>--space-4</code>, <code>--radius-card</code> — that every component reads instead of hardcoding. The elite sites never write <code>#f5a623</code> twice. <span class="ref">Vercel ↗</span> maps size/line-height/tracking/weight into Geist typography classes so a heading is one class, not five declarations. <span class="ref">Pitch ↗</span> (built on Framer) themes its entire body background from a single design token (<code>var(--token-9f3d2b7e…)</code>). <span class="ref">Sara Soueidan ↗</span> hand-authors custom properties keyed to a <code>data-theme</code> attribute for an enhanced tier.</p>
+    <div class="wrap">
+      <div class="doc">
+        <nav class="toc" aria-label="On this page">
+          <p class="toc-label">Contents</p>
+          <ol>
+            <li><a href="#tokens">Design tokens: one source of truth</a></li>
+            <li><a href="#tailwind-vs-vars">Tailwind v4 vs raw CSS variables</a></li>
+            <li><a href="#fluid">Fluid &amp; responsive without breakpoints</a></li>
+            <li><a href="#modern">Modern CSS: :has(), container queries, subgrid</a></li>
+            <li><a href="#components">Component styling &amp; cascade layers</a></li>
+            <li><a href="#theming">Theming: dark mode &amp; live re-skinning</a></li>
+            <li><a href="#performance">CSS performance budget</a></li>
+            <li><a href="#checklist">The styling checklist</a></li>
+          </ol>
+        </nav>
 
-    <p>The professional pattern is a <strong>three-layer token system</strong>: primitive (raw values) → semantic (intent) → component (usage). Semantic tokens are what components reference, so you can re-point <code>--surface</code> from one primitive to another and the whole UI follows.</p>
+        <div class="content">
+
+          <div class="callout steal reveal">
+            <p><strong>The one move:</strong> Define every color, space, radius, and type step as a CSS custom property on <code>:root</code>, then compose <em>everything</em> from those tokens. <span class="ref">Vercel ↗</span> ships an entire site from the Geist token system; <span class="ref">Stripe ↗</span> drives its variable font and fluid scale the same way. When a token is the single source of truth, a redesign is a find-and-replace, not a rewrite.</p>
+          </div>
+
+          <section id="tokens">
+            <div class="sec-head reveal">
+              <span class="sec-no">01</span>
+              <h2>Design tokens: one source of truth</h2>
+            </div>
+            <p>A design token is a named value — <code>--accent</code>, <code>--space-4</code>, <code>--radius-card</code> — that every component reads instead of hardcoding. The elite sites never write <code>#f5a623</code> twice. <span class="ref">Vercel ↗</span> maps size/line-height/tracking/weight into Geist typography classes so a heading is one class, not five declarations. <span class="ref">Pitch ↗</span> (built on Framer) themes its entire body background from a single design token (<code>var(--token-9f3d2b7e…)</code>). <span class="ref">Sara Soueidan ↗</span> hand-authors custom properties keyed to a <code>data-theme</code> attribute for an enhanced tier.</p>
+
+            <p>The professional pattern is a <strong>three-layer token system</strong>: primitive (raw values) → semantic (intent) → component (usage). Semantic tokens are what components reference, so you can re-point <code>--surface</code> from one primitive to another and the whole UI follows.</p>
 
 <pre><code>:root {
   /* 1 — Primitive: raw, brand-agnostic values */
@@ -148,14 +652,19 @@
   padding: var(--space-4);
 }</code></pre>
 
-    <div class="callout tip">
-      <p>Use <code>color-mix()</code> to derive states from one token instead of defining ten shades: <code>border-color: color-mix(in srgb, var(--color-accent) 30%, transparent)</code> gives you a tinted hairline that tracks the accent automatically. The live demos on this page use exactly this.</p>
-    </div>
+            <div class="callout tip reveal">
+              <p>Use <code>color-mix()</code> to derive states from one token instead of defining ten shades: <code>border-color: color-mix(in srgb, var(--color-accent) 30%, transparent)</code> gives you a tinted hairline that tracks the accent automatically. The live demos on this page use exactly this.</p>
+            </div>
+          </section>
 
-    <h2 id="tailwind-vs-vars">2 · Tailwind v4 vs raw CSS variables</h2>
-    <p>This is the real decision for a new project. Both are token systems — Tailwind is a token system <em>with a utility-class compiler and a design-constraint guardrail</em>. In our teardowns Tailwind dominates the product/SaaS tier: <span class="ref">Linear ↗</span>, <span class="ref">Vercel ↗</span>, <span class="ref">Ramp ↗</span>, and <span class="ref">Manu Arora ↗</span> all ship utility CSS. The bespoke-craft tier (<span class="ref">Mike Hall ↗</span>, <span class="ref">Sara Soueidan ↗</span>) hand-authors CSS with custom properties and cascade layers.</p>
+          <section id="tailwind-vs-vars">
+            <div class="sec-head reveal">
+              <span class="sec-no">02</span>
+              <h2>Tailwind v4 vs raw CSS variables</h2>
+            </div>
+            <p>This is the real decision for a new project. Both are token systems — Tailwind is a token system <em>with a utility-class compiler and a design-constraint guardrail</em>. In our teardowns Tailwind dominates the product/SaaS tier: <span class="ref">Linear ↗</span>, <span class="ref">Vercel ↗</span>, <span class="ref">Ramp ↗</span>, and <span class="ref">Manu Arora ↗</span> all ship utility CSS. The bespoke-craft tier (<span class="ref">Mike Hall ↗</span>, <span class="ref">Sara Soueidan ↗</span>) hand-authors CSS with custom properties and cascade layers.</p>
 
-    <p><strong>Tailwind v4</strong> changed the calculus: the config is now CSS-native. You declare tokens in a <code>@theme</code> block and they become both utility classes <em>and</em> real CSS custom properties you can read anywhere — so the old "Tailwind vs CSS variables" framing is mostly dead. You get both.</p>
+            <p><strong>Tailwind v4</strong> changed the calculus: the config is now CSS-native. You declare tokens in a <code>@theme</code> block and they become both utility classes <em>and</em> real CSS custom properties you can read anywhere — so the old "Tailwind vs CSS variables" framing is mostly dead. You get both.</p>
 
 <pre><code>/* Tailwind v4 — tokens live in CSS, no JS config file */
 @import "tailwindcss";
@@ -171,24 +680,31 @@
    - utilities:  class="bg-accent rounded-card font-display"
    - properties: var(--color-accent) anywhere in your CSS  */</code></pre>
 
-    <table>
-      <thead><tr><th>Dimension</th><th>Tailwind v4 (utilities)</th><th>Raw CSS variables</th></tr></thead>
-      <tbody>
-        <tr><td>Constraint</td><td>Strong — you can only pick from the scale</td><td>None — discipline is on you</td></tr>
-        <tr><td>Co-location</td><td>Styles sit in markup; fast to read in one place</td><td>Separate stylesheet; cleaner markup</td></tr>
-        <tr><td>Dynamic theming</td><td>Via the same CSS vars under the hood</td><td>Native; flip one property at runtime</td></tr>
-        <tr><td>Bundle</td><td>Tiny — unused utilities purged at build</td><td>Whatever you write; easy to bloat</td></tr>
-        <tr><td>Best for</td><td>Teams, product UI, fast iteration</td><td>Editorial / craft sites, total control</td></tr>
-      </tbody>
-      <caption>Verdict: Tailwind v4 for product work and teams; raw custom properties when the CSS <em>is</em> the design system (à la Mike Hall).</caption>
-    </table>
+            <div class="table-scroll reveal">
+              <table>
+                <thead><tr><th>Dimension</th><th>Tailwind v4 (utilities)</th><th>Raw CSS variables</th></tr></thead>
+                <tbody>
+                  <tr><td>Constraint</td><td>Strong — you can only pick from the scale</td><td>None — discipline is on you</td></tr>
+                  <tr><td>Co-location</td><td>Styles sit in markup; fast to read in one place</td><td>Separate stylesheet; cleaner markup</td></tr>
+                  <tr><td>Dynamic theming</td><td>Via the same CSS vars under the hood</td><td>Native; flip one property at runtime</td></tr>
+                  <tr><td>Bundle</td><td>Tiny — unused utilities purged at build</td><td>Whatever you write; easy to bloat</td></tr>
+                  <tr><td>Best for</td><td>Teams, product UI, fast iteration</td><td>Editorial / craft sites, total control</td></tr>
+                </tbody>
+                <caption>Verdict: Tailwind v4 for product work and teams; raw custom properties when the CSS <em>is</em> the design system (à la Mike Hall).</caption>
+              </table>
+            </div>
 
-    <div class="callout warn">
-      <p><strong>Pitfall — the utility soup:</strong> 14 utility classes on one <code>div</code> is a smell. When a pattern repeats 3+ times, extract a component (<code>@apply</code> sparingly, or a real component in React/Vue). Tailwind without component extraction drifts into the same copy-paste rot raw CSS does.</p>
-    </div>
+            <div class="callout warn reveal">
+              <p><strong>The utility soup:</strong> 14 utility classes on one <code>div</code> is a smell. When a pattern repeats 3+ times, extract a component (<code>@apply</code> sparingly, or a real component in React/Vue). Tailwind without component extraction drifts into the same copy-paste rot raw CSS does.</p>
+            </div>
+          </section>
 
-    <h2 id="fluid">3 · Fluid &amp; responsive without breakpoints</h2>
-    <p>The single biggest upgrade in modern CSS: stop writing breakpoint stacks and let one <code>clamp()</code> interpolate continuously. <span class="ref">Stripe ↗</span> renders its H1 fluidly (~34px on a laptop, scaling up) with tight leading; <span class="ref">Vercel ↗</span>, <span class="ref">Lusion ↗</span>, and <span class="ref">Family ↗</span> all lean on <code>clamp()</code> for type and spacing. The pattern: <code>clamp(MIN, PREFERRED, MAX)</code> where PREFERRED mixes a <code>rem</code> base with a <code>vw</code> slope.</p>
+          <section id="fluid">
+            <div class="sec-head reveal">
+              <span class="sec-no">03</span>
+              <h2>Fluid &amp; responsive without breakpoints</h2>
+            </div>
+            <p>The single biggest upgrade in modern CSS: stop writing breakpoint stacks and let one <code>clamp()</code> interpolate continuously. <span class="ref">Stripe ↗</span> renders its H1 fluidly (~34px on a laptop, scaling up) with tight leading; <span class="ref">Vercel ↗</span>, <span class="ref">Lusion ↗</span>, and <span class="ref">Family ↗</span> all lean on <code>clamp()</code> for type and spacing. The pattern: <code>clamp(MIN, PREFERRED, MAX)</code> where PREFERRED mixes a <code>rem</code> base with a <code>vw</code> slope.</p>
 
 <pre><code>/* Fluid type: never too small on mobile, never too big on 4K */
 h1     { font-size: clamp(2.3rem, 1.7rem + 2.9vw, 4.4rem); }
@@ -204,24 +720,29 @@ h1     { font-size: clamp(2.3rem, 1.7rem + 2.9vw, 4.4rem); }
   gap: 1.5rem;
 }</code></pre>
 
-    <p>The <code>auto-fit / minmax / min()</code> grid is the workhorse — cards reflow from 4 columns to 1 with zero media queries, and <code>min(100%, 260px)</code> stops a single card overflowing on a 320px phone. This page's card grids and <code>shared.css</code> use exactly this.</p>
+            <p>The <code>auto-fit / minmax / min()</code> grid is the workhorse — cards reflow from 4 columns to 1 with zero media queries, and <code>min(100%, 260px)</code> stops a single card overflowing on a 320px phone. This page's card grids and <code>shared.css</code> use exactly this.</p>
 
-    <figure class="figure">
-      <img src="../workings/shots/vercel/01-hero.png" alt="Vercel homepage hero with Geist type, monochrome canvas and a single spectrum gradient line" loading="lazy" decoding="async">
-      <figcaption><strong>Vercel</strong> — the entire site is the Geist token system: fluid type, monochrome canvas, saturated color reserved only for code / data. One scale, no decorative breakpoints.</figcaption>
-    </figure>
+            <figure class="figure reveal">
+              <img src="../workings/shots/vercel/01-hero.png" alt="Vercel homepage hero with Geist type, monochrome canvas and a single spectrum gradient line" loading="lazy" decoding="async">
+              <figcaption><strong>Vercel</strong> — the entire site is the Geist token system: fluid type, monochrome canvas, saturated color reserved only for code / data. One scale, no decorative breakpoints.</figcaption>
+            </figure>
 
-    <div class="example">
-      <p style="margin:0 0 var(--s-3); font-family:var(--font-mono); font-size:var(--step--1); color:var(--ink-dim);">Resize the window — this heading scales <em>continuously</em>, not in steps.</p>
-      <h3 id="fluid-target" style="font-family:var(--font-serif); font-size:clamp(1.5rem,1rem + 5vw,4.5rem); line-height:1.05; letter-spacing:-0.02em; margin:0; text-wrap:balance;">Fluid by clamp()</h3>
-      <p class="caption">Computed size: <b id="px" style="color:var(--accent-soft); font-family:var(--font-mono);">—</b> · one declaration, infinite breakpoints.</p>
-    </div>
+            <div class="example reveal">
+              <p class="demo-note">Resize the window — this heading scales <em>continuously</em>, not in steps.</p>
+              <h3 id="fluid-target" style="font-family:var(--sans); font-weight:800; font-size:clamp(1.5rem,1rem + 5vw,4.5rem); line-height:1.02; letter-spacing:-0.03em; margin:0;">Fluid by clamp()</h3>
+              <p class="caption">Computed size: <b id="px">—</b> · one declaration, infinite breakpoints.</p>
+            </div>
+          </section>
 
-    <h2 id="modern">4 · Modern CSS: <code>:has()</code>, container queries, subgrid</h2>
-    <p>These three shipped to all evergreen browsers and quietly killed a lot of JavaScript.</p>
+          <section id="modern">
+            <div class="sec-head reveal">
+              <span class="sec-no">04</span>
+              <h2>Modern CSS: <code>:has()</code>, container queries, subgrid</h2>
+            </div>
+            <p>These three shipped to all evergreen browsers and quietly killed a lot of JavaScript.</p>
 
-    <h3><code>:has()</code> — the parent selector</h3>
-    <p><span class="ref">Mike Hall ↗</span> builds an entire <strong>5-mode theme switcher with zero JavaScript</strong> using radio inputs plus <code>:has()</code> sibling selectors — the page re-themes instantly, fully keyboard-accessible. <code>:has()</code> lets a parent style itself based on its children's state, so form-field validation, "card contains an image", and toggle UIs become pure CSS.</p>
+            <h3><code>:has()</code> — the parent selector</h3>
+            <p><span class="ref">Mike Hall ↗</span> builds an entire <strong>5-mode theme switcher with zero JavaScript</strong> using radio inputs plus <code>:has()</code> sibling selectors — the page re-themes instantly, fully keyboard-accessible. <code>:has()</code> lets a parent style itself based on its children's state, so form-field validation, "card contains an image", and toggle UIs become pure CSS.</p>
 
 <pre><code>/* Re-theme the whole page from a checked radio — no JS (Mike Hall) */
 body:has(#theme-dark:checked)  { --color-bg: #0b0c0e; --color-text: #e9eaec; }
@@ -231,20 +752,20 @@ body:has(#theme-sepia:checked) { --color-bg: #f4ecd8; --color-text: #2b2417; }
 .field:has(input:focus) { border-color: var(--color-accent); }
 .field:has(input:valid) { border-color: var(--color-ok); }</code></pre>
 
-    <div class="example">
-      <div class="has-demo">
-        <p style="margin:0 0 var(--s-3); font-family:var(--font-mono); font-size:var(--step--1); color:var(--ink-dim);">No JS — the field border is driven entirely by <code>:has(input:…)</code></p>
-        <div class="field">
-          <label for="email-demo">Email (try a bad one, then a good one)</label>
-          <input id="email-demo" type="email" placeholder="you@example.com" autocomplete="off">
-        </div>
-        <p class="hint">focus → amber · invalid → orange · valid → teal</p>
-      </div>
-      <p class="caption">The parent <code>.field</code> styles itself from its child input's <code>:focus</code> / <code>:valid</code> / <code>:invalid</code> state. Zero script.</p>
-    </div>
+            <div class="example reveal">
+              <div class="has-demo">
+                <p class="demo-note">No JS — the field border is driven entirely by <code>:has(input:…)</code></p>
+                <div class="field">
+                  <label for="email-demo">Email (try a bad one, then a good one)</label>
+                  <input id="email-demo" type="email" placeholder="you@example.com" autocomplete="off">
+                </div>
+                <p class="hint">focus → orange · invalid → amber · valid → green</p>
+              </div>
+              <p class="caption">The parent <code>.field</code> styles itself from its child input's <code>:focus</code> / <code>:valid</code> / <code>:invalid</code> state. Zero script.</p>
+            </div>
 
-    <h3>Container queries — components that size to their slot</h3>
-    <p>Media queries ask "how big is the viewport?" Container queries ask "how big is <em>my container</em>?" — so a card in a wide sidebar and the same card in a narrow column style themselves correctly, regardless of screen size. This is the right tool for the bento grids in <span class="ref">Ramp ↗</span>, where one card template appears at many sizes.</p>
+            <h3>Container queries — components that size to their slot</h3>
+            <p>Media queries ask "how big is the viewport?" Container queries ask "how big is <em>my container</em>?" — so a card in a wide sidebar and the same card in a narrow column style themselves correctly, regardless of screen size. This is the right tool for the bento grids in <span class="ref">Ramp ↗</span>, where one card template appears at many sizes.</p>
 
 <pre><code>.card-wrap { container-type: inline-size; }      /* establish a query container */
 
@@ -253,8 +774,8 @@ body:has(#theme-sepia:checked) { --color-bg: #f4ecd8; --color-text: #2b2417; }
   .card { display: grid; grid-template-columns: 96px 1fr; gap: 1rem; }
 }</code></pre>
 
-    <h3>Subgrid — align nested grids to the parent's tracks</h3>
-    <p>Card grids look polished only when every card's title, body, and footer line up across the row. <code>grid-template-rows: subgrid</code> lets a card inherit the parent grid's row tracks so all titles share a baseline even with uneven content.</p>
+            <h3>Subgrid — align nested grids to the parent's tracks</h3>
+            <p>Card grids look polished only when every card's title, body, and footer line up across the row. <code>grid-template-rows: subgrid</code> lets a card inherit the parent grid's row tracks so all titles share a baseline even with uneven content.</p>
 
 <pre><code>.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 .card {
@@ -262,11 +783,16 @@ body:has(#theme-sepia:checked) { --color-bg: #f4ecd8; --color-text: #2b2417; }
   grid-row: span 3;
   grid-template-rows: subgrid;   /* title / body / footer align across ALL cards */
 }</code></pre>
+          </section>
 
-    <h2 id="components">5 · Component styling &amp; cascade layers</h2>
-    <p>The recurring approach across crafted sites is to scope styles and control the cascade explicitly. <span class="ref">Mike Hall ↗</span> authors with native <strong><code>@layer</code> cascade layers</strong> plus logical properties (<code>margin-inline</code>, <code>padding-block</code>) and relative units. <span class="ref">Ramp ↗</span> and <span class="ref">Brittany Chiang ↗</span> use <strong>CSS Modules</strong> (hashed class names) for collision-free scoping. <span class="ref">Josh Comeau ↗</span> uses <strong>Linaria</strong> — zero-runtime CSS-in-JS compiled to CSS Modules — specifically to drop the styled-components runtime and stay RSC-compatible.</p>
+          <section id="components">
+            <div class="sec-head reveal">
+              <span class="sec-no">05</span>
+              <h2>Component styling &amp; cascade layers</h2>
+            </div>
+            <p>The recurring approach across crafted sites is to scope styles and control the cascade explicitly. <span class="ref">Mike Hall ↗</span> authors with native <strong><code>@layer</code> cascade layers</strong> plus logical properties (<code>margin-inline</code>, <code>padding-block</code>) and relative units. <span class="ref">Ramp ↗</span> and <span class="ref">Brittany Chiang ↗</span> use <strong>CSS Modules</strong> (hashed class names) for collision-free scoping. <span class="ref">Josh Comeau ↗</span> uses <strong>Linaria</strong> — zero-runtime CSS-in-JS compiled to CSS Modules — specifically to drop the styled-components runtime and stay RSC-compatible.</p>
 
-    <p>Cascade layers end specificity wars. You declare an order once, and later layers always win regardless of selector strength — so your tokens, base, components, and utilities never fight.</p>
+            <p>Cascade layers end specificity wars. You declare an order once, and later layers always win regardless of selector strength — so your tokens, base, components, and utilities never fight.</p>
 
 <pre><code>/* Declare the cascade order ONCE — predictable forever after */
 @layer reset, tokens, base, components, utilities;
@@ -279,12 +805,17 @@ body:has(#theme-sepia:checked) { --color-bg: #f4ecd8; --color-text: #2b2417; }
   .mt-0 { margin-block-start: 0; }
 }</code></pre>
 
-    <div class="callout tip">
-      <p><strong>Logical properties</strong> (<code>margin-inline</code>, <code>inset-block</code>, <code>padding-inline</code>) make a layout RTL- and vertical-writing-ready for free. <code>shared.css</code> uses <code>margin-inline: auto</code> and <code>padding-block</code> throughout for exactly this reason — write once, work in every writing mode.</p>
-    </div>
+            <div class="callout tip reveal">
+              <p><strong>Logical properties</strong> (<code>margin-inline</code>, <code>inset-block</code>, <code>padding-inline</code>) make a layout RTL- and vertical-writing-ready for free. <code>shared.css</code> uses <code>margin-inline: auto</code> and <code>padding-block</code> throughout for exactly this reason — write once, work in every writing mode.</p>
+            </div>
+          </section>
 
-    <h2 id="theming">6 · Theming: dark mode &amp; live re-skinning</h2>
-    <p>Because every color is a token, theming is just re-pointing those tokens. <span class="ref">Josh Comeau ↗</span> — who wrote the canonical "Perfect Dark Mode" — ships a flicker-free, persisted, token-driven toggle. <span class="ref">Sara Soueidan ↗</span> swaps a <code>data-theme</code> attribute. <span class="ref">Mike Hall ↗</span> does it with pure <code>:has()</code>. The mechanism is always the same: override semantic tokens, let the cascade repaint.</p>
+          <section id="theming">
+            <div class="sec-head reveal">
+              <span class="sec-no">06</span>
+              <h2>Theming: dark mode &amp; live re-skinning</h2>
+            </div>
+            <p>Because every color is a token, theming is just re-pointing those tokens. <span class="ref">Josh Comeau ↗</span> — who wrote the canonical "Perfect Dark Mode" — ships a flicker-free, persisted, token-driven toggle. <span class="ref">Sara Soueidan ↗</span> swaps a <code>data-theme</code> attribute. <span class="ref">Mike Hall ↗</span> does it with pure <code>:has()</code>. The mechanism is always the same: override semantic tokens, let the cascade repaint.</p>
 
 <pre><code>:root               { --color-bg: #fff;     --color-text: #111; }
 [data-theme="dark"] { --color-bg: #0b0c0e; --color-text: #e9eaec; }
@@ -295,44 +826,49 @@ body:has(#theme-sepia:checked) { --color-bg: #f4ecd8; --color-text: #2b2417; }
 }
 html { color-scheme: light dark; }   /* themes native UI: scrollbars, form controls */</code></pre>
 
-    <div class="example">
-      <div class="theme-demo">
-        <div class="skin" id="skin">
-          <h4>Live token re-skin</h4>
-          <p style="margin-top:var(--s-2); color:inherit; opacity:.8;">Every property below is read from a CSS variable. Change the token, the component follows — no rebuild.</p>
-          <span class="pill">--color-accent</span>
-        </div>
-        <div class="theme-controls">
-          <label>Accent token
-            <input type="color" id="accent-input" value="#f5a623">
-          </label>
-          <label>Radius token — <span id="radius-val" style="color:var(--accent-soft)">14</span>px
-            <input type="range" id="radius-input" min="0" max="32" value="14">
-          </label>
-          <div class="swatch-row">
-            <button type="button" data-bg="#14171c" data-fg="#e9eaec">Ink</button>
-            <button type="button" data-bg="#f4ecd8" data-fg="#2b2417">Sepia</button>
-            <button type="button" data-bg="#0d1f1c" data-fg="#d6f5ec">Forest</button>
-          </div>
-        </div>
-      </div>
-      <p class="caption">One element, four tokens. This is how Josh Comeau, Sara Soueidan and Mike Hall re-skin entire pages — flip the variables, the cascade repaints.</p>
-    </div>
+            <div class="example reveal">
+              <div class="theme-demo">
+                <div class="skin" id="skin">
+                  <h4>Live token re-skin</h4>
+                  <p>Every property below is read from a CSS variable. Change the token, the component follows — no rebuild.</p>
+                  <span class="pill">--color-accent</span>
+                </div>
+                <div class="theme-controls">
+                  <label>Accent token
+                    <input type="color" id="accent-input" value="#ff4d12">
+                  </label>
+                  <label>Radius token — <span id="radius-val">0</span>px
+                    <input type="range" id="radius-input" min="0" max="32" value="0">
+                  </label>
+                  <div class="swatch-row">
+                    <button type="button" data-bg="#14171c" data-fg="#e9eaec">Ink</button>
+                    <button type="button" data-bg="#f4ecd8" data-fg="#2b2417">Sepia</button>
+                    <button type="button" data-bg="#0d1f1c" data-fg="#d6f5ec">Forest</button>
+                  </div>
+                </div>
+              </div>
+              <p class="caption">One element, four tokens. This is how Josh Comeau, Sara Soueidan and Mike Hall re-skin entire pages — flip the variables, the cascade repaints.</p>
+            </div>
 
-    <figure class="figure">
-      <img src="../workings/shots/mike-hall-mikemai-net/01-hero.png" alt="Mike Hall mikemai.net — bold brutalist display type and a CSS-only theme switcher" loading="lazy" decoding="async">
-      <figcaption><strong>Mike Hall (mikemai.net)</strong> — a 5-mode theme switcher built entirely from radio inputs + <code>:has()</code>, no JavaScript. The CSS <em>is</em> the design system: cascade layers, logical properties, near-zero JS budget.</figcaption>
-    </figure>
+            <figure class="figure reveal">
+              <img src="../workings/shots/mike-hall-mikemai-net/01-hero.png" alt="Mike Hall mikemai.net — bold brutalist display type and a CSS-only theme switcher" loading="lazy" decoding="async">
+              <figcaption><strong>Mike Hall (mikemai.net)</strong> — a 5-mode theme switcher built entirely from radio inputs + <code>:has()</code>, no JavaScript. The CSS <em>is</em> the design system: cascade layers, logical properties, near-zero JS budget.</figcaption>
+            </figure>
+          </section>
 
-    <h2 id="performance">7 · CSS performance budget</h2>
-    <p>CSS is render-blocking — it sits on the critical path to first paint. The fast sites keep it lean and animate cheaply.</p>
-    <ul>
-      <li><strong>Animate only <code>transform</code> and <code>opacity</code>.</strong> <span class="ref">Stripe ↗</span> bakes this into its motion token system as a hard rule and isolates animated components to limit repaint. These two properties run on the compositor and skip layout / paint.</li>
-      <li><strong>Kill layout shift from fonts.</strong> <span class="ref">Ramp ↗</span> uses <code>next/font local</code> with a metric-matched fallback so its paid typeface swaps in with zero CLS. Pair with <code>font-display: swap</code>.</li>
-      <li><strong>Use <code>content-visibility: auto</code></strong> on long off-screen sections to skip rendering work until they scroll near the viewport — near-free virtualization.</li>
-      <li><strong>Reach for <code>will-change</code> only just before an animation</strong> and remove it after; leaving it on permanently wastes GPU memory.</li>
-      <li><strong>Purge unused CSS.</strong> Tailwind does this automatically; hand-authored CSS needs discipline. <span class="ref">Mike Hall ↗</span> ships two stylesheets total and only an analytics beacon for JS — instant load.</li>
-    </ul>
+          <section id="performance">
+            <div class="sec-head reveal">
+              <span class="sec-no">07</span>
+              <h2>CSS performance budget</h2>
+            </div>
+            <p>CSS is render-blocking — it sits on the critical path to first paint. The fast sites keep it lean and animate cheaply.</p>
+            <ul>
+              <li><strong>Animate only <code>transform</code> and <code>opacity</code>.</strong> <span class="ref">Stripe ↗</span> bakes this into its motion token system as a hard rule and isolates animated components to limit repaint. These two properties run on the compositor and skip layout / paint.</li>
+              <li><strong>Kill layout shift from fonts.</strong> <span class="ref">Ramp ↗</span> uses <code>next/font local</code> with a metric-matched fallback so its paid typeface swaps in with zero CLS. Pair with <code>font-display: swap</code>.</li>
+              <li><strong>Use <code>content-visibility: auto</code></strong> on long off-screen sections to skip rendering work until they scroll near the viewport — near-free virtualization.</li>
+              <li><strong>Reach for <code>will-change</code> only just before an animation</strong> and remove it after; leaving it on permanently wastes GPU memory.</li>
+              <li><strong>Purge unused CSS.</strong> Tailwind does this automatically; hand-authored CSS needs discipline. <span class="ref">Mike Hall ↗</span> ships two stylesheets total and only an analytics beacon for JS — instant load.</li>
+            </ul>
 
 <pre><code>/* Skip rendering off-screen blocks until needed */
 .section {
@@ -344,40 +880,50 @@ html { color-scheme: light dark; }   /* themes native UI: scrollbars, form contr
 .card { transition: transform .2s var(--ease), opacity .2s var(--ease); }
 .card:hover { transform: translateY(-2px); }</code></pre>
 
-    <div class="callout warn">
-      <p><strong>Pitfall — animating layout properties:</strong> transitioning <code>width</code>, <code>height</code>, <code>top</code>, or <code>margin</code> forces layout + paint on every frame and janks on mobile. Animate <code>transform: scale()</code> / <code>translate()</code> instead. <code>backdrop-filter: blur()</code> (the glass nav in <span class="ref">Nothing ↗</span> and our own header) is expensive — use it on small, static surfaces, never on scrolling content.</p>
-    </div>
+            <div class="callout warn reveal">
+              <p><strong>Animating layout properties:</strong> transitioning <code>width</code>, <code>height</code>, <code>top</code>, or <code>margin</code> forces layout + paint on every frame and janks on mobile. Animate <code>transform: scale()</code> / <code>translate()</code> instead. <code>backdrop-filter: blur()</code> (the glass nav in <span class="ref">Nothing ↗</span> and our own header) is expensive — use it on small, static surfaces, never on scrolling content.</p>
+            </div>
+          </section>
 
-    <h2 id="checklist">8 · The styling checklist</h2>
-    <div class="grid">
-      <div class="card">
-        <h4>Tokens first</h4>
-        <p>Every color, space, radius, and type step is a custom property on <code>:root</code>. No hardcoded hex twice. Semantic tokens, not raw values, in components.</p>
-      </div>
-      <div class="card">
-        <h4>Fluid by default</h4>
-        <p>Type and section spacing use one <code>clamp()</code>, not breakpoint stacks. Grids use <code>auto-fit + minmax + min()</code> — reflow without media queries.</p>
-      </div>
-      <div class="card">
-        <h4>Modern selectors</h4>
-        <p><code>:has()</code> for parent-aware styling, container queries for component-level responsiveness, subgrid for cross-card alignment. Delete the JS they replace.</p>
-      </div>
-      <div class="card">
-        <h4>Control the cascade</h4>
-        <p>Declare <code>@layer</code> order once. Scope components (CSS Modules / zero-runtime). Logical properties for free RTL.</p>
-      </div>
-      <div class="card">
-        <h4>Theme via tokens</h4>
-        <p>Dark mode = re-point semantic variables. <code>color-scheme</code> for native UI. Flicker-free, persisted, no duplicate stylesheets.</p>
-      </div>
-      <div class="card">
-        <h4>Cheap to paint</h4>
-        <p>Animate transform / opacity only. <code>content-visibility</code> for long pages. Purge unused CSS. Metric-matched font fallbacks to kill CLS.</p>
-      </div>
-    </div>
+          <section id="checklist">
+            <div class="sec-head reveal">
+              <span class="sec-no">08</span>
+              <h2>The styling checklist</h2>
+            </div>
+            <div class="grid reveal">
+              <div class="card">
+                <h4>Tokens first</h4>
+                <p>Every color, space, radius, and type step is a custom property on <code>:root</code>. No hardcoded hex twice. Semantic tokens, not raw values, in components.</p>
+              </div>
+              <div class="card">
+                <h4>Fluid by default</h4>
+                <p>Type and section spacing use one <code>clamp()</code>, not breakpoint stacks. Grids use <code>auto-fit + minmax + min()</code> — reflow without media queries.</p>
+              </div>
+              <div class="card">
+                <h4>Modern selectors</h4>
+                <p><code>:has()</code> for parent-aware styling, container queries for component-level responsiveness, subgrid for cross-card alignment. Delete the JS they replace.</p>
+              </div>
+              <div class="card">
+                <h4>Control the cascade</h4>
+                <p>Declare <code>@layer</code> order once. Scope components (CSS Modules / zero-runtime). Logical properties for free RTL.</p>
+              </div>
+              <div class="card">
+                <h4>Theme via tokens</h4>
+                <p>Dark mode = re-point semantic variables. <code>color-scheme</code> for native UI. Flicker-free, persisted, no duplicate stylesheets.</p>
+              </div>
+              <div class="card">
+                <h4>Cheap to paint</h4>
+                <p>Animate transform / opacity only. <code>content-visibility</code> for long pages. Purge unused CSS. Metric-matched font fallbacks to kill CLS.</p>
+              </div>
+            </div>
 
-    <div class="callout steal">
-      <p><strong>Steal this stack:</strong> Tailwind v4 <code>@theme</code> tokens (or raw custom properties if you want full control) → fluid <code>clamp()</code> type + <code>auto-fit</code> grids → <code>:has()</code> and container queries instead of JS → <code>@layer</code> to tame the cascade → theme by re-pointing variables → animate only transform / opacity. That is the spine under Vercel, Linear, Stripe, Ramp, and every hand-crafted site in this atlas.</p>
+            <div class="callout steal reveal">
+              <p><strong>Steal this stack:</strong> Tailwind v4 <code>@theme</code> tokens (or raw custom properties if you want full control) → fluid <code>clamp()</code> type + <code>auto-fit</code> grids → <code>:has()</code> and container queries instead of JS → <code>@layer</code> to tame the cascade → theme by re-pointing variables → animate only transform / opacity. That is the spine under Vercel, Linear, Stripe, Ramp, and every hand-crafted site in this atlas.</p>
+            </div>
+          </section>
+
+        </div>
+      </div>
     </div>
   </main>
 
@@ -418,6 +964,44 @@ html { color-scheme: light dark; }   /* themes native UI: scrollbars, form contr
           skin.style.setProperty('--t-fg', b.dataset.fg);
         });
       });
+    })();
+
+    // --- scroll reveal (IntersectionObserver, honors reduced-motion) ---
+    (function () {
+      var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var els = document.querySelectorAll('.reveal');
+      if (reduce || !('IntersectionObserver' in window)) {
+        els.forEach(function (el) { el.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+      els.forEach(function (el) { io.observe(el); });
+    })();
+
+    // --- TOC active-section highlight ---
+    (function () {
+      var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+      var map = {};
+      links.forEach(function (a) {
+        var id = a.getAttribute('href').slice(1);
+        var sec = document.getElementById(id);
+        if (sec) map[id] = a;
+      });
+      if (!('IntersectionObserver' in window)) return;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            var a = map[e.target.id];
+            if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+      Object.keys(map).forEach(function (id) { io.observe(document.getElementById(id)); });
     })();
   </script>
 </body>

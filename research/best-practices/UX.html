@@ -4,85 +4,747 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UX — Craft Atlas</title>
+  <meta name="description" content="A guide to UX: information architecture, navigation, wayfinding, onboarding, performance-as-UX, accessibility, and error/empty states — mined from 80 live site teardowns.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* Page-local live demos only */
-    .demo-nav {
-      display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; align-items: center;
-      padding: 0.7rem 1rem; border: 1px solid var(--line);
-      border-radius: var(--r-2); background: var(--bg-2);
+    /* =====================================================================
+       UX — Craft Atlas · 04
+       Bespoke art direction: "Calm Editorial Field Notes".
+       Cool, airy near-white canvas with a single muted eucalyptus accent.
+       Newsreader (quiet text serif) leads the reading rhythm; Inter Tight
+       carries UI/labels; JetBrains Mono marks meta. Lots of air, ruled
+       left margin, sidenote feel. Restful, humane, quietly confident.
+       Deliberately distinct from the warm-paper / Fraunces sibling pages.
+       Self-contained: NO shared.css dependency.
+       ===================================================================== */
+
+    :root {
+      /* ---- color: cool airy light base, one locked accent ---- */
+      --paper:      #f6f7f4;   /* cool near-white canvas              */
+      --paper-2:    #eef0ea;   /* recessed panel                     */
+      --paper-3:    #e7eae2;   /* deeper panel                       */
+      --card:       #fcfdfb;   /* raised surface                     */
+      --ink:        #1b201c;   /* near-black, faint green undertone  */
+      --ink-soft:   #3c443d;   /* body                               */
+      --ink-dim:    #687069;   /* secondary / captions               */
+      --ink-faint:  #9aa29a;   /* dimmed, two-tone, hairline glyphs  */
+      --line:       #d7ddd3;   /* hairline                           */
+      --line-strong:#bcc4b8;
+      --accent:     #3f7158;   /* eucalyptus — the one accent, locked */
+      --accent-ink: #2f5a44;   /* darker for text-on-light contrast  */
+      --accent-wash:#e2ece6;   /* pale accent fill                   */
+      --accent-line:#bcd4c7;
+      --sel:        #cfe4d8;
+
+      /* ---- semantic callout tints (muted, washed) ---- */
+      --tip-wash:   #e6eef0; --tip-ink:   #2c5763; --tip-line:  #c4d9de;
+      --warn-wash:  #f4ece1; --warn-ink:  #8a5a22; --warn-line: #e3d2b9;
+      --steal-wash: #e2ece6; --steal-ink: #2f5a44; --steal-line:#bcd4c7;
+
+      /* ---- type families ---- */
+      --serif: "Newsreader", Georgia, "Times New Roman", serif;
+      --sans:  "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono:  "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+      /* ---- fluid modular scale ---- */
+      --step--2: clamp(0.70rem, 0.67rem + 0.12vw, 0.77rem);
+      --step--1: clamp(0.80rem, 0.77rem + 0.16vw, 0.90rem);
+      --step-0:  clamp(1.02rem, 0.98rem + 0.22vw, 1.16rem);
+      --step-1:  clamp(1.18rem, 1.08rem + 0.45vw, 1.45rem);
+      --step-2:  clamp(1.5rem, 1.28rem + 1.0vw, 2.15rem);
+      --step-3:  clamp(1.9rem, 1.5rem + 1.9vw, 3.0rem);
+      --hero:    clamp(2.4rem, 1.5rem + 4.2vw, 5.0rem);
+
+      /* ---- spacing ---- */
+      --s-1:.25rem; --s-2:.5rem; --s-3:.75rem; --s-4:1rem;
+      --s-5:1.5rem; --s-6:2rem; --s-7:3rem; --s-8:4.5rem; --s-9:7rem;
+
+      --r-1:6px; --r-2:10px; --r-3:16px; --r-4:24px; --r-pill:999px;
+
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+      --dur-fast:180ms; --dur:420ms; --dur-slow:760ms;
+
+      --maxw:  1180px;
+      --measure: 66ch;
+      --rail:  17rem;        /* sticky left rail width on wide screens */
     }
 
-    /* Skip-link live demo */
-    .skip-demo { position: relative; min-height: 3.4rem; }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper:      #121613;
+        --paper-2:    #181d19;
+        --paper-3:    #1e231f;
+        --card:       #1a201c;
+        --ink:        #eef2ec;
+        --ink-soft:   #c5ccc4;
+        --ink-dim:    #8c948b;
+        --ink-faint:  #5e655e;
+        --line:       #2a312b;
+        --line-strong:#3a423b;
+        --accent:     #8fc7a9;
+        --accent-ink: #aedcc2;
+        --accent-wash:#1c2a23;
+        --accent-line:#2e463a;
+        --sel:        #25382e;
+
+        --tip-wash:   #16242a; --tip-ink:   #9ecbd6; --tip-line:  #244049;
+        --warn-wash:  #261e12; --warn-ink:  #d9b27e; --warn-line: #463720;
+        --steal-wash: #1c2a23; --steal-ink: #aedcc2; --steal-line:#2e463a;
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+      scroll-padding-top: 5.5rem;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink-soft);
+      font-family: var(--serif);
+      font-optical-sizing: auto;
+      font-size: var(--step-0);
+      line-height: 1.72;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: var(--sel); color: var(--ink); }
+
+    /* faint cool light spot behind the top of the page — adds depth, no flatness */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(120% 70% at 78% -8%, var(--accent-wash) 0%, transparent 46%),
+        radial-gradient(90% 50% at 10% 0%, var(--paper-2) 0%, transparent 40%);
+      opacity: .6;
+    }
+
+    a { color: inherit; }
+
+    /* ---------- header / nav ---------- */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: color-mix(in srgb, var(--paper) 78%, transparent);
+      backdrop-filter: saturate(140%) blur(12px);
+      -webkit-backdrop-filter: saturate(140%) blur(12px);
+      border-bottom: 1px solid transparent;
+      transition: border-color var(--dur) var(--ease),
+                  background var(--dur) var(--ease);
+    }
+    .site-header[data-scrolled] {
+      border-bottom-color: var(--line);
+      background: color-mix(in srgb, var(--paper) 90%, transparent);
+    }
+    .site-nav {
+      max-width: var(--maxw);
+      margin-inline: auto;
+      display: flex;
+      align-items: center;
+      gap: .35rem .9rem;
+      flex-wrap: wrap;
+      padding: .7rem clamp(1rem, 4vw, 2.4rem);
+      font-family: var(--sans);
+      font-size: var(--step--1);
+    }
+    .site-nav a {
+      text-decoration: none;
+      color: var(--ink-dim);
+      padding: .3rem .15rem;
+      position: relative;
+      transition: color var(--dur-fast) var(--ease);
+    }
+    .site-nav a:not(.brand):not(.cta)::after {
+      content: "";
+      position: absolute;
+      left: .15rem; right: .15rem; bottom: .06rem;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform var(--dur) var(--ease);
+    }
+    .site-nav a:not(.brand):not(.cta):hover { color: var(--ink); }
+    .site-nav a:not(.brand):not(.cta):hover::after { transform: scaleX(1); }
+    .site-nav a[aria-current="page"] {
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .site-nav a[aria-current="page"]::after { transform: scaleX(1); }
+
+    .site-nav .brand {
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      margin-right: auto;
+      font-size: var(--step-0);
+    }
+    .site-nav .brand:hover { color: var(--accent-ink); }
+
+    .site-nav .cta {
+      color: var(--accent-ink);
+      border: 1px solid var(--accent-line);
+      background: var(--accent-wash);
+      border-radius: var(--r-pill);
+      padding: .35rem .85rem;
+      font-weight: 600;
+      transition: background var(--dur-fast) var(--ease),
+                  border-color var(--dur-fast) var(--ease),
+                  transform var(--dur-fast) var(--ease);
+    }
+    .site-nav .cta:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .site-nav .cta:active { transform: scale(0.97); }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 3px;
+    }
+
+    /* ---------- layout shell: editorial column + sticky rail ---------- */
+    .shell {
+      position: relative;
+      z-index: 1;
+      max-width: var(--maxw);
+      margin-inline: auto;
+      padding: 0 clamp(1rem, 4vw, 2.4rem);
+    }
+
+    /* ---------- masthead ---------- */
+    .masthead {
+      padding: clamp(3rem, 8vw, 6.5rem) 0 clamp(2rem, 5vw, 3.5rem);
+      border-bottom: 1px solid var(--line);
+      max-width: 56rem;
+    }
+    .kicker {
+      font-family: var(--mono);
+      font-size: var(--step--2);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent-ink);
+      margin: 0 0 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+    }
+    .kicker::before {
+      content: "";
+      width: 1.8rem; height: 1px;
+      background: var(--accent);
+      display: inline-block;
+    }
+    h1.title {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: var(--hero);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: 0 0 1.4rem;
+      max-width: 20ch;
+    }
+    h1.title em {
+      font-style: italic;
+      color: var(--accent-ink);
+    }
+    .lede {
+      font-size: var(--step-1);
+      line-height: 1.6;
+      color: var(--ink-soft);
+      max-width: 54ch;
+      margin: 0;
+    }
+
+    /* main grid: rail + article on wide screens */
+    .grid-main {
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+    @media (min-width: 1000px) {
+      .grid-main {
+        display: grid;
+        grid-template-columns: var(--rail) 1fr;
+        gap: clamp(2rem, 5vw, 4.5rem);
+        align-items: start;
+      }
+    }
+
+    /* ---------- sticky table of contents rail ---------- */
+    .toc {
+      font-family: var(--sans);
+      padding: var(--s-7) 0;
+    }
+    @media (min-width: 1000px) {
+      .toc {
+        position: sticky;
+        top: 5.5rem;
+        padding: clamp(2.5rem, 5vw, 4rem) 0;
+        max-height: calc(100dvh - 6rem);
+        overflow-y: auto;
+      }
+    }
+    .toc-label {
+      font-family: var(--mono);
+      font-size: var(--step--2);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      margin: 0 0 1rem;
+    }
+    .toc ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      counter-reset: toc;
+    }
+    .toc li { margin: 0; }
+    .toc a {
+      display: flex;
+      gap: .7rem;
+      align-items: baseline;
+      text-decoration: none;
+      color: var(--ink-dim);
+      font-size: var(--step--1);
+      line-height: 1.4;
+      padding: .42rem 0;
+      border-left: 2px solid transparent;
+      padding-left: .85rem;
+      margin-left: -.85rem;
+      transition: color var(--dur-fast) var(--ease),
+                  border-color var(--dur-fast) var(--ease);
+    }
+    .toc a .num {
+      font-family: var(--mono);
+      font-size: var(--step--2);
+      color: var(--ink-faint);
+      flex: none;
+      width: 1.2rem;
+    }
+    .toc a:hover { color: var(--ink); }
+    .toc a[aria-current="true"] {
+      color: var(--ink);
+      border-left-color: var(--accent);
+      font-weight: 600;
+    }
+    .toc a[aria-current="true"] .num { color: var(--accent-ink); }
+
+    /* ---------- article ---------- */
+    article {
+      min-width: 0;
+      padding-bottom: var(--s-9);
+    }
+    section {
+      padding: clamp(2.6rem, 6vw, 4.2rem) 0;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 5.5rem;
+    }
+    section:first-of-type { border-top: none; }
+
+    h2 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: var(--step-3);
+      line-height: 1.08;
+      letter-spacing: -0.018em;
+      color: var(--ink);
+      margin: 0 0 1.2rem;
+      position: relative;
+      max-width: 22ch;
+    }
+    h2 .sec-no {
+      display: block;
+      font-family: var(--mono);
+      font-size: var(--step--2);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent-ink);
+      margin-bottom: .7rem;
+      font-weight: 500;
+    }
+    h3 {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: var(--step-1);
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin: 2.4rem 0 .8rem;
+    }
+    h4 {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: var(--step-0);
+      letter-spacing: -0.005em;
+      color: var(--ink);
+      margin: 0 0 .5rem;
+    }
+
+    p { margin: 0 0 1.1rem; max-width: var(--measure); }
+    article p { color: var(--ink-soft); }
+    em { font-style: italic; }
+    strong { color: var(--ink); font-weight: 600; }
+
+    article ul {
+      margin: 0 0 1.3rem;
+      padding: 0;
+      list-style: none;
+      max-width: var(--measure);
+    }
+    article ul li {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-bottom: .7rem;
+      color: var(--ink-soft);
+    }
+    article ul li::before {
+      content: "";
+      position: absolute;
+      left: .15rem; top: .72em;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .card ul { margin-bottom: 0; }
+    .card ul li { font-size: var(--step--1); margin-bottom: .5rem; line-height: 1.5; }
+
+    /* inline code + meta */
+    code {
+      font-family: var(--mono);
+      font-size: 0.86em;
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-radius: var(--r-1);
+      padding: 0.08em 0.38em;
+      color: var(--ink);
+    }
+    pre code { background: none; border: none; padding: 0; }
+
+    /* ---------- the .ref site citation chip ---------- */
+    .ref {
+      font-family: var(--sans);
+      font-size: 0.84em;
+      font-weight: 600;
+      color: var(--accent-ink);
+      white-space: nowrap;
+      border-bottom: 1px dashed var(--accent-line);
+      padding-bottom: 1px;
+      transition: color var(--dur-fast) var(--ease),
+                  border-color var(--dur-fast) var(--ease);
+      cursor: default;
+    }
+    .ref:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ---------- code blocks ---------- */
+    pre {
+      font-family: var(--mono);
+      font-size: var(--step--1);
+      line-height: 1.7;
+      color: var(--ink-soft);
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent-line);
+      border-radius: var(--r-2);
+      padding: 1.15rem 1.3rem;
+      overflow-x: auto;
+      margin: 1.6rem 0;
+      -webkit-overflow-scrolling: touch;
+    }
+    pre code { color: var(--ink-soft); }
+
+    /* ---------- figure ---------- */
+    .figure {
+      margin: 2rem 0;
+    }
+    .figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: var(--r-3);
+      border: 1px solid var(--line);
+      background: var(--card);
+    }
+    .figure figcaption,
+    .example figcaption {
+      font-family: var(--sans);
+      font-size: var(--step--1);
+      color: var(--ink-dim);
+      line-height: 1.55;
+      margin-top: .8rem;
+      max-width: var(--measure);
+    }
+    .figure figcaption strong,
+    .example figcaption strong { color: var(--ink); }
+
+    /* ---------- card grid ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin: 1.8rem 0;
+    }
+    @media (min-width: 620px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      padding: 1.5rem 1.5rem 1.6rem;
+      transition: border-color var(--dur) var(--ease),
+                  transform var(--dur) var(--ease),
+                  box-shadow var(--dur) var(--ease);
+    }
+    .card:hover {
+      border-color: var(--accent-line);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px -18px color-mix(in srgb, var(--accent) 60%, transparent);
+    }
+    .card p { font-size: var(--step--1); margin-bottom: 0; line-height: 1.6; }
+
+    /* ---------- callouts ---------- */
+    .callout {
+      margin: 1.8rem 0;
+      padding: 1.1rem 1.3rem 1.1rem 1.4rem;
+      border-radius: var(--r-2);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--ink-faint);
+      background: var(--paper-2);
+      position: relative;
+    }
+    .callout p { margin: 0; max-width: 62ch; color: var(--ink-soft); font-size: var(--step--1); line-height: 1.62; }
+    .callout p strong { color: var(--ink); }
+    .callout::before {
+      font-family: var(--mono);
+      font-size: var(--step--2);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: .5rem;
+      font-weight: 600;
+    }
+    .callout.tip   { background: var(--tip-wash);   border-left-color: var(--tip-ink);   border-color: var(--tip-line); }
+    .callout.warn  { background: var(--warn-wash);  border-left-color: var(--warn-ink);  border-color: var(--warn-line); }
+    .callout.steal { background: var(--steal-wash); border-left-color: var(--steal-ink); border-color: var(--steal-line); }
+    .callout.tip::before   { content: "Tip"; color: var(--tip-ink); }
+    .callout.warn::before  { content: "Watch out"; color: var(--warn-ink); }
+    .callout.steal::before { content: "Steal this"; color: var(--steal-ink); }
+
+    /* ---------- live demo wrappers ---------- */
+    .example {
+      margin: 1.8rem 0;
+      padding: 1.4rem;
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      background:
+        repeating-linear-gradient(45deg, var(--paper-2) 0 1px, transparent 1px 9px),
+        var(--card);
+    }
+    .example > p:first-child { margin-top: 0; }
+
+    /* table */
+    .table-wrap { overflow-x: auto; margin: 1.8rem 0; -webkit-overflow-scrolling: touch; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--sans);
+      font-size: var(--step--1);
+      min-width: 32rem;
+    }
+    th, td {
+      text-align: left;
+      padding: .8rem 1rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      color: var(--ink-soft);
+    }
+    thead th {
+      font-weight: 600;
+      color: var(--ink);
+      font-size: var(--step--2);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    tbody tr:hover td { background: var(--paper-2); }
+    td strong { color: var(--ink); }
+
+    kbd {
+      font-family: var(--mono);
+      font-size: 0.78em;
+      background: var(--card);
+      border: 1px solid var(--line-strong);
+      border-bottom-width: 2px;
+      border-radius: var(--r-1);
+      padding: 0.08em 0.42em;
+      color: var(--ink);
+    }
+
+    /* ===== page-local live demo styles ===== */
+    /* Skip-link demo */
+    .skip-demo { position: relative; min-height: 3.6rem; }
     .skip-demo .skip-link {
-      position: absolute; left: 0.5rem; top: 0.5rem;
-      transform: translateY(-200%); opacity: 0;
-      background: var(--accent); color: var(--accent-ink);
-      font-family: var(--font-mono); font-weight: 600; font-size: 0.8rem;
-      padding: 0.4rem 0.8rem; border-radius: var(--r-1);
-      transition: transform 0.18s var(--ease), opacity 0.18s var(--ease);
+      position: absolute; left: .5rem; top: .5rem;
+      transform: translateY(-220%); opacity: 0;
+      background: var(--accent); color: #fff;
+      font-family: var(--mono); font-weight: 600; font-size: 0.8rem;
+      padding: .45rem .85rem; border-radius: var(--r-1);
+      text-decoration: none;
+      transition: transform .2s var(--ease), opacity .2s var(--ease);
     }
     .skip-demo .skip-link:focus {
-      transform: translateY(0); opacity: 1; text-decoration: none;
+      transform: translateY(0); opacity: 1;
     }
-    .skip-demo p { margin-top: 0.4rem; color: var(--ink-dim); font-size: 0.85rem; }
+    .skip-demo p { margin: 0; color: var(--ink-dim); font-size: var(--step--1); font-family: var(--sans); }
 
     /* Mega-menu morph demo */
-    .morph { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .morph { display: flex; gap: .5rem; flex-wrap: wrap; }
     .morph button {
-      font: inherit; font-size: 0.85rem; color: var(--ink-soft);
-      background: var(--bg-3); border: 1px solid var(--line);
-      border-radius: var(--r-pill); padding: 0.4rem 0.9rem; cursor: pointer;
-      transition: border-color 0.18s var(--ease), color 0.18s var(--ease);
+      font-family: var(--sans);
+      font-size: var(--step--1); font-weight: 500;
+      color: var(--ink-soft);
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-radius: var(--r-pill);
+      padding: .42rem .95rem; cursor: pointer;
+      transition: border-color var(--dur-fast) var(--ease),
+                  color var(--dur-fast) var(--ease),
+                  background var(--dur-fast) var(--ease);
     }
-    .morph button:hover, .morph button[aria-expanded="true"] {
-      color: var(--ink); border-color: var(--accent);
+    .morph button:hover { color: var(--ink); border-color: var(--accent-line); }
+    .morph button[aria-expanded="true"] {
+      color: var(--accent-ink);
+      border-color: var(--accent);
+      background: var(--accent-wash);
     }
     .morph-panel {
-      margin-top: 0.8rem; overflow: hidden;
+      margin-top: .9rem; overflow: hidden;
       max-height: 0; opacity: 0;
-      transition: max-height 0.45s var(--ease), opacity 0.3s var(--ease), padding 0.45s var(--ease);
       border: 1px solid transparent; border-radius: var(--r-2);
+      transition: max-height var(--dur) var(--ease),
+                  opacity var(--dur-fast) var(--ease),
+                  padding var(--dur) var(--ease);
     }
     .morph-panel[data-open] {
-      max-height: 240px; opacity: 1; padding: 1rem;
-      border-color: var(--line); background: var(--bg-2);
+      max-height: 260px; opacity: 1; padding: 1rem 1.1rem;
+      border-color: var(--line); background: var(--card);
     }
-    .morph-panel .mp-row { display: grid; gap: 0.15rem; padding: 0.4rem 0; }
-    .morph-panel .mp-row strong { color: var(--ink); font-size: 0.9rem; }
-    .morph-panel .mp-row span { color: var(--ink-dim); font-size: 0.8rem; }
+    .morph-panel .mp-row { display: grid; gap: .12rem; padding: .42rem 0; }
+    .morph-panel .mp-row + .mp-row { border-top: 1px solid var(--line); }
+    .morph-panel .mp-row strong { color: var(--ink); font-size: var(--step--1); font-family: var(--sans); }
+    .morph-panel .mp-row span { color: var(--ink-dim); font-size: var(--step--2); font-family: var(--sans); }
 
     /* Empty-state demo */
     .empty-state {
-      text-align: center; padding: 1.6rem 1rem;
-      border: 1px dashed var(--line); border-radius: var(--r-3);
-      background: var(--bg-2);
+      text-align: center;
+      padding: 2rem 1.2rem;
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--r-3);
+      background: var(--paper);
     }
     .empty-state .es-glyph {
-      font-family: var(--font-mono); font-size: 1.8rem; color: var(--ink-faint);
+      font-family: var(--mono);
+      font-size: 2rem;
+      color: var(--accent);
+      line-height: 1;
     }
-    .empty-state h4 { margin-top: 0.6rem; color: var(--ink); }
-    .empty-state p { color: var(--ink-dim); font-size: 0.86rem; margin-top: 0.3rem; }
+    .empty-state h4 { margin-top: .8rem; }
+    .empty-state p { color: var(--ink-dim); font-size: var(--step--1); margin: .35rem auto 0; max-width: 36ch; font-family: var(--sans); }
     .empty-state .es-cta {
-      display: inline-block; margin-top: 0.9rem;
-      background: var(--accent); color: var(--accent-ink);
-      font-weight: 600; font-size: 0.85rem;
-      padding: 0.45rem 1rem; border-radius: var(--r-pill);
+      display: inline-flex; align-items: center; gap: .4rem;
+      margin-top: 1.1rem;
+      background: var(--accent); color: #fff;
+      font-family: var(--sans); font-weight: 600; font-size: var(--step--1);
+      padding: .5rem 1.1rem; border-radius: var(--r-pill);
+      text-decoration: none;
+      transition: background var(--dur-fast) var(--ease),
+                  transform var(--dur-fast) var(--ease);
     }
-    .es-cta:hover { background: var(--accent-soft); text-decoration: none; }
-    kbd {
-      font-family: var(--font-mono); font-size: 0.78em;
-      background: var(--bg-3); border: 1px solid var(--line);
-      border-bottom-width: 2px; border-radius: var(--r-1);
-      padding: 0.05em 0.4em; color: var(--ink);
+    .empty-state .es-cta:hover { background: var(--accent-ink); }
+    .empty-state .es-cta:active { transform: scale(0.97); }
+
+    /* ---------- footer ---------- */
+    .ftr {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--line);
+      background: var(--paper-2);
+      margin-top: var(--s-7);
+    }
+    .ftr .wide {
+      max-width: var(--maxw);
+      margin-inline: auto;
+      padding: clamp(2.5rem, 6vw, 4rem) clamp(1rem, 4vw, 2.4rem);
+    }
+    .ftr .brand {
+      font-family: var(--sans);
+      font-weight: 700;
+      color: var(--ink);
+      font-size: var(--step-1);
+    }
+    .ftr p { color: var(--ink-dim); max-width: 60ch; font-size: var(--step--1); }
+    .ftr p:first-child { margin-bottom: .6rem; }
+    .ftr a {
+      color: var(--accent-ink);
+      text-decoration: none;
+      font-family: var(--sans);
+      font-weight: 600;
+      border-bottom: 1px solid var(--accent-line);
+      transition: border-color var(--dur-fast) var(--ease);
+    }
+    .ftr a:hover { border-bottom-color: var(--accent); }
+
+    /* ---------- scroll-reveal ---------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity var(--dur-slow) var(--ease),
+                  transform var(--dur-slow) var(--ease);
+      will-change: opacity, transform;
+    }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        transition-duration: .001ms !important;
+      }
+    }
+
+    /* responsive trims */
+    @media (max-width: 560px) {
+      .site-nav { gap: .25rem .6rem; }
     }
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#main" style="position:absolute;left:-999px;top:0;background:var(--accent);color:#fff;padding:.5rem .9rem;border-radius:6px;z-index:100;font-family:var(--mono);font-size:.8rem;text-decoration:none;" onfocus="this.style.left='.6rem';this.style.top='.6rem';" onblur="this.style.left='-999px';">Skip to content</a>
+
   <header class="site-header">
     <nav class="site-nav" aria-label="Best practices">
       <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
@@ -105,86 +767,95 @@
     </nav>
   </header>
 
-  <main class="wrap" id="main">
-    <p class="kicker">Craft Atlas · 04</p>
-    <h1>User Experience: the architecture of "where am I, and where next?"</h1>
-    <p class="lede">UX is not decoration applied at the end. It is the structure underneath — how a site is divided, named, navigated, and recovered from when things break. Mined from 80 live teardowns, here is what elite sites actually do.</p>
+  <span id="hero-sentinel" aria-hidden="true"></span>
 
+  <div class="shell">
+    <header class="masthead">
+      <p class="kicker">Craft Atlas · 04 · User Experience</p>
+      <h1 class="title">The architecture of <em>where am I,</em> and where next?</h1>
+      <p class="lede">UX is not decoration applied at the end. It is the structure underneath — how a site is divided, named, navigated, and recovered from when things break. Mined from 80 live teardowns, here is what elite sites actually do.</p>
+    </header>
+  </div>
+
+  <div class="shell grid-main">
     <nav class="toc" aria-label="On this page">
+      <p class="toc-label">On this page</p>
       <ol>
-        <li><a href="#ia">1 · Information architecture</a></li>
-        <li><a href="#nav">2 · Navigation patterns</a></li>
-        <li><a href="#wayfinding">3 · Wayfinding &amp; orientation</a></li>
-        <li><a href="#first">4 · First impression &amp; onboarding</a></li>
-        <li><a href="#content">5 · Content design</a></li>
-        <li><a href="#perf">6 · Performance as UX</a></li>
-        <li><a href="#a11y">7 · Accessibility is the baseline</a></li>
-        <li><a href="#states">8 · Error &amp; empty states</a></li>
-        <li><a href="#checklist">9 · The steal-this checklist</a></li>
+        <li><a href="#ia"><span class="num">01</span> Information architecture</a></li>
+        <li><a href="#nav"><span class="num">02</span> Navigation patterns</a></li>
+        <li><a href="#wayfinding"><span class="num">03</span> Wayfinding &amp; orientation</a></li>
+        <li><a href="#first"><span class="num">04</span> First impression &amp; onboarding</a></li>
+        <li><a href="#content"><span class="num">05</span> Content design</a></li>
+        <li><a href="#perf"><span class="num">06</span> Performance as UX</a></li>
+        <li><a href="#a11y"><span class="num">07</span> Accessibility is the baseline</a></li>
+        <li><a href="#states"><span class="num">08</span> Error &amp; empty states</a></li>
+        <li><a href="#checklist"><span class="num">09</span> The steal-this checklist</a></li>
       </ol>
     </nav>
 
-    <!-- ============================================================= -->
-    <section id="ia">
-      <h2>1 · Information architecture</h2>
-      <p>Before a single pixel of style, every great site answers one question: <em>what are the chunks, and in what order do they reveal?</em> Across our teardowns, the winning IA is almost always a <strong>linear scroll narrative built from self-contained bands</strong> — not a sprawling sitemap you have to hold in your head.</p>
+    <main class="article-wrap" id="main">
+      <article>
+        <!-- ============================================================= -->
+        <section id="ia" class="reveal">
+          <h2><span class="sec-no">01 — Foundation</span>Information architecture</h2>
+          <p>Before a single pixel of style, every great site answers one question: <em>what are the chunks, and in what order do they reveal?</em> Across our teardowns, the winning IA is almost always a <strong>linear scroll narrative built from self-contained bands</strong> — not a sprawling sitemap you have to hold in your head.</p>
 
-      <p><span class="ref">Linear ↗</span> structures its entire homepage as a <strong>numbered chapter system</strong>: hero → logo wall → thesis → five numbered capability sections (1.0–5.0), each with sub-feature tabs (1.1 Agent, 1.2 Triage…) → changelog → quotes → CTA → mega-footer. The numbering <em>is</em> the IA — it tells you exactly how deep you are and how much is left. <span class="ref">Stripe ↗</span> runs a different but equally legible spine: a <strong>top-of-funnel ladder</strong> — hero claim → social-proof logo wall → 6-proposition accordion → stat band (135+ currencies, $1.9T volume, 99.999% uptime) → segmented Enterprise/Startups/Platforms tabs → developer section → news carousel → dual CTA → mega-footer.</p>
+          <p><span class="ref">Linear ↗</span> structures its entire homepage as a <strong>numbered chapter system</strong>: hero → logo wall → thesis → five numbered capability sections (1.0–5.0), each with sub-feature tabs (1.1 Agent, 1.2 Triage…) → changelog → quotes → CTA → mega-footer. The numbering <em>is</em> the IA — it tells you exactly how deep you are and how much is left. <span class="ref">Stripe ↗</span> runs a different but equally legible spine: a <strong>top-of-funnel ladder</strong> — hero claim → social-proof logo wall → 6-proposition accordion → stat band (135+ currencies, $1.9T volume, 99.999% uptime) → segmented Enterprise/Startups/Platforms tabs → developer section → news carousel → dual CTA → mega-footer.</p>
 
-      <figure class="figure">
-        <img src="../workings/shots/stripe/04-full.png" alt="Full-page capture of stripe.com showing the funnel ladder: hero, logo wall, accordion, stat band, segmented tabs, and a dense mega-footer.">
-        <figcaption><strong>Stripe</strong> — the full-page IA reads as a deliberate funnel. Each band is one idea, ordered claim → proof → depth → conversion. Density rises only at the mega-footer (the sitemap), never in the body.</figcaption>
-      </figure>
+          <figure class="figure">
+            <img src="../workings/shots/stripe/04-full.png" alt="Full-page capture of stripe.com showing the funnel ladder: hero, logo wall, accordion, stat band, segmented tabs, and a dense mega-footer." loading="lazy" decoding="async">
+            <figcaption><strong>Stripe</strong> — the full-page IA reads as a deliberate funnel. Each band is one idea, ordered claim → proof → depth → conversion. Density rises only at the mega-footer (the sitemap), never in the body.</figcaption>
+          </figure>
 
-      <p>Three IA principles recur across the reference set:</p>
-      <div class="grid">
-        <div class="card">
-          <h4>One idea per band</h4>
-          <p><span class="ref">Apple ↗</span> uses full-bleed stacked bands with deliberately low density — "one idea per screen." The page is long but never crowded; whitespace separates concepts so nothing competes.</p>
-        </div>
-        <div class="card">
-          <h4>Semantic heading map</h4>
-          <p><span class="ref">Apple ↗</span> reserves h1 for the brand anchor, h2 for marquee products, h3 for secondary tiles — a clean scannable outline a screen reader can traverse top-to-bottom.</p>
-        </div>
-        <div class="card">
-          <h4>Dense only where expected</h4>
-          <p><span class="ref">Linear ↗</span> keeps marketing copy sparse but makes the embedded app mockups intentionally dense — density signals product depth, and the user opts into it.</p>
-        </div>
-      </div>
+          <p>Three IA principles recur across the reference set:</p>
+          <div class="grid">
+            <div class="card">
+              <h4>One idea per band</h4>
+              <p><span class="ref">Apple ↗</span> uses full-bleed stacked bands with deliberately low density — "one idea per screen." The page is long but never crowded; whitespace separates concepts so nothing competes.</p>
+            </div>
+            <div class="card">
+              <h4>Semantic heading map</h4>
+              <p><span class="ref">Apple ↗</span> reserves h1 for the brand anchor, h2 for marquee products, h3 for secondary tiles — a clean scannable outline a screen reader can traverse top-to-bottom.</p>
+            </div>
+            <div class="card">
+              <h4>Dense only where expected</h4>
+              <p><span class="ref">Linear ↗</span> keeps marketing copy sparse but makes the embedded app mockups intentionally dense — density signals product depth, and the user opts into it.</p>
+            </div>
+          </div>
 
-      <div class="callout steal">
-        <p><strong>The mega-footer is your sitemap, not your nav.</strong> Nearly every reference site — <span class="ref">Linear ↗</span>, <span class="ref">Stripe ↗</span>, <span class="ref">Apple ↗</span>, <span class="ref">Arc ↗</span> — keeps the top nav lean and dumps full breadth into a dense multi-column footer. The header is for the 3–5 things most people want; the footer catches everything else without cluttering the chrome.</p>
-      </div>
-    </section>
+          <div class="callout steal">
+            <p><strong>The mega-footer is your sitemap, not your nav.</strong> Nearly every reference site — <span class="ref">Linear ↗</span>, <span class="ref">Stripe ↗</span>, <span class="ref">Apple ↗</span>, <span class="ref">Arc ↗</span> — keeps the top nav lean and dumps full breadth into a dense multi-column footer. The header is for the 3–5 things most people want; the footer catches everything else without cluttering the chrome.</p>
+          </div>
+        </section>
 
-    <!-- ============================================================= -->
-    <section id="nav">
-      <h2>2 · Navigation patterns</h2>
-      <p>A navigation bar is a promise about scope. The teardowns cluster into three honest archetypes — and the best sites pick one deliberately rather than defaulting to a hamburger.</p>
+        <!-- ============================================================= -->
+        <section id="nav" class="reveal">
+          <h2><span class="sec-no">02 — Movement</span>Navigation patterns</h2>
+          <p>A navigation bar is a promise about scope. The teardowns cluster into three honest archetypes — and the best sites pick one deliberately rather than defaulting to a hamburger.</p>
 
-      <h3>Pattern A — Lean text nav (brochure confidence)</h3>
-      <p><span class="ref">Things ↗</span> ships the most confident nav we found: wordmark + three text links (Features, Support, Blog). No hamburger, no mega-menu, no sticky-on-scroll transformation. Critically, the download CTAs are <strong>deliberately not in the nav</strong> — they live in a dedicated mid-page "Get Things" section, keeping the chrome uncluttered. The nav assumes you came to learn, get help, or read, and pushes the purchase decision into the body. <span class="ref">Sara Soueidan ↗</span> does the same with honest underlined text links in a real <code>&lt;nav aria-label="Main"&gt;</code> — no hamburger on desktop, no mega-menu.</p>
+          <h3>Pattern A — Lean text nav (brochure confidence)</h3>
+          <p><span class="ref">Things ↗</span> ships the most confident nav we found: wordmark + three text links (Features, Support, Blog). No hamburger, no mega-menu, no sticky-on-scroll transformation. Critically, the download CTAs are <strong>deliberately not in the nav</strong> — they live in a dedicated mid-page "Get Things" section, keeping the chrome uncluttered. The nav assumes you came to learn, get help, or read, and pushes the purchase decision into the body. <span class="ref">Sara Soueidan ↗</span> does the same with honest underlined text links in a real <code>&lt;nav aria-label="Main"&gt;</code> — no hamburger on desktop, no mega-menu.</p>
 
-      <h3>Pattern B — Mega-menu (when breadth is real)</h3>
-      <p>When you genuinely have dozens of destinations, use categorized panels — but make them <em>real ARIA buttons</em>, not hover traps. <span class="ref">Stripe ↗</span>, <span class="ref">Vercel ↗</span>, <span class="ref">Apple ↗</span>, <span class="ref">Linear ↗</span> and <span class="ref">Family ↗</span> all expose Products/Resources/Solutions as <code>aria-expanded</code> buttons. The Stripe nav is the famous one: <strong>a single morphing dropdown panel that tweens its width/height/position between menu items</strong> rather than swapping four discrete dropdowns — moving Products→Solutions feels like one fluid surface.</p>
+          <h3>Pattern B — Mega-menu (when breadth is real)</h3>
+          <p>When you genuinely have dozens of destinations, use categorized panels — but make them <em>real ARIA buttons</em>, not hover traps. <span class="ref">Stripe ↗</span>, <span class="ref">Vercel ↗</span>, <span class="ref">Apple ↗</span>, <span class="ref">Linear ↗</span> and <span class="ref">Family ↗</span> all expose Products/Resources/Solutions as <code>aria-expanded</code> buttons. The Stripe nav is the famous one: <strong>a single morphing dropdown panel that tweens its width/height/position between menu items</strong> rather than swapping four discrete dropdowns — moving Products→Solutions feels like one fluid surface.</p>
 
-      <div class="example">
-        <p style="color:var(--ink-soft);font-size:0.9rem;margin-bottom:0.6rem;">Click a trigger — the panel <em>morphs open</em> in place instead of popping a separate menu (the Stripe move). The triggers are real <code>aria-expanded</code> buttons you can Tab to.</p>
-        <div class="morph">
-          <button type="button" aria-expanded="false" data-target="prod">Products</button>
-          <button type="button" aria-expanded="false" data-target="res">Resources</button>
-          <button type="button" aria-expanded="false" data-target="sol">Solutions</button>
-        </div>
-        <div class="morph-panel" id="morph-panel" role="region" aria-label="Menu detail"></div>
-        <figcaption>Mega-menu-lite: each row carries a <strong>title + one-line description</strong> (the Family pattern) so the menu teaches, not just links.</figcaption>
-      </div>
+          <div class="example">
+            <p style="color:var(--ink-dim);font-size:var(--step--1);font-family:var(--sans);margin-bottom:.7rem;">Click a trigger — the panel <em>morphs open</em> in place instead of popping a separate menu (the Stripe move). The triggers are real <code>aria-expanded</code> buttons you can Tab to.</p>
+            <div class="morph">
+              <button type="button" aria-expanded="false" data-target="prod">Products</button>
+              <button type="button" aria-expanded="false" data-target="res">Resources</button>
+              <button type="button" aria-expanded="false" data-target="sol">Solutions</button>
+            </div>
+            <div class="morph-panel" id="morph-panel" role="region" aria-label="Menu detail"></div>
+            <figcaption>Mega-menu-lite: each row carries a <strong>title + one-line description</strong> (the Family pattern) so the menu teaches, not just links.</figcaption>
+          </div>
 
-      <p><span class="ref">Family ↗</span> sharpens this: dropdowns are content-rich (ConnectKit, Family Account, Blog, Changelog, FAQs) with a title <em>and</em> a one-line description per item — "mega-menu-lite." The menu becomes a tiny landing page.</p>
+          <p><span class="ref">Family ↗</span> sharpens this: dropdowns are content-rich (ConnectKit, Family Account, Blog, Changelog, FAQs) with a title <em>and</em> a one-line description per item — "mega-menu-lite." The menu becomes a tiny landing page.</p>
 
-      <h3>Pattern C — Sticky cross-sell / contextual ribbon</h3>
-      <p><span class="ref">Arc ↗</span> pins a "Meet Dia" promo strip directly under the nav that rides along on scroll — keeping a cross-sell CTA permanently visible <strong>without a modal</strong>. <span class="ref">Vercel ↗</span> does the restrained version: an event ribbon styled as a contextual chip ("Ship 26 is coming…"), not an intrusive bar. The lesson: persistent promotion is fine if it's a thin companion to the nav — not an interstitial that blocks the page.</p>
+          <h3>Pattern C — Sticky cross-sell / contextual ribbon</h3>
+          <p><span class="ref">Arc ↗</span> pins a "Meet Dia" promo strip directly under the nav that rides along on scroll — keeping a cross-sell CTA permanently visible <strong>without a modal</strong>. <span class="ref">Vercel ↗</span> does the restrained version: an event ribbon styled as a contextual chip ("Ship 26 is coming…"), not an intrusive bar. The lesson: persistent promotion is fine if it's a thin companion to the nav — not an interstitial that blocks the page.</p>
 
-      <pre><code>/* The transparent-over-hero sticky nav (Linear, Vercel pattern).
+          <pre><code>/* The transparent-over-hero sticky nav (Linear, Vercel pattern).
    Backdrop-blur appears only once you scroll past the hero. */
 .site-header {
   position: sticky;
@@ -198,7 +869,7 @@
   border-bottom: 1px solid var(--line);
 }</code></pre>
 
-      <pre><code>// Toggle the scrolled state with a sentinel + IntersectionObserver
+          <pre><code>// Toggle the scrolled state with a sentinel + IntersectionObserver
 // (cheaper and jank-free vs. a scroll listener).
 const header = document.querySelector('.site-header');
 const sentinel = document.querySelector('#hero-sentinel');
@@ -207,31 +878,31 @@ new IntersectionObserver(([entry]) => {
   header.toggleAttribute('data-scrolled', !entry.isIntersecting);
 }, { rootMargin: '-1px 0px 0px 0px', threshold: 0 }).observe(sentinel);</code></pre>
 
-      <div class="callout warn">
-        <p><strong>Anti-pattern: the hover-only mega-menu.</strong> A dropdown that opens on hover with no keyboard or click path strands touch and keyboard users entirely. Every reference site uses <code>aria-expanded</code> buttons you can <kbd>Tab</kbd> to and <kbd>Enter</kbd> on. If it only works with a mouse, it's broken for a large slice of your visitors.</p>
-      </div>
-    </section>
+          <div class="callout warn">
+            <p><strong>Anti-pattern: the hover-only mega-menu.</strong> A dropdown that opens on hover with no keyboard or click path strands touch and keyboard users entirely. Every reference site uses <code>aria-expanded</code> buttons you can <kbd>Tab</kbd> to and <kbd>Enter</kbd> on. If it only works with a mouse, it's broken for a large slice of your visitors.</p>
+          </div>
+        </section>
 
-    <!-- ============================================================= -->
-    <section id="wayfinding">
-      <h2>3 · Wayfinding &amp; orientation</h2>
-      <p>Wayfinding answers "where am I?" mid-scroll. The strongest sites bake orientation into the content rather than relying on a breadcrumb trail.</p>
+        <!-- ============================================================= -->
+        <section id="wayfinding" class="reveal">
+          <h2><span class="sec-no">03 — Orientation</span>Wayfinding &amp; orientation</h2>
+          <p>Wayfinding answers "where am I?" mid-scroll. The strongest sites bake orientation into the content rather than relying on a breadcrumb trail.</p>
 
-      <ul>
-        <li><strong>Numbered chapters</strong> — <span class="ref">Linear ↗</span> uses 1.0–5.0 capability sections so position is always explicit; wayfinding "comes from the numbered chapter system rather than nav anchors."</li>
-        <li><strong>Eyebrow labels</strong> — <span class="ref">Josh Comeau ↗</span> introduces every section with a small uppercase eyebrow (ARTICLES AND TUTORIALS, BROWSE BY CATEGORY, POPULAR CONTENT). <span class="ref">Family ↗</span> puts a green "Simple" pill above headlines to categorize. The eyebrow is a cheap, scannable "you are here" marker.</li>
-        <li><strong>A fixed identity rail</strong> — <span class="ref">Brittany Chiang ↗</span>'s signature split-screen pins name, role, and in-page nav in a sticky left column while content scrolls past on the right. The identity never leaves the viewport, so you always know whose site you're on and what the sections are.</li>
-        <li><strong>An anchored focal point</strong> — <span class="ref">Active Theory ↗</span> has almost no DOM content; wayfinding "relies on motion and the persistent center orb as an anchor rather than breadcrumbs."</li>
-      </ul>
+          <ul>
+            <li><strong>Numbered chapters</strong> — <span class="ref">Linear ↗</span> uses 1.0–5.0 capability sections so position is always explicit; wayfinding "comes from the numbered chapter system rather than nav anchors."</li>
+            <li><strong>Eyebrow labels</strong> — <span class="ref">Josh Comeau ↗</span> introduces every section with a small uppercase eyebrow (ARTICLES AND TUTORIALS, BROWSE BY CATEGORY, POPULAR CONTENT). <span class="ref">Family ↗</span> puts a green "Simple" pill above headlines to categorize. The eyebrow is a cheap, scannable "you are here" marker.</li>
+            <li><strong>A fixed identity rail</strong> — <span class="ref">Brittany Chiang ↗</span>'s signature split-screen pins name, role, and in-page nav in a sticky left column while content scrolls past on the right. The identity never leaves the viewport, so you always know whose site you're on and what the sections are.</li>
+            <li><strong>An anchored focal point</strong> — <span class="ref">Active Theory ↗</span> has almost no DOM content; wayfinding "relies on motion and the persistent center orb as an anchor rather than breadcrumbs."</li>
+          </ul>
 
-      <figure class="figure">
-        <img src="../workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang portfolio: a fixed left column pins name, role, tagline and an in-page nav with the active section highlighted; the right column holds scrolling content.">
-        <figcaption><strong>Brittany Chiang</strong> — the sticky left rail is persistent wayfinding. Its in-page nav highlights the active section (an <code>aria-current</code> / scroll-spy pattern) so the reader's position is always legible.</figcaption>
-      </figure>
+          <figure class="figure">
+            <img src="../workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang portfolio: a fixed left column pins name, role, tagline and an in-page nav with the active section highlighted; the right column holds scrolling content." loading="lazy" decoding="async">
+            <figcaption><strong>Brittany Chiang</strong> — the sticky left rail is persistent wayfinding. Its in-page nav highlights the active section (an <code>aria-current</code> / scroll-spy pattern) so the reader's position is always legible. The page you are reading uses the same device for its table of contents.</figcaption>
+          </figure>
 
-      <p>That active-section highlight is a scroll-spy. The robust, broadly-supported version is a tiny <code>IntersectionObserver</code>:</p>
+          <p>That active-section highlight is a scroll-spy. The robust, broadly-supported version is a tiny <code>IntersectionObserver</code>:</p>
 
-      <pre><code>// Scroll-spy: mark the in-view section's nav link as current.
+          <pre><code>// Scroll-spy: mark the in-view section's nav link as current.
 const links = new Map(
   [...document.querySelectorAll('.rail-nav a')]
     .map(a => [a.getAttribute('href').slice(1), a])
@@ -247,27 +918,27 @@ const spy = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('main section[id]').forEach(s => spy.observe(s));</code></pre>
 
-      <div class="callout tip">
-        <p>Pair scroll-spy with <code>scroll-margin-top</code> on your headings (shared.css already sets <code>5.5rem</code>) so anchor jumps land <em>below</em> the sticky nav, not hidden behind it. This one property is the difference between a polished and a broken anchor-link experience.</p>
-      </div>
-    </section>
+          <div class="callout tip">
+            <p>Pair scroll-spy with <code>scroll-margin-top</code> on your headings (this page sets <code>5.5rem</code>) so anchor jumps land <em>below</em> the sticky nav, not hidden behind it. This one property is the difference between a polished and a broken anchor-link experience.</p>
+          </div>
+        </section>
 
-    <!-- ============================================================= -->
-    <section id="first">
-      <h2>4 · First impression &amp; onboarding</h2>
-      <p>You get one frame to establish what kind of place this is. The teardowns show two opposite — both valid — strategies.</p>
+        <!-- ============================================================= -->
+        <section id="first" class="reveal">
+          <h2><span class="sec-no">04 — Arrival</span>First impression &amp; onboarding</h2>
+          <p>You get one frame to establish what kind of place this is. The teardowns show two opposite — both valid — strategies.</p>
 
-      <h3>Strategy 1 — Instant content (credibility through speed)</h3>
-      <p><span class="ref">Sara Soueidan ↗</span> loads instantly with a 100% system-font stack — zero web-font requests, zero FOUT, "perfect rendering everywhere." For a content site, the fastest possible first paint <em>is</em> the first impression: it says "I respect your time." <span class="ref">Things ↗</span> and <span class="ref">Apple ↗</span> similarly front-load the single most important idea above the fold and let you scroll into depth.</p>
+          <h3>Strategy 1 — Instant content (credibility through speed)</h3>
+          <p><span class="ref">Sara Soueidan ↗</span> loads instantly with a 100% system-font stack — zero web-font requests, zero FOUT, "perfect rendering everywhere." For a content site, the fastest possible first paint <em>is</em> the first impression: it says "I respect your time." <span class="ref">Things ↗</span> and <span class="ref">Apple ↗</span> similarly front-load the single most important idea above the fold and let you scroll into depth.</p>
 
-      <h3>Strategy 2 — The crafted preloader (personality moment)</h3>
-      <p>For experiential sites, a loader buys asset-load time <em>and</em> sets tone. <span class="ref">Dennis Snellenberg ↗</span> cycles a multilingual greeting sequence ("Hello / Bonjour / स्वागत हे / Ciao / Olá…") — nine <code>h2</code>s that double as a loading counter and a personality moment. <span class="ref">Active Theory ↗</span> makes the brand orb itself the loading/idle centerpiece, so the very first frame is already the experience.</p>
+          <h3>Strategy 2 — The crafted preloader (personality moment)</h3>
+          <p>For experiential sites, a loader buys asset-load time <em>and</em> sets tone. <span class="ref">Dennis Snellenberg ↗</span> cycles a multilingual greeting sequence ("Hello / Bonjour / स्वागत हे / Ciao / Olá…") — nine <code>h2</code>s that double as a loading counter and a personality moment. <span class="ref">Active Theory ↗</span> makes the brand orb itself the loading/idle centerpiece, so the very first frame is already the experience.</p>
 
-      <div class="callout warn">
-        <p><strong>Pitfall: the loader that's slower than the content.</strong> A preloader is only justified if real work is happening behind it (WebGL scene compile, heavy media). On a content site, an artificial 2-second intro is a tax you charge every returning visitor. Gate it behind <code>prefers-reduced-motion</code> and skip it on repeat loads.</p>
-      </div>
+          <div class="callout warn">
+            <p><strong>Pitfall: the loader that's slower than the content.</strong> A preloader is only justified if real work is happening behind it (WebGL scene compile, heavy media). On a content site, an artificial 2-second intro is a tax you charge every returning visitor. Gate it behind <code>prefers-reduced-motion</code> and skip it on repeat loads.</p>
+          </div>
 
-      <pre><code>// Honest preloader: show it only while assets actually load,
+          <pre><code>// Honest preloader: show it only while assets actually load,
 // respect motion prefs, and never block repeat visits.
 const seen = sessionStorage.getItem('intro-seen');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -282,16 +953,16 @@ if (seen || reduced) {
   sessionStorage.setItem('intro-seen', '1');
   document.documentElement.dataset.intro = 'done';
 }</code></pre>
-    </section>
+        </section>
 
-    <!-- ============================================================= -->
-    <section id="content">
-      <h2>5 · Content design</h2>
-      <p>Content design is UX — the words <em>are</em> the interface. The teardowns reward two moves repeatedly.</p>
+        <!-- ============================================================= -->
+        <section id="content" class="reveal">
+          <h2><span class="sec-no">05 — Voice</span>Content design</h2>
+          <p>Content design is UX — the words <em>are</em> the interface. The teardowns reward two moves repeatedly.</p>
 
-      <p><strong>Two-tone emphasis instead of a second font.</strong> <span class="ref">Linear ↗</span> renders the first clause of a heading in bright white and the continuation in muted gray within the <em>same</em> <code>h2</code> ("A new species of product tool." bright, the rest dimmed) — emphasis without a second typeface or hue. It directs the eye to the claim and demotes the supporting clause in one element.</p>
+          <p><strong>Two-tone emphasis instead of a second font.</strong> <span class="ref">Linear ↗</span> renders the first clause of a heading in bright white and the continuation in muted gray within the <em>same</em> <code>h2</code> ("A new species of product tool." bright, the rest dimmed) — emphasis without a second typeface or hue. It directs the eye to the claim and demotes the supporting clause in one element.</p>
 
-      <pre><code>&lt;!-- One heading, two emphasis levels — no extra font, no color hue --&gt;
+          <pre><code>&lt;!-- One heading, two emphasis levels — no extra font, no color hue --&gt;
 &lt;h2 class="lede-heading"&gt;
   &lt;span class="hot"&gt;A new species of product tool.&lt;/span&gt;
   Built for how software is designed and shipped today.
@@ -302,26 +973,26 @@ if (seen || reduced) {
   .lede-heading .hot { color: var(--ink); }  /* claim stays bright     */
 &lt;/style&gt;</code></pre>
 
-      <p><strong>Descriptions that teach inside navigation.</strong> <span class="ref">Family ↗</span> and <span class="ref">Stripe ↗</span> never ship a bare link list — each destination gets a one-line description so the menu itself answers "is this the thing I want?" before the click. This is content design doing wayfinding's job.</p>
+          <p><strong>Descriptions that teach inside navigation.</strong> <span class="ref">Family ↗</span> and <span class="ref">Stripe ↗</span> never ship a bare link list — each destination gets a one-line description so the menu itself answers "is this the thing I want?" before the click. This is content design doing wayfinding's job.</p>
 
-      <div class="callout steal">
-        <p><strong>Write labels for strangers, not insiders.</strong> <span class="ref">Things ↗</span> labels its nav "Features / Support / Blog" — verbs of intent, not internal product names. The test: a first-time visitor should predict what's behind every nav item without clicking. If a label needs a tooltip to be understood, it's the wrong label.</p>
-      </div>
-    </section>
+          <div class="callout steal">
+            <p><strong>Write labels for strangers, not insiders.</strong> <span class="ref">Things ↗</span> labels its nav "Features / Support / Blog" — verbs of intent, not internal product names. The test: a first-time visitor should predict what's behind every nav item without clicking. If a label needs a tooltip to be understood, it's the wrong label.</p>
+          </div>
+        </section>
 
-    <!-- ============================================================= -->
-    <section id="perf">
-      <h2>6 · Performance as UX</h2>
-      <p>Speed is not a separate engineering concern — it is felt as quality. Slow is a UX bug. The teardowns treat performance as a design constraint.</p>
+        <!-- ============================================================= -->
+        <section id="perf" class="reveal">
+          <h2><span class="sec-no">06 — Speed</span>Performance as UX</h2>
+          <p>Speed is not a separate engineering concern — it is felt as quality. Slow is a UX bug. The teardowns treat performance as a design constraint.</p>
 
-      <ul>
-        <li><strong>Self-hosted variable fonts.</strong> <span class="ref">Vercel ↗</span> ships one variable family (Geist Sans + Geist Mono) as self-hosted woff2 — one typeface covers display <em>and</em> mono via weight + tracking, cutting requests. <span class="ref">Linear ↗</span> does the same with Inter Variable.</li>
-        <li><strong>The zero-font extreme.</strong> <span class="ref">Sara Soueidan ↗</span> loads <em>no</em> web fonts at all — a deliberate "performance + resilience decision (zero font requests, zero FOUT, perfect rendering everywhere)."</li>
-        <li><strong>Lazy-load below-the-fold media.</strong> <span class="ref">Dennis Snellenberg ↗</span> ships vanilla-lazyload so off-screen imagery never competes with the first paint.</li>
-        <li><strong>GPU-only motion.</strong> Per <span class="ref">Vercel ↗</span>'s own published guidelines: motion priority is CSS &gt; Web Animations API &gt; JS libs; animate only <code>transform</code>/<code>opacity</code>, never layout-triggering properties, no gratuitous autoplay.</li>
-      </ul>
+          <ul>
+            <li><strong>Self-hosted variable fonts.</strong> <span class="ref">Vercel ↗</span> ships one variable family (Geist Sans + Geist Mono) as self-hosted woff2 — one typeface covers display <em>and</em> mono via weight + tracking, cutting requests. <span class="ref">Linear ↗</span> does the same with Inter Variable.</li>
+            <li><strong>The zero-font extreme.</strong> <span class="ref">Sara Soueidan ↗</span> loads <em>no</em> web fonts at all — a deliberate "performance + resilience decision (zero font requests, zero FOUT, perfect rendering everywhere)."</li>
+            <li><strong>Lazy-load below-the-fold media.</strong> <span class="ref">Dennis Snellenberg ↗</span> ships vanilla-lazyload so off-screen imagery never competes with the first paint.</li>
+            <li><strong>GPU-only motion.</strong> Per <span class="ref">Vercel ↗</span>'s own published guidelines: motion priority is CSS &gt; Web Animations API &gt; JS libs; animate only <code>transform</code>/<code>opacity</code>, never layout-triggering properties, no gratuitous autoplay.</li>
+          </ul>
 
-      <pre><code>&lt;!-- Below-the-fold images: native lazy + explicit dimensions kill CLS --&gt;
+          <pre><code>&lt;!-- Below-the-fold images: native lazy + explicit dimensions kill CLS --&gt;
 &lt;img src="case-study.webp" alt="…"
      loading="lazy" decoding="async"
      width="1200" height="675" /&gt;
@@ -329,24 +1000,24 @@ if (seen || reduced) {
 &lt;!-- The ONE hero image gets the opposite treatment: load it eagerly --&gt;
 &lt;img src="hero.webp" alt="…" fetchpriority="high" /&gt;</code></pre>
 
-      <div class="callout tip">
-        <p>Always set <code>width</code>/<code>height</code> (or <code>aspect-ratio</code>) on media. The reserved box prevents Cumulative Layout Shift — content jumping as images arrive is the most common, most jarring perceived-performance failure, and it's free to fix.</p>
-      </div>
-    </section>
+          <div class="callout tip">
+            <p>Always set <code>width</code>/<code>height</code> (or <code>aspect-ratio</code>) on media. The reserved box prevents Cumulative Layout Shift — content jumping as images arrive is the most common, most jarring perceived-performance failure, and it's free to fix.</p>
+          </div>
+        </section>
 
-    <!-- ============================================================= -->
-    <section id="a11y">
-      <h2>7 · Accessibility is the baseline</h2>
-      <p>The reference-class sites treat a11y as structure, not a plugin. The clearest tell is the <strong>skip link as the literal first DOM node</strong>.</p>
+        <!-- ============================================================= -->
+        <section id="a11y" class="reveal">
+          <h2><span class="sec-no">07 — Baseline</span>Accessibility is the baseline</h2>
+          <p>The reference-class sites treat a11y as structure, not a plugin. The clearest tell is the <strong>skip link as the literal first DOM node</strong>.</p>
 
-      <p><span class="ref">Linear ↗</span> includes an accessible "Skip to content" link as the first focusable element ("good a11y discipline"). <span class="ref">Sara Soueidan ↗</span> goes furthest: a skip link is "the very first element in the DOM," followed by real ARIA-labelled landmarks — "accessibility baked into structure, not bolted on." <span class="ref">Vercel ↗</span> ships a skip-to-content link too.</p>
+          <p><span class="ref">Linear ↗</span> includes an accessible "Skip to content" link as the first focusable element ("good a11y discipline"). <span class="ref">Sara Soueidan ↗</span> goes furthest: a skip link is "the very first element in the DOM," followed by real ARIA-labelled landmarks — "accessibility baked into structure, not bolted on." <span class="ref">Vercel ↗</span> ships a skip-to-content link too.</p>
 
-      <div class="example skip-demo">
-        <a href="#main" class="skip-link">Skip to content</a>
-        <p>Click into this box, then press <kbd>Tab</kbd> — the skip link slides in from off-screen. It's invisible until focused, then it's the first stop for keyboard users.</p>
-      </div>
+          <div class="example skip-demo">
+            <a href="#main" class="skip-link">Skip to content</a>
+            <p>Click into this box, then press <kbd>Tab</kbd> — the skip link slides in from off-screen. It's invisible until focused, then it's the first stop for keyboard users.</p>
+          </div>
 
-      <pre><code>&lt;body&gt;
+          <pre><code>&lt;body&gt;
   &lt;a class="skip-link" href="#main"&gt;Skip to content&lt;/a&gt;
   &lt;header&gt;…nav…&lt;/header&gt;
   &lt;main id="main"&gt;…&lt;/main&gt;
@@ -361,99 +1032,103 @@ if (seen || reduced) {
   .skip-link:focus { transform: translateY(0); }  /* reveal on focus */
 &lt;/style&gt;</code></pre>
 
-      <p>Beyond the skip link, the patterns that recur:</p>
-      <ul>
-        <li><strong>Never use color as the only signifier.</strong> <span class="ref">Sara Soueidan ↗</span> keeps links black, differentiated by underline not hue — "so color is never the sole signifier."</li>
-        <li><strong>Real landmarks.</strong> Every nav is a labelled <code>&lt;nav aria-label="…"&gt;</code>; sections are <code>region</code>s with ARIA headings (<span class="ref">Brittany Chiang ↗</span>).</li>
-        <li><strong>Visible focus + keyboard paths.</strong> <code>focus-visible</code> outlines and keyboard-operable skip / back-to-top anchors (<span class="ref">Sara Soueidan ↗</span>) — "microinteractions serve accessibility, not spectacle."</li>
-        <li><strong>Respect <code>prefers-reduced-motion</code>.</strong> shared.css disables animation under the query; honor it for every loader and scroll effect.</li>
-      </ul>
-
-      <div class="callout warn">
-        <p><strong>Pitfall: ARIA theater.</strong> Sprinkling <code>role</code> and <code>aria-*</code> onto <code>&lt;div&gt;</code>s does not make a site accessible — and often makes it worse. The reference sites use <em>real</em> semantic elements (<code>nav</code>, <code>main</code>, <code>button</code>, headings) first, and add ARIA only to fill genuine gaps. A native <code>&lt;button&gt;</code> beats <code>&lt;div role="button"&gt;</code> every time.</p>
-      </div>
-    </section>
-
-    <!-- ============================================================= -->
-    <section id="states">
-      <h2>8 · Error &amp; empty states</h2>
-      <p>The forgotten screens — empty lists, failed loads, 404s, first-run states — are where polish is proven. The teardowns show the discipline of <strong>states that carry their own way out</strong>.</p>
-
-      <p><span class="ref">Stripe ↗</span>'s prev/next carousel controls ship "proper disabled states on the first slide" — the control communicates its own boundary instead of failing silently. The same principle scales to every dead-end: an empty or error state should explain <em>what</em>, <em>why</em>, and <em>the next action</em>.</p>
-
-      <div class="example">
-        <div class="empty-state">
-          <div class="es-glyph" aria-hidden="true">⌁</div>
-          <h4>No projects yet</h4>
-          <p>Your work will show up here. Start by importing a repository or creating one from a template.</p>
-          <a class="es-cta" href="#states">Create your first project</a>
-        </div>
-        <figcaption>A complete empty state: an icon, a plain-language line that reframes "nothing here" as "here's what goes here," and a single primary action — never a dead end.</figcaption>
-      </div>
-
-      <p>The anatomy the strong examples share:</p>
-      <table>
-        <thead>
-          <tr><th>State</th><th>Must answer</th><th>Reference move</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Empty</td><td>"What goes here + how do I fill it?"</td><td>One icon + reframed line + single primary CTA</td></tr>
-          <tr><td>Disabled</td><td>"Why can't I act?"</td><td><span class="ref">Stripe ↗</span> disabled carousel arrow at the boundary</td></tr>
-          <tr><td>Error / 404</td><td>"What broke + a way back"</td><td>Keep the nav + a clear "back to home" anchor (the <span class="ref">Sara Soueidan ↗</span> back-to-top discipline applied to dead ends)</td></tr>
-          <tr><td>Loading</td><td>"Is it working?"</td><td><span class="ref">Dennis Snellenberg ↗</span> greeting counter doubles as honest progress</td></tr>
-        </tbody>
-      </table>
-
-      <div class="callout steal">
-        <p><strong>Every dead end keeps the chrome.</strong> A 404 or error page that strips the nav traps the user. Keep the header and footer sitemap on error screens — the <span class="ref">Arc ↗</span> / <span class="ref">Linear ↗</span> mega-footer is a built-in escape hatch from <em>any</em> broken state. The cheapest error recovery is the navigation you already built.</p>
-      </div>
-    </section>
-
-    <!-- ============================================================= -->
-    <section id="checklist">
-      <h2>9 · The steal-this checklist</h2>
-      <p>A scannable pass to run against any page before you ship it.</p>
-
-      <div class="grid">
-        <div class="card">
-          <h4>Architecture</h4>
+          <p>Beyond the skip link, the patterns that recur:</p>
           <ul>
-            <li>One idea per band (Apple)</li>
-            <li>Clean h1→h2→h3 outline (Apple)</li>
-            <li>Breadth lives in the footer, not the nav</li>
-            <li>Density only where users opt in (Linear mockups)</li>
+            <li><strong>Never use color as the only signifier.</strong> <span class="ref">Sara Soueidan ↗</span> keeps links black, differentiated by underline not hue — "so color is never the sole signifier."</li>
+            <li><strong>Real landmarks.</strong> Every nav is a labelled <code>&lt;nav aria-label="…"&gt;</code>; sections are <code>region</code>s with ARIA headings (<span class="ref">Brittany Chiang ↗</span>).</li>
+            <li><strong>Visible focus + keyboard paths.</strong> <code>focus-visible</code> outlines and keyboard-operable skip / back-to-top anchors (<span class="ref">Sara Soueidan ↗</span>) — "microinteractions serve accessibility, not spectacle."</li>
+            <li><strong>Respect <code>prefers-reduced-motion</code>.</strong> This page disables animation under the query; honor it for every loader and scroll effect.</li>
           </ul>
-        </div>
-        <div class="card">
-          <h4>Navigation &amp; wayfinding</h4>
-          <ul>
-            <li>Pick one nav archetype on purpose (Things vs Stripe)</li>
-            <li><code>aria-expanded</code> buttons, not hover traps</li>
-            <li>Eyebrow labels or numbered chapters for position</li>
-            <li>Scroll-spy <code>aria-current</code> + <code>scroll-margin-top</code></li>
-          </ul>
-        </div>
-        <div class="card">
-          <h4>Performance &amp; a11y</h4>
-          <ul>
-            <li>One self-hosted variable font (Vercel / Linear)</li>
-            <li>Skip link as the first DOM node (Sara Soueidan)</li>
-            <li><code>width</code>/<code>height</code> on every image (no CLS)</li>
-            <li>Honor <code>prefers-reduced-motion</code> on loaders</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h4>States</h4>
-          <ul>
-            <li>Empty = icon + reframed line + one CTA</li>
-            <li>Disabled controls show their boundary (Stripe)</li>
-            <li>404/error keeps the nav + footer escape hatch</li>
-            <li>Loaders are honest, skippable, reduced-motion-safe</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-  </main>
+
+          <div class="callout warn">
+            <p><strong>Pitfall: ARIA theater.</strong> Sprinkling <code>role</code> and <code>aria-*</code> onto <code>&lt;div&gt;</code>s does not make a site accessible — and often makes it worse. The reference sites use <em>real</em> semantic elements (<code>nav</code>, <code>main</code>, <code>button</code>, headings) first, and add ARIA only to fill genuine gaps. A native <code>&lt;button&gt;</code> beats <code>&lt;div role="button"&gt;</code> every time.</p>
+          </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <section id="states" class="reveal">
+          <h2><span class="sec-no">08 — Edges</span>Error &amp; empty states</h2>
+          <p>The forgotten screens — empty lists, failed loads, 404s, first-run states — are where polish is proven. The teardowns show the discipline of <strong>states that carry their own way out</strong>.</p>
+
+          <p><span class="ref">Stripe ↗</span>'s prev/next carousel controls ship "proper disabled states on the first slide" — the control communicates its own boundary instead of failing silently. The same principle scales to every dead-end: an empty or error state should explain <em>what</em>, <em>why</em>, and <em>the next action</em>.</p>
+
+          <div class="example">
+            <div class="empty-state">
+              <div class="es-glyph" aria-hidden="true">⌁</div>
+              <h4>No projects yet</h4>
+              <p>Your work will show up here. Start by importing a repository or creating one from a template.</p>
+              <a class="es-cta" href="#states">Create your first project</a>
+            </div>
+            <figcaption>A complete empty state: an icon, a plain-language line that reframes "nothing here" as "here's what goes here," and a single primary action — never a dead end.</figcaption>
+          </div>
+
+          <p>The anatomy the strong examples share:</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>State</th><th>Must answer</th><th>Reference move</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Empty</td><td>"What goes here + how do I fill it?"</td><td>One icon + reframed line + single primary CTA</td></tr>
+                <tr><td>Disabled</td><td>"Why can't I act?"</td><td><span class="ref">Stripe ↗</span> disabled carousel arrow at the boundary</td></tr>
+                <tr><td>Error / 404</td><td>"What broke + a way back"</td><td>Keep the nav + a clear "back to home" anchor (the <span class="ref">Sara Soueidan ↗</span> back-to-top discipline applied to dead ends)</td></tr>
+                <tr><td>Loading</td><td>"Is it working?"</td><td><span class="ref">Dennis Snellenberg ↗</span> greeting counter doubles as honest progress</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout steal">
+            <p><strong>Every dead end keeps the chrome.</strong> A 404 or error page that strips the nav traps the user. Keep the header and footer sitemap on error screens — the <span class="ref">Arc ↗</span> / <span class="ref">Linear ↗</span> mega-footer is a built-in escape hatch from <em>any</em> broken state. The cheapest error recovery is the navigation you already built.</p>
+          </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <section id="checklist" class="reveal">
+          <h2><span class="sec-no">09 — Ship</span>The steal-this checklist</h2>
+          <p>A scannable pass to run against any page before you ship it.</p>
+
+          <div class="grid">
+            <div class="card">
+              <h4>Architecture</h4>
+              <ul>
+                <li>One idea per band (Apple)</li>
+                <li>Clean h1→h2→h3 outline (Apple)</li>
+                <li>Breadth lives in the footer, not the nav</li>
+                <li>Density only where users opt in (Linear mockups)</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4>Navigation &amp; wayfinding</h4>
+              <ul>
+                <li>Pick one nav archetype on purpose (Things vs Stripe)</li>
+                <li><code>aria-expanded</code> buttons, not hover traps</li>
+                <li>Eyebrow labels or numbered chapters for position</li>
+                <li>Scroll-spy <code>aria-current</code> + <code>scroll-margin-top</code></li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4>Performance &amp; a11y</h4>
+              <ul>
+                <li>One self-hosted variable font (Vercel / Linear)</li>
+                <li>Skip link as the first DOM node (Sara Soueidan)</li>
+                <li><code>width</code>/<code>height</code> on every image (no CLS)</li>
+                <li>Honor <code>prefers-reduced-motion</code> on loaders</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4>States</h4>
+              <ul>
+                <li>Empty = icon + reframed line + one CTA</li>
+                <li>Disabled controls show their boundary (Stripe)</li>
+                <li>404/error keeps the nav + footer escape hatch</li>
+                <li>Loaders are honest, skippable, reduced-motion-safe</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </article>
+    </main>
+  </div>
 
   <footer class="ftr">
     <div class="wide">
@@ -464,7 +1139,50 @@ if (seen || reduced) {
   </footer>
 
   <script>
-    // Mega-menu morph demo — a single morphing panel (the Stripe move)
+    // ---- header scrolled-state via sentinel + IntersectionObserver ----
+    (function () {
+      const header = document.querySelector('.site-header');
+      const sentinel = document.querySelector('#hero-sentinel');
+      if (!header || !sentinel) return;
+      new IntersectionObserver(([entry]) => {
+        header.toggleAttribute('data-scrolled', !entry.isIntersecting);
+      }, { rootMargin: '-1px 0px 0px 0px', threshold: 0 }).observe(sentinel);
+    })();
+
+    // ---- scroll-spy: highlight the in-view section in the TOC rail ----
+    (function () {
+      const links = new Map(
+        [...document.querySelectorAll('.toc a')]
+          .map(a => [a.getAttribute('href').slice(1), a])
+      );
+      if (!links.size) return;
+      const spy = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          links.forEach(a => a.removeAttribute('aria-current'));
+          links.get(e.target.id)?.setAttribute('aria-current', 'true');
+        }
+      }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+      document.querySelectorAll('article section[id]').forEach(s => spy.observe(s));
+    })();
+
+    // ---- gentle scroll-reveal (respects reduced-motion) ----
+    (function () {
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const els = document.querySelectorAll('.reveal');
+      if (reduce || !('IntersectionObserver' in window)) {
+        els.forEach(el => el.classList.add('in'));
+        return;
+      }
+      const io = new IntersectionObserver((entries, obs) => {
+        for (const e of entries) {
+          if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+        }
+      }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
+      els.forEach(el => io.observe(el));
+    })();
+
+    // ---- mega-menu morph demo: a single morphing panel (the Stripe move) ----
     (function () {
       const data = {
         prod: [
@@ -485,6 +1203,7 @@ if (seen || reduced) {
       };
       const panel = document.getElementById('morph-panel');
       const btns = document.querySelectorAll('.morph button');
+      if (!panel || !btns.length) return;
 
       const render = (key) => {
         panel.innerHTML = data[key]

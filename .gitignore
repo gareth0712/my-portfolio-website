@@ -108,3 +108,7 @@ dist
 # Compressed GIF previews + hero/mid/lower screenshots ARE committed so the Craft Atlas pages render.
 research/workings/shots/**/04-full.png
 research/workings/clips/*.webm
+
+# --- Project-scoped agent skill packs (kept local, not versioned) ---
+.agents/
+skills-lock.json

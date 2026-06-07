@@ -6,28 +6,505 @@
   <title>UI Design — Layout, Grids &amp; Hierarchy · Craft Atlas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* Page-local: live demos only */
+    /* ============================================================
+       UI-DESIGN.html — bespoke art direction: "The Grid Field"
+       Systematic & structural. A blueprint-grade light interface
+       where the layout itself demonstrates impeccable composition:
+       a ruled modular field, bento mosaics, monospace coordinates,
+       and a single ink-blue structural accent. Self-contained.
+       ============================================================ */
+
+    :root {
+      /* --- Palette: paper white + graphite ink + one structural blue --- */
+      --paper:      #f4f3ee;   /* warm bone canvas              */
+      --paper-2:    #faf9f6;   /* raised surface                */
+      --paper-3:    #ffffff;   /* card core                     */
+      --ink:        #16181d;   /* near-black graphite           */
+      --ink-soft:   #3b3f48;   /* body                          */
+      --ink-dim:    #71757f;   /* meta / captions               */
+      --ink-faint:  #9a9da5;   /* coordinates                   */
+      --line:       #d9d7cf;   /* structural rule               */
+      --line-soft:  #e6e4dc;   /* hairline                      */
+      --accent:     #1d4ed8;   /* ink blue — the only accent    */
+      --accent-ink: #ffffff;   /* text on accent                */
+      --accent-wash:#e7edfb;   /* pale blue field               */
+      --accent-line:#aec3f4;   /* blue rule                     */
+      --grid-line:  rgba(22,24,29,0.045); /* blueprint hatch    */
+
+      /* --- Type --- */
+      --sans: 'Sora', 'Helvetica Neue', system-ui, sans-serif;
+      --display: 'Space Grotesk', 'Helvetica Neue', system-ui, sans-serif;
+      --mono: 'Spline Sans Mono', ui-monospace, 'SF Mono', monospace;
+
+      /* --- Modular spacing scale (8pt) --- */
+      --s-1: .25rem; --s-2: .5rem; --s-3: .75rem; --s-4: 1rem;
+      --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem; --s-8: 4rem; --s-9: 6rem;
+
+      /* --- Radius (crisp, structural) --- */
+      --r-1: 4px; --r-2: 8px; --r-3: 14px; --r-pill: 999px;
+
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --maxw: 1240px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+    body {
+      margin: 0;
+      background-color: var(--paper);
+      /* blueprint hatch: a faint 32px modular field behind everything */
+      background-image:
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+      background-size: 32px 32px;
+      color: var(--ink-soft);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    ::selection { background: var(--accent); color: var(--accent-ink); }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+
+    /* ---------------------------------------------------------------
+       NAV — a horizontal "spec strip": ruled, monospace, scrollable
+       --------------------------------------------------------------- */
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(244,243,238,0.82);
+      backdrop-filter: saturate(140%) blur(12px);
+      -webkit-backdrop-filter: saturate(140%) blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .site-nav {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: var(--s-2);
+      padding: 0 var(--s-5);
+      height: 60px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line) transparent;
+    }
+    .site-nav::-webkit-scrollbar { height: 5px; }
+    .site-nav::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
+    .site-nav a {
+      flex: none;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.01em;
+      color: var(--ink-dim);
+      padding: 6px 10px;
+      border-radius: var(--r-1);
+      text-decoration: none;
+      transition: color .18s var(--ease), background .18s var(--ease);
+    }
+    .site-nav a:hover { color: var(--ink); background: rgba(22,24,29,0.05); text-decoration: none; }
+    .site-nav a.brand {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      padding-right: var(--s-4);
+      margin-right: var(--s-2);
+      border-right: 1px solid var(--line);
+    }
+    .site-nav a[href="UI-DESIGN.html"] {
+      color: var(--ink);
+      background: var(--accent-wash);
+      box-shadow: inset 0 0 0 1px var(--accent-line);
+    }
+    .site-nav a.cta {
+      margin-left: auto;
+      color: var(--accent-ink);
+      background: var(--ink);
+      font-weight: 600;
+      padding: 7px 14px;
+    }
+    .site-nav a.cta:hover { background: var(--accent); color: #fff; }
+
+    /* ---------------------------------------------------------------
+       LAYOUT SHELL
+       --------------------------------------------------------------- */
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 var(--s-5);
+    }
+
+    main.wrap { padding-top: var(--s-8); padding-bottom: var(--s-9); }
+
+    /* ---------------------------------------------------------------
+       HERO — a structural masthead inside a ruled frame
+       --------------------------------------------------------------- */
+    .hero {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      background:
+        linear-gradient(180deg, var(--paper-2), var(--paper-3));
+      padding: var(--s-7) var(--s-6) var(--s-6);
+      margin-bottom: var(--s-7);
+      overflow: hidden;
+    }
+    /* corner registration ticks — blueprint detail */
+    .hero::before, .hero::after {
+      content: "";
+      position: absolute;
+      width: 14px; height: 14px;
+      border: 1.5px solid var(--accent-line);
+      pointer-events: none;
+    }
+    .hero::before { top: 14px; left: 14px; border-right: 0; border-bottom: 0; }
+    .hero::after  { bottom: 14px; right: 14px; border-left: 0; border-top: 0; }
+
+    .coord {
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 var(--s-5);
+    }
+    .coord::before {
+      content: "";
+      width: 28px; height: 1px; background: var(--accent-line);
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(2.1rem, 6vw, 4rem);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin: 0 0 var(--s-5);
+      max-width: 16ch;
+    }
+    .lede {
+      font-size: clamp(1.02rem, 1.6vw, 1.22rem);
+      color: var(--ink-soft);
+      line-height: 1.6;
+      max-width: 62ch;
+      margin: 0;
+    }
+    .hero .lede { margin-bottom: var(--s-5); }
+
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: var(--r-2);
+      overflow: hidden;
+      margin-top: var(--s-6);
+    }
+    .hero-meta div {
+      background: var(--paper-3);
+      padding: var(--s-4) var(--s-5);
+    }
+    .hero-meta dt {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin: 0 0 4px;
+    }
+    .hero-meta dd {
+      margin: 0;
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: 1.4rem;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .hero-meta dd small {
+      display: block;
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: 0.8rem;
+      color: var(--ink-dim);
+      letter-spacing: 0;
+      margin-top: 2px;
+    }
+
+    /* ---------------------------------------------------------------
+       TOC — a coordinate index, two columns
+       --------------------------------------------------------------- */
+    .toc {
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      background: var(--paper-2);
+      padding: var(--s-5) var(--s-6);
+      margin-bottom: var(--s-8);
+    }
+    .toc h2.toc-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin: 0 0 var(--s-4);
+      font-weight: 500;
+    }
+    .toc ol {
+      list-style: none;
+      margin: 0; padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2px var(--s-6);
+      counter-reset: toc;
+    }
+    .toc li { border-top: 1px solid var(--line-soft); }
+    .toc li:first-child, .toc li:nth-child(2) { border-top: 0; }
+    @media (max-width: 639px) { .toc li:nth-child(2) { border-top: 1px solid var(--line-soft); } }
+    .toc a {
+      display: flex;
+      gap: var(--s-3);
+      align-items: baseline;
+      padding: 10px 4px;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: color .15s var(--ease), padding-left .2s var(--ease);
+    }
+    .toc a:hover { color: var(--accent); padding-left: 10px; }
+    .toc a .n {
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      color: var(--ink-faint);
+      flex: none;
+      min-width: 1.4em;
+    }
+
+    /* ---------------------------------------------------------------
+       SECTION HEADINGS — numbered structural markers
+       --------------------------------------------------------------- */
+    h2 {
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin: var(--s-9) 0 var(--s-4);
+      padding-top: var(--s-5);
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 80px;
+    }
+    h2:first-of-type { margin-top: 0; }
+    h3 {
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: 1.18rem;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin: var(--s-6) 0 var(--s-3);
+    }
+    h4 {
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: 1.02rem;
+      color: var(--ink);
+      margin: 0 0 var(--s-2);
+    }
+
+    p { margin: 0 0 var(--s-4); max-width: 70ch; }
+
+    strong { color: var(--ink); font-weight: 600; }
+    em { color: var(--ink-soft); }
+
+    /* ---------------------------------------------------------------
+       LISTS — coordinate bullets
+       --------------------------------------------------------------- */
+    main ul {
+      list-style: none;
+      margin: 0 0 var(--s-5);
+      padding: 0;
+      max-width: 80ch;
+    }
+    main ul li {
+      position: relative;
+      padding: var(--s-3) 0 var(--s-3) var(--s-6);
+      border-top: 1px solid var(--line-soft);
+      line-height: 1.55;
+    }
+    main ul li:first-child { border-top: 0; }
+    main ul li::before {
+      content: "";
+      position: absolute;
+      left: 4px; top: calc(var(--s-3) + 0.62em);
+      width: 7px; height: 7px;
+      background: var(--accent);
+      transform: rotate(45deg);
+    }
+
+    /* ---------------------------------------------------------------
+       REF CITATIONS — inline source chips
+       --------------------------------------------------------------- */
+    .ref {
+      font-family: var(--mono);
+      font-size: 0.82em;
+      color: var(--accent);
+      background: var(--accent-wash);
+      padding: 1px 6px;
+      border-radius: var(--r-1);
+      box-shadow: inset 0 0 0 1px var(--accent-line);
+      white-space: nowrap;
+    }
+
+    /* ---------------------------------------------------------------
+       CODE
+       --------------------------------------------------------------- */
+    code {
+      font-family: var(--mono);
+      font-size: 0.86em;
+      background: rgba(22,24,29,0.055);
+      color: var(--ink);
+      padding: 1.5px 5px;
+      border-radius: var(--r-1);
+    }
+    pre {
+      font-family: var(--mono);
+      font-size: 0.84rem;
+      line-height: 1.6;
+      background: var(--ink);
+      color: #e7e9ee;
+      border-radius: var(--r-3);
+      padding: var(--s-5) var(--s-6);
+      overflow-x: auto;
+      margin: var(--s-5) 0 var(--s-6);
+      border: 1px solid #2a2d35;
+      position: relative;
+    }
+    pre::before {
+      content: "·  ·  ·";
+      position: absolute;
+      top: 10px; left: 16px;
+      color: #4b4f59;
+      letter-spacing: 4px;
+      font-size: 0.7rem;
+    }
+    pre code {
+      background: none; color: inherit; padding: 0; font-size: inherit;
+      display: block; padding-top: var(--s-5);
+    }
+
+    /* ---------------------------------------------------------------
+       CALLOUTS — typed structural notices
+       --------------------------------------------------------------- */
+    .callout {
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--r-2);
+      background: var(--paper-3);
+      padding: var(--s-5) var(--s-6);
+      margin: var(--s-6) 0;
+      position: relative;
+    }
+    .callout p { margin: 0; max-width: none; }
+    .callout::before {
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: var(--s-3);
+      font-weight: 500;
+    }
+    .callout.steal { border-left-color: var(--accent); }
+    .callout.steal::before { content: "Steal this"; color: var(--accent); }
+    .callout.tip { border-left-color: #2f8f5b; }
+    .callout.tip::before { content: "Field note"; color: #2f8f5b; }
+    .callout.warn { border-left-color: #c08a1e; }
+    .callout.warn::before { content: "Pitfall"; color: #c08a1e; }
+
+    /* ---------------------------------------------------------------
+       FIGURES
+       --------------------------------------------------------------- */
+    .figure {
+      margin: var(--s-6) 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      background: var(--paper-3);
+      padding: var(--s-2);
+      overflow: hidden;
+    }
+    .figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: calc(var(--r-3) - 6px);
+      border: 1px solid var(--line-soft);
+    }
+    figcaption {
+      font-size: 0.86rem;
+      color: var(--ink-dim);
+      line-height: 1.55;
+      padding: var(--s-4) var(--s-4) var(--s-2);
+      max-width: 78ch;
+    }
+    .figure figcaption strong { color: var(--ink); }
+
+    /* ---------------------------------------------------------------
+       INTERACTIVE EXAMPLE SURFACES
+       --------------------------------------------------------------- */
+    .example {
+      border: 1px dashed var(--line);
+      border-radius: var(--r-3);
+      background: var(--paper-2);
+      padding: var(--s-6);
+      margin: var(--s-6) 0;
+    }
+    .example > figcaption {
+      padding: var(--s-4) 0 0;
+      border-top: 1px solid var(--line-soft);
+      margin-top: var(--s-5);
+    }
+
+    /* live grid demo */
     .demo-grid {
       display: grid;
-      gap: 14px;
+      gap: 12px;
       grid-template-columns: repeat(4, 1fr);
       grid-auto-rows: 64px;
     }
     .demo-grid .cell {
-      background: var(--bg-2);
+      background: var(--paper-3);
       border: 1px solid var(--line);
       border-radius: var(--r-2);
       display: grid;
       place-items: center;
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
+      font-family: var(--mono);
+      font-size: 0.7rem;
       color: var(--ink-dim);
-      letter-spacing: 0.06em;
+      letter-spacing: 0.04em;
+      transition: transform .25s var(--ease), border-color .25s var(--ease);
     }
-    .demo-grid .a { grid-column: span 2; grid-row: span 2; background: var(--accent-glow); border-color: rgba(245,166,35,0.3); color: var(--accent-soft); }
+    .demo-grid .cell:hover { border-color: var(--accent-line); transform: translateY(-2px); }
+    .demo-grid .a { grid-column: span 2; grid-row: span 2; background: var(--accent-wash); border-color: var(--accent-line); color: var(--accent); }
     .demo-grid .b { grid-column: span 2; }
     .demo-grid .c { grid-row: span 2; }
     @media (max-width: 560px) {
@@ -36,36 +513,134 @@
       .demo-grid .b { grid-column: span 2; }
     }
 
-    .density-demo { --pad: 18px; --gap: 14px; }
-    .density-demo.tight { --pad: 8px; --gap: 6px; }
+    /* density demo */
+    .density-demo { --pad: 16px; --gap: 12px; }
+    .density-demo.tight { --pad: 7px; --gap: 5px; }
     .density-rows { display: grid; gap: var(--gap); }
     .density-rows .row {
       display: flex; align-items: center; gap: 12px;
       padding: var(--pad);
-      background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r-2);
-      font-size: var(--step--1);
+      background: var(--paper-3); border: 1px solid var(--line); border-radius: var(--r-2);
+      font-size: 0.92rem;
       transition: padding 0.25s var(--ease);
     }
     .density-rows .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
     .density-rows .grow { flex: 1; color: var(--ink-soft); }
-    .density-rows .meta { font-family: var(--font-mono); color: var(--ink-dim); font-size: 0.72rem; }
+    .density-rows .meta { font-family: var(--mono); color: var(--ink-dim); font-size: 0.78rem; }
+
+    /* segmented toggles */
     .seg {
-      display: inline-flex; border: 1px solid var(--line); border-radius: var(--r-pill);
-      overflow: hidden; margin-bottom: var(--s-4);
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: var(--r-pill);
+      overflow: hidden;
+      margin-bottom: var(--s-5);
+      background: var(--paper-3);
     }
     .seg button {
-      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em;
-      padding: 6px 14px; background: transparent; color: var(--ink-dim);
+      font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.04em;
+      padding: 7px 16px; background: transparent; color: var(--ink-dim);
       border: 0; cursor: pointer; transition: background 0.18s var(--ease), color 0.18s var(--ease);
     }
+    .seg button:hover { color: var(--ink); }
     .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+    .seg button > span { color: inherit; }
 
+    /* baseline rhythm demo */
     .rhythm { position: relative; padding: 4px 0; }
     .rhythm.show {
-      background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 7px, rgba(245,166,35,0.18) 7px, rgba(245,166,35,0.18) 8px);
+      background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 7px, var(--accent-line) 7px, var(--accent-line) 8px);
     }
-    .rhythm p { margin: 0 0 8px; line-height: 24px; }
+    .rhythm p { margin: 0 0 8px; line-height: 24px; max-width: none; }
     .rhythm h4 { margin: 0 0 8px; line-height: 24px; }
+
+    /* ---------------------------------------------------------------
+       CHECKLIST BENTO — the structural finale
+       --------------------------------------------------------------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--s-4);
+      margin: var(--s-6) 0;
+    }
+    .card {
+      background: var(--paper-3);
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      padding: var(--s-5) var(--s-5) var(--s-6);
+      grid-column: span 2;
+      position: relative;
+      counter-increment: chk;
+      transition: transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
+    }
+    .card::after {
+      content: counter(chk, decimal-leading-zero);
+      position: absolute;
+      top: var(--s-4); right: var(--s-5);
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      color: var(--ink-faint);
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent-line);
+      box-shadow: 0 6px 24px rgba(29,78,216,0.07);
+    }
+    /* bento rhythm: first two cards larger */
+    .card:nth-child(1) { grid-column: span 4; background: var(--accent-wash); border-color: var(--accent-line); }
+    .card:nth-child(1) h3 { color: var(--ink); }
+    .card h3 { margin-top: 0; }
+    .card p { margin: 0; font-size: 0.94rem; color: var(--ink-soft); }
+    .grid { counter-reset: chk; }
+    @media (max-width: 880px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .card, .card:nth-child(1) { grid-column: span 1; }
+    }
+    @media (max-width: 520px) {
+      .grid { grid-template-columns: 1fr; }
+      .card, .card:nth-child(1) { grid-column: span 1; }
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: var(--s-8) 0 var(--s-6);
+    }
+
+    /* ---------------------------------------------------------------
+       FOOTER
+       --------------------------------------------------------------- */
+    .ftr {
+      border-top: 1px solid var(--line);
+      background: var(--paper-2);
+      padding: var(--s-8) 0 var(--s-9);
+      margin-top: var(--s-9);
+    }
+    .ftr .brand {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--ink);
+      margin: 0 0 var(--s-3);
+    }
+    .ftr p { color: var(--ink-dim); font-size: 0.92rem; max-width: 80ch; }
+
+    /* ---------------------------------------------------------------
+       SCROLL-REVEAL
+       --------------------------------------------------------------- */
+    .reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1 !important; transform: none !important; transition: none; }
+    }
+
+    @media (max-width: 700px) {
+      body { font-size: 16px; background-size: 24px 24px; }
+      main.wrap { padding-top: var(--s-6); }
+      .hero { padding: var(--s-6) var(--s-4) var(--s-5); }
+      pre { padding: var(--s-5) var(--s-4); }
+      .callout, .example { padding: var(--s-5) var(--s-4); }
+    }
   </style>
 </head>
 <body>
@@ -92,48 +667,57 @@
   </header>
 
 <main class="wrap">
-  <p class="kicker">Visual UI Design</p>
-  <h1>Layout is the argument. Everything else is decoration.</h1>
-  <p class="lede">Where things sit, how big they are, and how much air surrounds them decides what a visitor understands before they read a word. This page distills how 80 elite sites build grids, bento mosaics, hierarchy, rhythm and density — with the exact techniques, lifted from teardowns.</p>
+  <section class="hero reveal">
+    <p class="coord">FIELD&nbsp;01 · VISUAL UI DESIGN · LAYOUT / GRIDS / HIERARCHY</p>
+    <h1>Layout is the argument. Everything else is decoration.</h1>
+    <p class="lede">Where things sit, how big they are, and how much air surrounds them decides what a visitor understands before they read a word. This page distills how 80 elite sites build grids, bento mosaics, hierarchy, rhythm and density — with the exact techniques, lifted from teardowns.</p>
+    <dl class="hero-meta">
+      <div><dt>Sites teared down</dt><dd>80<small>live, in production</small></dd></div>
+      <div><dt>Layout skeletons</dt><dd>4<small>column · grid · bento · split</small></dd></div>
+      <div><dt>Base spacing unit</dt><dd>8px<small>every gap a multiple</small></dd></div>
+      <div><dt>Sections below</dt><dd>9<small>system → checklist</small></dd></div>
+    </dl>
+  </section>
 
-  <nav class="toc" aria-label="On this page">
+  <nav class="toc reveal" aria-label="On this page">
+    <h2 class="toc-label">Index · coordinates</h2>
     <ol>
-      <li><a href="#systems">1 · Pick a layout system (and commit)</a></li>
-      <li><a href="#grids">2 · The modular grid &amp; the 8pt rhythm</a></li>
-      <li><a href="#bento">3 · Bento: density variety in a single mosaic</a></li>
-      <li><a href="#hierarchy">4 · Hierarchy: size, weight, position</a></li>
-      <li><a href="#whitespace">5 · Whitespace &amp; density as a dial</a></li>
-      <li><a href="#composition">6 · Component composition &amp; repeated grammar</a></li>
-      <li><a href="#alignment">7 · Alignment, asymmetry &amp; the optical edge</a></li>
-      <li><a href="#footer-ia">8 · The mega-footer: where density is allowed</a></li>
-      <li><a href="#checklist">9 · Steal-this checklist</a></li>
+      <li><a href="#systems"><span class="n">01</span>Pick a layout system (and commit)</a></li>
+      <li><a href="#grids"><span class="n">02</span>The modular grid &amp; the 8pt rhythm</a></li>
+      <li><a href="#bento"><span class="n">03</span>Bento: density variety in a single mosaic</a></li>
+      <li><a href="#hierarchy"><span class="n">04</span>Hierarchy: size, weight, position</a></li>
+      <li><a href="#whitespace"><span class="n">05</span>Whitespace &amp; density as a dial</a></li>
+      <li><a href="#composition"><span class="n">06</span>Component composition &amp; repeated grammar</a></li>
+      <li><a href="#alignment"><span class="n">07</span>Alignment, asymmetry &amp; the optical edge</a></li>
+      <li><a href="#footer-ia"><span class="n">08</span>The mega-footer: where density is allowed</a></li>
+      <li><a href="#checklist"><span class="n">09</span>Steal-this checklist</a></li>
     </ol>
   </nav>
 
-  <h2 id="systems">1 · Pick a layout system (and commit)</h2>
-  <p>Almost every elite site resolves to one of four spatial skeletons. The craft is not inventing a fifth — it is picking one and executing it ruthlessly.</p>
-  <ul>
+  <h2 id="systems" class="reveal">01 · Pick a layout system (and commit)</h2>
+  <p class="reveal">Almost every elite site resolves to one of four spatial skeletons. The craft is not inventing a fifth — it is picking one and executing it ruthlessly.</p>
+  <ul class="reveal">
     <li><strong>Centered reading column.</strong> A constrained max-width on a quiet canvas with deep gutters. <span class="ref">Stripe</span> runs a ~1080px column on white; <span class="ref">Linear</span> ~1100–1200px on near-black; <span class="ref">Family</span> ~1160px with very wide side gutters that keep everything in a relaxed reading lane.</li>
     <li><strong>Hard modular grid.</strong> Visible 1px rules form literal cells. <span class="ref">Vercel</span>'s "Your product, delivered." section is a literal 3-column × 2-row ruled grid — the blueprint metaphor <em>is</em> the design.</li>
     <li><strong>Bento mosaic.</strong> Rounded cards of varying span on one field. <span class="ref">Ramp</span>, <span class="ref">Gianmarco Cavallo</span> and <span class="ref">Framer</span> (its "Bento" shipping card) all lean on this.</li>
     <li><strong>Split / asymmetric.</strong> A fixed identity rail beside scrolling content. <span class="ref">Brittany Chiang</span> pins name + nav on the left while the right column scrolls; <span class="ref">14islands</span> deliberately imbalances a giant left headline against a tiny right intro paragraph.</li>
   </ul>
 
-  <div class="callout steal">
+  <div class="callout steal reveal">
     <p><strong>The decision rule.</strong> Marketing narrative that must be <em>read top-to-bottom</em> → centered column (Stripe, Linear, Family). Capability matrix where blocks are <em>peers</em>, scanned not read → modular grid or bento (Vercel, Ramp). A personal identity that must stay present → split-screen (Brittany Chiang). Don't mix two skeletons in one viewport.</p>
   </div>
 
-  <figure class="figure">
+  <figure class="figure reveal">
     <img src="../workings/shots/vercel/02-mid.png" alt="Vercel's capability section rendered as a literal 3-column by 2-row grid with visible hairline rules forming cells.">
     <figcaption><strong>Vercel</strong> — a literal hard-ruled modular grid. Each cell is a self-contained capability: heading + one-line description + circular arrow button + a tiny product artifact. The visible 1px rules sell a "precision engineering" promise the copy never has to state.</figcaption>
   </figure>
 
-  <h2 id="grids">2 · The modular grid &amp; the 8pt rhythm</h2>
-  <p>A grid is two things: a set of <strong>columns</strong> (horizontal alignment) and a <strong>spacing scale</strong> (vertical and gutter rhythm). The sites that feel "tight" share one trait — every gap is a multiple of a base unit, usually 4 or 8px. shared.css itself ships an 8pt-ish scale (<code>--s-1: .25rem</code> → <code>--s-9: 6rem</code>); this is not decoration, it is the load-bearing system.</p>
+  <h2 id="grids" class="reveal">02 · The modular grid &amp; the 8pt rhythm</h2>
+  <p class="reveal">A grid is two things: a set of <strong>columns</strong> (horizontal alignment) and a <strong>spacing scale</strong> (vertical and gutter rhythm). The sites that feel "tight" share one trait — every gap is a multiple of a base unit, usually 4 or 8px. The system below ships an 8pt-ish scale (<code>--s-1: .25rem</code> → <code>--s-9: 6rem</code>); this is not decoration, it is the load-bearing system.</p>
 
-  <p>Modern CSS gives you the whole grid in a few declarations. The pattern below is the responsive "cells without media queries" technique — the same one <span class="ref">Vercel</span> and <span class="ref">Stripe</span> use for solution-card rows:</p>
+  <p class="reveal">Modern CSS gives you the whole grid in a few declarations. The pattern below is the responsive "cells without media queries" technique — the same one <span class="ref">Vercel</span> and <span class="ref">Stripe</span> use for solution-card rows:</p>
 
-  <pre><code>/* Responsive card grid — no media queries needed.
+  <pre class="reveal"><code>/* Responsive card grid — no media queries needed.
    Cells auto-flow; each is at least 260px, sharing leftover space. */
 .grid {
   display: grid;
@@ -151,8 +735,8 @@
 }
 .ruled > * { background: var(--bg); padding: var(--s-6); }</code></pre>
 
-  <div class="example density-demo">
-    <p style="margin-top:0; color: var(--ink-soft); font-size: var(--step--1);">A 4-column grid where three cells <strong>span</strong> to break the monotony — the seed of a bento. Resize the window: it reflows to 2 columns under 560px.</p>
+  <div class="example density-demo reveal">
+    <p style="margin-top:0; color: var(--ink-soft); font-size: 0.95rem;">A 4-column grid where three cells <strong>span</strong> to break the monotony — the seed of a bento. Resize the window: it reflows to 2 columns under 560px.</p>
     <div class="demo-grid" aria-hidden="true">
       <div class="cell a">SPAN 2×2</div>
       <div class="cell b">SPAN 2 WIDE</div>
@@ -167,11 +751,11 @@
   </div>
 
   <h3>Vertical rhythm: snap text to a baseline</h3>
-  <p>The reason <span class="ref">Josh Comeau</span> and <span class="ref">Stripe Press</span> feel "magazine-spaced" is that vertical gaps are quantised. Set line-heights and margins to multiples of one unit so successive lines land on an invisible baseline.</p>
+  <p class="reveal">The reason <span class="ref">Josh Comeau</span> and <span class="ref">Stripe Press</span> feel "magazine-spaced" is that vertical gaps are quantised. Set line-heights and margins to multiples of one unit so successive lines land on an invisible baseline.</p>
 
-  <div class="example">
+  <div class="example reveal">
     <button class="seg" type="button" aria-pressed="false" onclick="var r=document.getElementById('rh');var on=r.classList.toggle('show');this.setAttribute('aria-pressed',String(on));this.querySelector('span').textContent=on?'GRID ON':'GRID OFF';">
-      <span style="font-family:var(--font-mono);font-size:.72rem;letter-spacing:.06em;color:var(--ink);padding:6px 14px;display:inline-block;">GRID OFF</span>
+      <span style="font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;color:var(--ink);padding:7px 16px;display:inline-block;">GRID OFF</span>
     </button>
     <div id="rh" class="rhythm">
       <h4>Lovable products, from vision to launch</h4>
@@ -181,13 +765,13 @@
     <figcaption>Toggle the baseline overlay. Text snaps to an 8px rhythm — the discipline behind editorial calm.</figcaption>
   </div>
 
-  <div class="callout tip">
-    <p>Use exactly one spacing scale per project and reference it by token, never by raw pixels in components. shared.css does this: a card pads with <code>var(--s-5)</code>, a callout with <code>var(--s-4) var(--s-5)</code>. When every gap is a token, "off-by-3px" drift becomes impossible.</p>
+  <div class="callout tip reveal">
+    <p>Use exactly one spacing scale per project and reference it by token, never by raw pixels in components. A disciplined system does this: a card pads with <code>var(--s-5)</code>, a callout with <code>var(--s-4) var(--s-5)</code>. When every gap is a token, "off-by-3px" drift becomes impossible.</p>
   </div>
 
-  <h2 id="bento">3 · Bento: density variety in a single mosaic</h2>
-  <p>The bento grid is the dominant 2024–2026 layout for "show many capabilities at once." Its power is <strong>density variety</strong> — big calm cards next to small dense ones inside one tidy frame. The teardowns are explicit about this:</p>
-  <ul>
+  <h2 id="bento" class="reveal">03 · Bento: density variety in a single mosaic</h2>
+  <p class="reveal">The bento grid is the dominant 2024–2026 layout for "show many capabilities at once." Its power is <strong>density variety</strong> — big calm cards next to small dense ones inside one tidy frame. The teardowns are explicit about this:</p>
+  <ul class="reveal">
     <li><span class="ref">Ramp</span> — a bento grid the studio (Bakken &amp; Baeck) literally nicknamed "the Bento box," deliberately <em>mixing low-density abstract cards with high-density UI screenshots</em>. The variety is the point.</li>
     <li><span class="ref">Stripe</span> — bento-style card grids for solutions: gradient-tinted product mockup cards (checkout UI, card issuing, agentic-commerce chat) sitting above descriptive cards.</li>
     <li><span class="ref">Arc Browser</span> — a single bento mockup grid used as the "densest moment" on an otherwise airy page, deployed deliberately as the product reveal.</li>
@@ -195,12 +779,12 @@
     <li><span class="ref">Framer</span> — even ships a feature literally named "Bento," and its shipping-log grid is a dense bento of "Live" cards (Shaders, CMS 3.0, Auto Translate).</li>
   </ul>
 
-  <figure class="figure">
+  <figure class="figure reveal">
     <img src="../workings/shots/gianmarco-cavallo/01-hero.png" alt="Gianmarco Cavallo's homepage built entirely as a bento grid of bordered, rounded cards of varying sizes on a dark canvas.">
     <figcaption><strong>Gianmarco Cavallo</strong> — a full-page bento. A wide intro card, a tall stack/tools card, a dual world-clock module, a gallery thumbnail card. High information density stays legible because every card shares the same generous internal padding and gutter.</figcaption>
   </figure>
 
-  <pre><code>/* A robust dense-but-legible bento.
+  <pre class="reveal"><code>/* A robust dense-but-legible bento.
    auto-flow: dense backfills holes left by spanning cards. */
 .bento {
   display: grid;
@@ -221,35 +805,35 @@
   background: var(--bg-3);
 }</code></pre>
 
-  <div class="callout warn">
+  <div class="callout warn reveal">
     <p><strong>Bento pitfalls.</strong> (1) <em>Uniform density</em> — if every card holds the same amount, it's just a boring grid; the variety is the value. (2) <em>Reading order chaos</em> — <code>grid-auto-flow: dense</code> can make visual order diverge from DOM order, which hurts screen-reader and keyboard users. Keep the DOM in logical reading order and only let dense backfill <em>small</em> holes. (3) <em>Span soup at mobile</em> — collapse most spans to full-width below ~560px (see the live demo above) or the mosaic shatters.</p>
   </div>
 
-  <h2 id="hierarchy">4 · Hierarchy: size, weight, position</h2>
-  <p>Hierarchy is how a layout tells the eye "this first, that second." The elite sites build it with three levers — <strong>size</strong>, <strong>weight/contrast</strong>, and <strong>position</strong> — and a clean semantic heading map underneath.</p>
+  <h2 id="hierarchy" class="reveal">04 · Hierarchy: size, weight, position</h2>
+  <p class="reveal">Hierarchy is how a layout tells the eye "this first, that second." The elite sites build it with three levers — <strong>size</strong>, <strong>weight/contrast</strong>, and <strong>position</strong> — and a clean semantic heading map underneath.</p>
 
-  <ul>
+  <ul class="reveal">
     <li><strong>Semantic map = visual map.</strong> <span class="ref">Apple</span>'s homepage is a textbook: <code>h1</code> "Apple" (visually-hidden brand anchor), <code>h2</code> for marquee products (iPhone 17 Pro), <code>h3</code> for secondary tiles (MacBook Air, Apple Watch). The DOM outline reads like the page looks.</li>
     <li><strong>Size as tiering.</strong> <span class="ref">14islands</span> tiers projects purely by heading level + thumbnail size — a featured 2-column case-study grid (large thumbs) over a denser overflow list (<code>h3</code> rows). No badges, no "featured" labels; scale alone does the work.</li>
     <li><strong>Weight contrast inside one phrase.</strong> <span class="ref">14islands</span> again: "Lovable Products" rendered half light-grey, half near-black to emphasise within a single line. <span class="ref">Ramp</span> lets full-width statement lines carry the page ("Systems that never spoke") — copy as the heaviest element.</li>
     <li><strong>Position = importance.</strong> <span class="ref">Ramp</span>'s hero is left-aligned with a tiny eyebrow stat above a giant H1; <span class="ref">Rauno Freiberg</span> goes loud-per-panel: one giant word per card in a horizontal filmstrip, sparse overall.</li>
   </ul>
 
-  <div class="callout steal">
+  <div class="callout steal reveal">
     <p><strong>Steal: the eyebrow → headline → subhead → single CTA unit.</strong> <span class="ref">Vercel</span> repeats exactly this grammar in every grid cell, and <span class="ref">Josh Comeau</span> introduces every homepage section with a small uppercase eyebrow label (ARTICLES AND TUTORIALS, POPULAR CONTENT). One repeated 4-part unit gives a whole page rhythm for free.</p>
   </div>
 
-  <h2 id="whitespace">5 · Whitespace &amp; density as a dial</h2>
-  <p>The most repeated phrase across the teardowns is "<em>density is deliberately low</em>." But the masters don't keep it low — they <strong>modulate</strong> it. Whitespace is a dial you turn down to create a deliberate spike where it matters.</p>
+  <h2 id="whitespace" class="reveal">05 · Whitespace &amp; density as a dial</h2>
+  <p class="reveal">The most repeated phrase across the teardowns is "<em>density is deliberately low</em>." But the masters don't keep it low — they <strong>modulate</strong> it. Whitespace is a dial you turn down to create a deliberate spike where it matters.</p>
 
-  <ul>
+  <ul class="reveal">
     <li><span class="ref">Family</span> — each feature is its own full "act" separated by hairline dividers and large vertical padding, then "Friends of Family" is a <em>dense masonry/marquee wall of real tweets</em>: a deliberate density spike after all the air, which makes social proof feel <em>abundant</em>.</li>
     <li><span class="ref">Linear</span> — sparse marketing copy, but the embedded app mockups are <em>intentionally dense</em> to signal product depth. Air around the words, density inside the product.</li>
     <li><span class="ref">Framer</span> — "alternating breathing room and dense proof": one headline owns the viewport up top; the shipping-log grid packs in downward.</li>
     <li><span class="ref">Arc Browser</span> — low-to-medium overall, with the bento mockup grid as the single densest, most deliberate moment.</li>
   </ul>
 
-  <div class="example density-demo" id="dens">
+  <div class="example density-demo reveal" id="dens">
     <div class="seg" role="group" aria-label="Density">
       <button type="button" aria-pressed="true" onclick="setDensity(this,false)">COMFORTABLE</button>
       <button type="button" aria-pressed="false" onclick="setDensity(this,true)">COMPACT</button>
@@ -263,20 +847,20 @@
     <figcaption>Same list, two densities — driven by one CSS variable (<code>--pad</code>) on the container. Comfortable for marketing/scan; compact for power-user data (a Linear/Mercury dashboard move).</figcaption>
   </div>
 
-  <div class="callout tip">
+  <div class="callout tip reveal">
     <p>Drive density from a single custom property, not by editing each row. One <code>--pad</code> / <code>--gap</code> on a parent lets a whole table flip between "marketing comfortable" and "operator compact" — and animates smoothly. <span class="ref">Mercury</span> and <span class="ref">Linear</span> both keep low density per marketing scene but pack their dashboard mockups full.</p>
   </div>
 
-  <h2 id="composition">6 · Component composition &amp; repeated grammar</h2>
-  <p>Pages that feel "designed" reuse a small vocabulary of blocks. The teardowns call this out as <strong>repeated component grammar</strong>:</p>
-  <ul>
+  <h2 id="composition" class="reveal">06 · Component composition &amp; repeated grammar</h2>
+  <p class="reveal">Pages that feel "designed" reuse a small vocabulary of blocks. The teardowns call this out as <strong>repeated component grammar</strong>:</p>
+  <ul class="reveal">
     <li><span class="ref">Vercel</span> — "Repeated component grammar: heading → short subhead → single CTA/arrow → embedded mini product demo. This template repeats down the page." One block, instantiated many times.</li>
     <li><span class="ref">Family</span> — alternating left-text / right-phone-mockup for deep features: a predictable scan pattern that still breaks monotony by flipping sides.</li>
     <li><span class="ref">Mercury</span> — a sticky/pinned accordion of product pillars paired with a live dashboard mockup on the right that <em>swaps</em> as you expand each item: one composition, four contents.</li>
     <li><span class="ref">Linear</span> — each capability section pairs a large H2 with an interactive demo panel; numbered chapters (1.0–5.0) give the repetition a spine.</li>
   </ul>
 
-  <pre><code>&lt;!-- One "capability block" component, reused down the page.
+  <pre class="reveal"><code>&lt;!-- One "capability block" component, reused down the page.
      Same grammar as Vercel: title -&gt; subhead -&gt; CTA -&gt; artifact. --&gt;
 &lt;section class="cap"&gt;
   &lt;div class="cap__copy"&gt;
@@ -294,34 +878,34 @@
   @media (min-width: 760px) { .cap { grid-template-columns: 1fr 1fr; } }
 &lt;/style&gt;</code></pre>
 
-  <div class="callout steal">
+  <div class="callout steal reveal">
     <p><strong>Steal: define 3–5 block types, then compose the whole page from them.</strong> A capability block, a logo wall, a stat band, a quote carousel, a CTA scene. <span class="ref">Stripe</span> and <span class="ref">Linear</span> both build entire long-scroll narratives from roughly this set. Fewer block types → stronger rhythm and far cheaper maintenance.</p>
   </div>
 
-  <h2 id="alignment">7 · Alignment, asymmetry &amp; the optical edge</h2>
-  <p>Alignment is the cheapest way to look intentional — a shared left edge does more for perceived quality than any gradient. But the best sites also know <em>when to break it</em>.</p>
-  <ul>
+  <h2 id="alignment" class="reveal">07 · Alignment, asymmetry &amp; the optical edge</h2>
+  <p class="reveal">Alignment is the cheapest way to look intentional — a shared left edge does more for perceived quality than any gradient. But the best sites also know <em>when to break it</em>.</p>
+  <ul class="reveal">
     <li><strong>Asymmetry as signature.</strong> <span class="ref">14islands</span> splits the hero into a giant left headline vs. a small right intro paragraph — "this deliberate imbalance is a signature." Tension, on purpose.</li>
     <li><strong>A fixed alignment anchor.</strong> <span class="ref">Brittany Chiang</span> keeps a sticky left identity column while content scrolls past; the pinned edge is the page's backbone. <span class="ref">Framer</span> uses sticky left-rail labels (AI / Design / CMS) against right-side visuals.</li>
     <li><strong>Two-sub-column rows.</strong> <span class="ref">Brittany Chiang</span>'s Experience/Writing entries: muted date range on the left, title + description + tech pills on the right — a tiny internal grid repeated per row reads as effortless order.</li>
     <li><strong>Negative space as the layout.</strong> <span class="ref">Rauno Freiberg</span> — "the negative space is the layout": generous grey gutters between cards in a horizontal filmstrip, loud per-panel but sparse overall.</li>
   </ul>
 
-  <div class="callout warn">
+  <div class="callout warn reveal">
     <p><strong>Centered-everything is the amateur tell.</strong> Centering a whole column of left-to-right text creates ragged left edges the eye can't anchor to. Center hero headlines and CTAs (Apple, Arc, Mercury all do); left-align body copy, lists, and any multi-line content. And remember <em>optical</em> alignment beats mathematical: a circular arrow button or a piece of punctuation often needs a 1–2px nudge to <em>look</em> aligned even when the box is centered.</p>
   </div>
 
-  <h2 id="footer-ia">8 · The mega-footer: where density is allowed</h2>
-  <p>One striking pattern: airy pages end in dense footers, and that's correct. The footer is the one zone where high link-density signals <em>depth and trust</em> rather than clutter — users arrive there deliberately, ready to hunt.</p>
-  <ul>
+  <h2 id="footer-ia" class="reveal">08 · The mega-footer: where density is allowed</h2>
+  <p class="reveal">One striking pattern: airy pages end in dense footers, and that's correct. The footer is the one zone where high link-density signals <em>depth and trust</em> rather than clutter — users arrive there deliberately, ready to hunt.</p>
+  <ul class="reveal">
     <li><span class="ref">Stripe</span> — a dense multi-column sitemap (Products / Solutions / Use cases / Developers / Resources / Company): "classic enterprise breadth, but visually quiet."</li>
     <li><span class="ref">Linear</span> — a 5-column sitemap + legal row, explicitly "the densest block on the page."</li>
     <li><span class="ref">Framer</span> — a "fat sitemap, 77 links," organised Product / Resources / Community / Company.</li>
     <li><span class="ref">Mercury</span> — an unusually long, link-rich legal/footnotes block (every yield/cashback claim superscript-footnoted) — density driven by regulation, anchored at the bottom on purpose.</li>
   </ul>
-  <p>The lesson: don't spread that link density up the page to "fill space." Concentrate it where intent is highest — the footer — and keep the body breathing. shared.css's own <code>.ftr</code> follows this: quiet styling, multi-column tolerance, anchored at the very bottom.</p>
+  <p class="reveal">The lesson: don't spread that link density up the page to "fill space." Concentrate it where intent is highest — the footer — and keep the body breathing. A disciplined footer follows this: quiet styling, multi-column tolerance, anchored at the very bottom.</p>
 
-  <h2 id="checklist">9 · Steal-this checklist</h2>
+  <h2 id="checklist" class="reveal">09 · Steal-this checklist</h2>
   <div class="grid">
     <div class="card">
       <h3>System</h3>
@@ -350,7 +934,7 @@
   </div>
 
   <hr>
-  <p>Layout is invisible when it works. If a visitor never notices the grid, the rhythm, or the spacing scale — only that the page felt calm, clear, and easy to scan — every principle above did its job.</p>
+  <p class="reveal">Layout is invisible when it works. If a visitor never notices the grid, the rhythm, or the spacing scale — only that the page felt calm, clear, and easy to scan — every principle above did its job.</p>
 </main>
 
 <footer class="ftr">
@@ -369,6 +953,22 @@
       b.setAttribute('aria-pressed', String(b === btn));
     });
   }
+
+  // Scroll-reveal — honors prefers-reduced-motion
+  (function () {
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var els = document.querySelectorAll('.reveal');
+    if (reduce || !('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    els.forEach(function (el) { io.observe(el); });
+  })();
 </script>
 </body>
 </html>

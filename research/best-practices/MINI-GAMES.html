@@ -6,25 +6,418 @@
   <title>Mini-Games &amp; Playful UI — Craft Atlas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
-    /* page-local: demos only */
-    .konami-demo{display:flex;flex-direction:column;align-items:center;gap:var(--s-3);text-align:center}
-    .konami-keys{display:flex;gap:var(--s-2);flex-wrap:wrap;justify-content:center;font-family:var(--font-mono);font-size:0.8rem}
-    .konami-keys kbd{background:var(--bg-2);border:1px solid var(--line);border-bottom-width:2px;border-radius:var(--r-1);padding:0.2em 0.55em;color:var(--ink-soft);transition:all .12s var(--ease);cursor:pointer}
-    .konami-keys kbd.lit{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);transform:translateY(1px)}
-    #konami-stage{font-family:var(--font-serif);font-size:var(--step-2);min-height:1.4em;transition:transform .4s var(--ease)}
-    #konami-stage.win{animation:pop .5s var(--ease)}
-    @keyframes pop{0%{transform:scale(.4) rotate(-8deg);opacity:0}60%{transform:scale(1.15) rotate(3deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+    /* ============================================================
+       MINI-GAMES — Arcade Brutalist art direction
+       Swiss Industrial Print substrate + arcade-cabinet energy.
+       Hazard-yellow primary, electric-blue secondary pop, carbon ink.
+       All corners 90deg. Toy shadows (offset hard shadow). Halftone.
+       ============================================================ */
 
-    /* squishy toy button demo */
-    .toy-row{display:flex;gap:var(--s-4);flex-wrap:wrap;align-items:center;justify-content:center}
-    .toy-btn{font-family:var(--font-sans);font-weight:600;font-size:1rem;color:var(--accent-ink);background:var(--accent);border:none;border-radius:var(--r-pill);padding:0.7em 1.5em;cursor:pointer;transition:transform .12s cubic-bezier(.34,1.56,.64,1),box-shadow .12s var(--ease);box-shadow:0 6px 0 #b9791a}
-    .toy-btn:hover{transform:translateY(-2px);box-shadow:0 8px 0 #b9791a}
-    .toy-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b9791a}
-    .toy-btn.linear{border-radius:var(--r-2);box-shadow:none;background:var(--bg-2);color:var(--ink-soft);border:1px solid var(--line);transition:transform .12s linear}
+    :root{
+      --paper:#ECE9E1;        /* matte unbleached documentation paper */
+      --paper-2:#E2DED3;
+      --ink:#0B0B0B;          /* carbon */
+      --ink-soft:#2A2A28;
+      --ink-dim:#5C5A52;
+      --ink-faint:#8A877C;
+      --hazard:#FFD400;       /* arcade hazard yellow — primary */
+      --hazard-deep:#C9A800;
+      --blast:#2B59FF;        /* electric blue — single secondary pop */
+      --hot:#FF2D2D;          /* aviation red — alerts / strike */
+      --line:#0B0B0B;
+      --shadow:6px 6px 0 var(--ink);
+      --shadow-sm:4px 4px 0 var(--ink);
+      --ease:cubic-bezier(.2,.9,.25,1);
+      --boing:cubic-bezier(.34,1.56,.64,1);
+      --maxw:1180px;
+
+      --step--1:clamp(.78rem,.74rem + .2vw,.86rem);
+      --step-0:clamp(1rem,.95rem + .25vw,1.12rem);
+      --step-1:clamp(1.2rem,1.05rem + .6vw,1.45rem);
+      --step-2:clamp(1.5rem,1.2rem + 1.2vw,2rem);
+      --step-3:clamp(2rem,1.4rem + 2.6vw,3.2rem);
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+    body{
+      margin:0;
+      background:var(--paper);
+      color:var(--ink);
+      font-family:"Space Grotesk",system-ui,sans-serif;
+      font-size:var(--step-0);
+      line-height:1.6;
+      /* faint halftone dot grid baked into the substrate */
+      background-image:radial-gradient(var(--ink) .8px, transparent .9px);
+      background-size:22px 22px;
+      background-position:0 0;
+    }
+    /* global film grain / scanline overlay, fixed + non-interactive */
+    body::after{
+      content:"";position:fixed;inset:0;z-index:60;pointer-events:none;
+      background:repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(11,11,11,.035) 3px, rgba(11,11,11,.035) 4px);
+      mix-blend-mode:multiply;
+    }
+
+    ::selection{background:var(--hazard);color:var(--ink)}
+    a{color:inherit}
+    :focus-visible{outline:3px solid var(--blast);outline-offset:2px}
+
+    /* ---------------- NAV : arcade marquee bar ---------------- */
+    .site-header{
+      position:sticky;top:0;z-index:50;
+      background:var(--ink);
+      border-bottom:3px solid var(--ink);
+      box-shadow:0 4px 0 rgba(11,11,11,.18);
+    }
+    .site-nav{
+      max-width:var(--maxw);margin:0 auto;
+      display:flex;align-items:stretch;gap:0;flex-wrap:wrap;
+      padding:0 4px;
+    }
+    .site-nav a{
+      text-decoration:none;
+      font-family:"Space Mono",monospace;
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:#CFCDC4;
+      padding:.85rem .7rem;
+      display:inline-flex;align-items:center;
+      border-right:1px solid #2c2c2c;
+      transition:background .12s var(--ease),color .12s var(--ease);
+      white-space:nowrap;
+    }
+    .site-nav a:hover{background:var(--hazard);color:var(--ink)}
+    .site-nav a.brand{
+      font-family:"Archivo Black",sans-serif;
+      font-size:.92rem;letter-spacing:0;
+      color:var(--hazard);
+      padding-right:1rem;
+    }
+    .site-nav a.brand:hover{background:var(--hazard);color:var(--ink)}
+    .site-nav a[aria-current="page"]{
+      background:var(--hazard);color:var(--ink);font-weight:700;
+    }
+    .site-nav a.cta{
+      margin-left:auto;
+      background:var(--blast);color:#fff;font-weight:700;
+      border-right:none;
+    }
+    .site-nav a.cta:hover{background:#fff;color:var(--blast)}
+
+    /* ---------------- WRAP ---------------- */
+    .wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+    main.wrap{padding-bottom:5rem}
+
+    /* ---------------- HERO : cabinet header ---------------- */
+    .hero{
+      position:relative;
+      border:3px solid var(--ink);
+      background:var(--paper);
+      margin-top:2.4rem;
+      padding:clamp(1.4rem,4vw,3rem);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    /* hazard warning stripe across the top of the cabinet */
+    .hero::before{
+      content:"";position:absolute;top:0;left:0;right:0;height:14px;
+      background:repeating-linear-gradient(45deg, var(--hazard) 0 16px, var(--ink) 16px 32px);
+    }
+    .hero .kicker{
+      display:inline-block;margin-top:.6rem;
+      font-family:"Space Mono",monospace;
+      font-size:.72rem;text-transform:uppercase;letter-spacing:.18em;
+      background:var(--ink);color:var(--hazard);
+      padding:.3rem .6rem;
+    }
+    .hero h1{
+      font-family:"Archivo Black",sans-serif;
+      font-weight:400;
+      font-size:clamp(2.4rem,7vw,5.5rem);
+      line-height:.9;
+      letter-spacing:-.02em;
+      text-transform:uppercase;
+      margin:.7rem 0 .4rem;
+      color:var(--ink);
+    }
+    .hero h1 em{
+      font-style:normal;color:var(--blast);
+      -webkit-text-stroke:2px var(--ink);
+      text-shadow:4px 4px 0 var(--hazard);
+    }
+    .hero .lede{
+      max-width:60ch;font-size:var(--step-1);line-height:1.4;color:var(--ink-soft);
+      margin:.4rem 0 0;
+    }
+    .hero .lede em{font-style:italic;background:var(--hazard);padding:0 .15em;font-weight:600}
+    /* corner registration marks */
+    .hero .reg{position:absolute;font-family:"Space Mono",monospace;font-size:.6rem;color:var(--ink-faint);letter-spacing:.1em}
+    .hero .reg.tr{top:22px;right:14px}
+    .hero .reg.bl{bottom:10px;left:14px}
+
+    /* ---------------- TOC : control panel ---------------- */
+    .toc{
+      border:3px solid var(--ink);
+      border-top:none;
+      background:var(--paper-2);
+      padding:1rem clamp(1.4rem,4vw,3rem) 1.4rem;
+    }
+    .toc::before{
+      content:"// INSERT COIN — SELECT LEVEL";
+      display:block;
+      font-family:"Space Mono",monospace;font-size:.7rem;letter-spacing:.14em;
+      color:var(--ink-dim);margin-bottom:.7rem;
+    }
+    .toc ol{
+      list-style:none;margin:0;padding:0;
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0;
+      border:1px solid var(--ink);background:var(--ink);
+    }
+    .toc li{counter-increment:lv}
+    .toc a{
+      display:block;background:var(--paper);text-decoration:none;
+      font-family:"Space Mono",monospace;font-size:.78rem;
+      padding:.7rem .8rem;color:var(--ink-soft);
+      transition:background .1s var(--ease),color .1s var(--ease),transform .1s var(--ease);
+    }
+    .toc a:hover{background:var(--hazard);color:var(--ink)}
+
+    /* ---------------- SECTIONS ---------------- */
+    section{
+      margin-top:3.2rem;scroll-margin-top:90px;
+    }
+    section > h2{
+      font-family:"Archivo Black",sans-serif;font-weight:400;
+      font-size:var(--step-3);line-height:.95;letter-spacing:-.015em;
+      text-transform:uppercase;
+      margin:0 0 1rem;
+      padding-bottom:.6rem;
+      border-bottom:4px solid var(--ink);
+      position:relative;
+    }
+    section > h2::after{
+      content:"";position:absolute;left:0;bottom:-4px;width:120px;height:4px;background:var(--hazard);
+    }
+    h3{
+      font-family:"Space Grotesk",sans-serif;font-weight:700;
+      font-size:var(--step-1);text-transform:uppercase;letter-spacing:.01em;
+      margin:2rem 0 .6rem;
+      display:flex;align-items:center;gap:.6rem;
+    }
+    h3::before{content:"\25B6";color:var(--blast);font-size:.8em}
+
+    p{margin:0 0 1.1rem;max-width:74ch}
+    p strong{font-weight:700}
+    em{font-style:italic}
+    code{
+      font-family:"Space Mono",monospace;font-size:.86em;
+      background:var(--paper-2);border:1px solid var(--ink);
+      padding:.05em .35em;
+    }
+
+    /* .ref site citations — arcade tag pills */
+    .ref{
+      font-family:"Space Mono",monospace;
+      font-size:.82em;font-weight:700;
+      background:var(--ink);color:var(--hazard);
+      padding:.05em .4em;
+      white-space:nowrap;
+      box-shadow:2px 2px 0 var(--hazard-deep);
+    }
+
+    /* ---------------- PRE / CODE BLOCKS : terminal ---------------- */
+    pre{
+      background:var(--ink);
+      color:#E8E6DD;
+      border:3px solid var(--ink);
+      box-shadow:var(--shadow-sm);
+      padding:1.1rem 1.2rem;
+      margin:1.4rem 0;
+      overflow-x:auto;
+      position:relative;
+    }
+    pre::before{
+      content:"\2022 \2022 \2022  TERMINAL";
+      display:block;
+      font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.18em;
+      color:var(--hazard);
+      border-bottom:1px dashed #444;
+      padding-bottom:.5rem;margin-bottom:.7rem;
+    }
+    pre code{
+      background:none;border:none;padding:0;color:inherit;
+      font-family:"Space Mono",monospace;font-size:.82rem;line-height:1.55;
+    }
+
+    /* ---------------- FIGURES ---------------- */
+    .figure{
+      margin:1.8rem 0;
+      border:3px solid var(--ink);
+      background:var(--paper);
+      box-shadow:var(--shadow);
+    }
+    .figure img{
+      display:block;width:100%;height:auto;
+      border-bottom:3px solid var(--ink);
+      filter:contrast(1.02) saturate(1.02);
+    }
+    figcaption{
+      font-family:"Space Mono",monospace;font-size:.78rem;line-height:1.5;
+      color:var(--ink-soft);
+      padding:.8rem 1rem;
+    }
+    figcaption strong{color:var(--ink);font-weight:700;text-transform:uppercase}
+
+    /* ---------------- CALLOUTS ---------------- */
+    .callout{
+      border:3px solid var(--ink);
+      padding:1.1rem 1.2rem 1.1rem 1.4rem;
+      margin:1.6rem 0;
+      box-shadow:var(--shadow-sm);
+      position:relative;
+    }
+    .callout p{margin:0;max-width:none}
+    .callout p strong:first-child{display:block;margin-bottom:.3rem;font-family:"Archivo Black",sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.01em;font-size:.95rem}
+    .callout::before{
+      position:absolute;top:-3px;left:-3px;
+      font-family:"Space Mono",monospace;font-size:.62rem;font-weight:700;letter-spacing:.12em;
+      padding:.22rem .5rem;color:var(--ink);
+    }
+    .callout.tip{background:#EAF0FF;border-color:var(--ink)}
+    .callout.tip::before{content:"[ TIP ]";background:var(--blast);color:#fff}
+    .callout.warn{background:#FFF1E8;border-color:var(--hot)}
+    .callout.warn::before{content:"[ WARNING ]";background:var(--hot);color:#fff}
+    .callout.steal{background:var(--hazard);border-color:var(--ink)}
+    .callout.steal::before{content:"[ STEAL THIS ]";background:var(--ink);color:var(--hazard)}
+    .callout.steal ul{margin:.4rem 0 0;padding-left:1.1rem}
+    .callout.steal li{margin-bottom:.6rem}
+    .callout.steal li::marker{content:"\25A0  ";color:var(--ink)}
+
+    /* ---------------- TABLE ---------------- */
+    table{
+      width:100%;border-collapse:collapse;margin:1.6rem 0;
+      border:3px solid var(--ink);
+      font-size:var(--step--1);
+      box-shadow:var(--shadow-sm);
+      background:var(--paper);
+    }
+    caption{
+      caption-side:bottom;
+      font-family:"Space Mono",monospace;font-size:.74rem;color:var(--ink-dim);
+      padding:.7rem .4rem 0;text-align:left;
+    }
+    thead th{
+      background:var(--ink);color:var(--hazard);
+      font-family:"Space Mono",monospace;text-transform:uppercase;letter-spacing:.06em;
+      font-size:.74rem;font-weight:700;
+      text-align:left;padding:.7rem .8rem;
+    }
+    tbody td{
+      padding:.8rem .8rem;
+      border-top:1px solid var(--ink);
+      border-right:1px solid var(--ink);
+      vertical-align:top;line-height:1.45;
+    }
+    tbody td:last-child{border-right:none}
+    tbody tr:nth-child(even){background:var(--paper-2)}
+    tbody td em{font-weight:600}
+
+    /* ---------------- EXAMPLE (live demo frame) ---------------- */
+    .example{
+      border:3px solid var(--ink);
+      background:var(--paper-2);
+      margin:1.6rem 0;
+      box-shadow:var(--shadow);
+    }
+    .example > div:first-child{padding:1.8rem 1.2rem}
+    .example::before{
+      content:"\25C9 LIVE DEMO";
+      display:block;
+      font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.16em;
+      background:var(--ink);color:var(--hazard);
+      padding:.45rem .8rem;
+    }
+    .example figcaption{border-top:1px solid var(--ink);background:var(--paper)}
+
+    /* ---------------- KONAMI DEMO ---------------- */
+    .konami-demo{display:flex;flex-direction:column;align-items:center;gap:1.1rem;text-align:center}
+    .konami-keys{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
+    .konami-keys kbd{
+      font-family:"Space Mono",monospace;font-size:1rem;font-weight:700;
+      background:var(--paper);color:var(--ink);
+      border:2px solid var(--ink);
+      box-shadow:0 4px 0 var(--ink);
+      padding:.45em .65em;min-width:2.4em;
+      cursor:pointer;
+      transition:transform .12s var(--boing),box-shadow .12s var(--ease),background .12s var(--ease);
+    }
+    .konami-keys kbd:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--ink)}
+    .konami-keys kbd.lit{
+      background:var(--hazard);color:var(--ink);
+      transform:translateY(4px);box-shadow:0 0 0 var(--ink);
+    }
+    #konami-stage{
+      font-family:"Archivo Black",sans-serif;font-size:var(--step-1);
+      text-transform:uppercase;min-height:1.4em;color:var(--ink);
+      transition:transform .4s var(--boing);
+    }
+    #konami-stage.win{animation:pop .55s var(--boing)}
+    @keyframes pop{0%{transform:scale(.4) rotate(-8deg);opacity:0}60%{transform:scale(1.18) rotate(3deg);color:var(--blast)}100%{transform:scale(1) rotate(0);opacity:1}}
+
+    /* ---------------- TOY BUTTON DEMO ---------------- */
+    .toy-row{display:flex;gap:2rem;flex-wrap:wrap;align-items:center;justify-content:center}
+    .toy-btn{
+      font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1rem;
+      text-transform:uppercase;letter-spacing:.02em;
+      color:var(--ink);background:var(--hazard);
+      border:3px solid var(--ink);
+      padding:.8em 1.5em;cursor:pointer;
+      box-shadow:0 7px 0 var(--ink);
+      transition:transform .12s var(--boing),box-shadow .12s var(--ease);
+    }
+    .toy-btn:hover{transform:translateY(-2px);box-shadow:0 9px 0 var(--ink)}
+    .toy-btn:active{transform:translateY(5px);box-shadow:0 2px 0 var(--ink)}
+    .toy-btn.linear{
+      background:var(--paper);color:var(--ink-dim);
+      box-shadow:none;transition:transform .12s linear;
+    }
     .toy-btn.linear:active{transform:scale(.96)}
+
+    /* ---------------- FOOTER ---------------- */
+    .ftr{
+      margin-top:5rem;
+      background:var(--ink);color:#CFCDC4;
+      border-top:14px solid transparent;
+      border-image:repeating-linear-gradient(45deg, var(--hazard) 0 16px, var(--ink) 16px 32px) 14;
+      padding:3rem 0 3.5rem;
+    }
+    .ftr .wrap{padding-top:0}
+    .ftr p{max-width:none;margin:0 0 .8rem;font-family:"Space Mono",monospace;font-size:.86rem}
+    .ftr a{color:var(--hazard);text-decoration:none;border-bottom:2px solid transparent;transition:border-color .12s var(--ease)}
+    .ftr a:hover{border-color:var(--hazard)}
+    .ftr a.brand{
+      font-family:"Archivo Black",sans-serif;font-size:1.4rem;color:var(--hazard);
+      border:none;text-transform:uppercase;
+    }
+    .ftr p:last-child{color:var(--ink-faint)}
+
+    /* ---------------- RESPONSIVE ---------------- */
+    @media (max-width:640px){
+      .site-nav a{font-size:.66rem;padding:.7rem .5rem}
+      .site-nav a.cta{margin-left:0;width:100%;justify-content:center}
+      .toc ol{grid-template-columns:1fr}
+      .toy-row{gap:1.2rem}
+      .hero h1 em{text-shadow:3px 3px 0 var(--hazard)}
+      :root{--shadow:4px 4px 0 var(--ink);--shadow-sm:3px 3px 0 var(--ink)}
+    }
   </style>
 </head>
 <body>
@@ -52,27 +445,29 @@
 
   <main class="wrap">
     <div class="hero">
+      <span class="reg tr">+ REV 2.6 / UNIT D-11</span>
+      <span class="reg bl">+ CRAFT-ATLAS®</span>
       <span class="kicker">Craft Atlas · 11 / 13</span>
-      <h1>Mini-Games &amp; Playful Interaction</h1>
+      <h1>Mini-Games &amp;<br>Playful <em>Play</em></h1>
       <p class="lede">When a portfolio stops being a page you read and becomes a thing you <em>play</em>. The mechanics behind drivable 3D worlds, Konami eggs, squishy toy buttons — and the hard discipline of knowing when to switch the toys off.</p>
     </div>
 
     <nav class="toc" aria-label="Table of contents">
       <ol>
-        <li><a href="#thesis">1 · The thesis: one mechanic beats ten effects</a></li>
-        <li><a href="#games-as-portfolio">2 · Games-as-portfolio: the drivable résumé</a></li>
-        <li><a href="#diegetic">3 · Diegetic navigation &amp; the toybox room</a></li>
-        <li><a href="#eggs">4 · Easter eggs &amp; the Konami code</a></li>
-        <li><a href="#replayability">5 · Replayability: achievements, sound, re-rolls</a></li>
-        <li><a href="#microtoys">6 · Micro-toys: playful without WebGL</a></li>
-        <li><a href="#perf-a11y">7 · Performance &amp; accessibility of playful UI</a></li>
-        <li><a href="#when-not">8 · Knowing when NOT to</a></li>
-        <li><a href="#steal">9 · Steal-this checklist</a></li>
+        <li><a href="#thesis">01 · One mechanic beats ten effects</a></li>
+        <li><a href="#games-as-portfolio">02 · Games-as-portfolio: drivable résumé</a></li>
+        <li><a href="#diegetic">03 · Diegetic nav &amp; the toybox room</a></li>
+        <li><a href="#eggs">04 · Easter eggs &amp; the Konami code</a></li>
+        <li><a href="#replayability">05 · Replayability: achievements, sound</a></li>
+        <li><a href="#microtoys">06 · Micro-toys: playful without WebGL</a></li>
+        <li><a href="#perf-a11y">07 · Performance &amp; accessibility</a></li>
+        <li><a href="#when-not">08 · Knowing when NOT to</a></li>
+        <li><a href="#steal">09 · Steal-this checklist</a></li>
       </ol>
     </nav>
 
     <section id="thesis">
-      <h2>1 · The thesis: one mechanic beats ten effects</h2>
+      <h2>01 · One mechanic beats ten effects</h2>
       <p>Every site in this teardown set that people <em>remember by name</em> made one bet: a single signature interaction, executed to obsession, outperforms a confetti of small animations. <span class="ref">Bruno Simon ↗</span> turns a CV into a car you drive. <span class="ref">Henry Heffernan ↗</span> boots a 90s OS inside a CRT. <span class="ref">Lusion ↗</span> hands you a cluster of 3D plumbing joints to shove around with your cursor. None of them are "a page with effects" — they are one toy, fully committed.</p>
 
       <p>The lesson recurs verbatim in our notes. Bruno Simon's teardown spells it out: <em>"one signature mechanic beats ten generic scroll animations."</em> Henry Heffernan's: <em>"a single, well-choreographed camera/scroll move at first interaction does more for wow than dozens of small effects."</em> Playful UI is not additive — it is <strong>focal</strong>. Pick the one thing, make it physical, make it the whole identity.</p>
@@ -83,7 +478,7 @@
     </section>
 
     <section id="games-as-portfolio">
-      <h2>2 · Games-as-portfolio: the drivable résumé</h2>
+      <h2>02 · The drivable résumé</h2>
       <p>The reference implementation is <span class="ref">Bruno Simon ↗</span> — the single most-copied 3D web portfolio in the industry. There is essentially <strong>no DOM layout</strong>: the entire experience is one full-viewport <code>&lt;canvas&gt;</code>, the accessibility tree returns just two buttons, and everything visual is rendered in WebGL. You don't scroll sections — you <strong>drive a physics car</strong> (now on Rapier, up from the 2019 Cannon.js) through 13 explorable districts: a landing area, a projects zone, a lab, race tracks, a bowling alley, an altar.</p>
 
       <figure class="figure">
@@ -106,7 +501,7 @@
     </section>
 
     <section id="diegetic">
-      <h2>3 · Diegetic navigation &amp; the toybox room</h2>
+      <h2>03 · Diegetic nav &amp; the toybox</h2>
       <p>"Diegetic" means the navigation exists <em>inside the fiction</em> — you don't click a nav link labelled "Projects," you drive up to a project or open a window on a desktop. <span class="ref">Bruno Simon ↗</span>'s IA is spatial: sections are physical districts. <span class="ref">Henry Heffernan ↗</span>'s is window-based: About / Experience / Projects / Contact are OS "apps," not links. <span class="ref">Active Theory ↗</span> doesn't even load a new page when you pick Work — it transitions the WebGL scene to an animated category list (<code>-&gt; games</code>, <code>-&gt; multiplayer</code>, <code>-&gt; XR / VR / AI</code>), so wayfinding is diegetic rather than route-based.</p>
 
       <p>The non-negotiable discipline underneath: <strong>keep a real semantic DOM skeleton</strong>. Henry exposes hidden <code>&lt;a&gt;</code> links and headings (ABOUT / EXPERIENCE / PROJECTS / CONTACT) in the accessibility tree so the experience still works for screen readers, SEO, and no-JS. Copy that discipline religiously — diegetic navigation is a layer <em>over</em> a working document, never a replacement for one.</p>
@@ -139,7 +534,7 @@
     </section>
 
     <section id="eggs">
-      <h2>4 · Easter eggs &amp; the Konami code</h2>
+      <h2>04 · Easter eggs &amp; the Konami code</h2>
       <p>An easter egg is the cheapest high-memorability interaction on the web: a hidden reward for the curious that costs a few lines and buys word-of-mouth. <span class="ref">Bruno Simon ↗</span> packs the canonical set — a cookie-clicker mini-game (1 → 1000 cookies), a hidden debug-UI achievement, a sacrifice altar with a cataclysm, and the <strong>Konami code</strong> ("Up up down down… you know the rest"). <span class="ref">Gianmarco Cavallo ↗</span> ships an explicit <code>easter egg btn</code> in the DOM. <span class="ref">Cassidy Williams ↗</span>'s teardown distills the principle: <em>"one tiny interaction makes the site feel human."</em></p>
 
       <p>The Konami code is the genre's mascot. Here is a correct, copy-pasteable listener — case-insensitive, resettable, and forgiving of a mistyped key:</p>
@@ -168,7 +563,7 @@ window.addEventListener('keydown', (e) =&gt; {
 
       <div class="example">
         <div class="konami-demo">
-          <p style="color:var(--ink-dim);font-size:var(--step--1);margin:0">Tap the keys in order (or use your arrow keys + B + A):</p>
+          <p style="color:var(--ink-dim);font-size:var(--step--1);margin:0;font-family:'Space Mono',monospace">Tap the keys in order (or use your arrow keys + B + A):</p>
           <div class="konami-keys" id="konami-keys" role="group" aria-label="Konami code demo">
             <kbd data-k="ArrowUp">↑</kbd><kbd data-k="ArrowUp">↑</kbd>
             <kbd data-k="ArrowDown">↓</kbd><kbd data-k="ArrowDown">↓</kbd>
@@ -204,7 +599,7 @@ window.addEventListener('keydown', (e) =&gt; {
     </section>
 
     <section id="replayability">
-      <h2>5 · Replayability: achievements, sound, re-rolls</h2>
+      <h2>05 · Replayability</h2>
       <p>A toy you play once is a gimmick; a toy you come back to is an engine. Three mechanics drive replay in our teardowns:</p>
 
       <h3>Achievements &amp; completion loops</h3>
@@ -239,7 +634,7 @@ function blip(freq = 660) {
     </section>
 
     <section id="microtoys">
-      <h2>6 · Micro-toys: playful without WebGL</h2>
+      <h2>06 · Playful without WebGL</h2>
       <p>You don't need Three.js to be playful. The cheapest, highest-ROI delight is physical-feeling motion on ordinary elements. <span class="ref">Josh Comeau ↗</span>'s entire brand is "delight engineering" — spring-based motion, squash-and-stretch, physical easing rather than linear transitions, applied to plain hover states. <span class="ref">Cassidy Williams ↗</span> gets personality from <strong>individually rainbow-colored inline links</strong> — zero JS, pure CSS, instantly memorable. <span class="ref">Gianmarco Cavallo ↗</span> ships a <strong>live world-clock</strong> that computes the visitor's offset ("7h behind you") — a tiny real-time toy on a static Astro site.</p>
 
       <p>Here is the difference a spring easing makes versus a linear one — the single most impactful "toy" upgrade you can ship:</p>
@@ -270,7 +665,7 @@ function blip(freq = 660) {
     </section>
 
     <section id="perf-a11y">
-      <h2>7 · Performance &amp; accessibility of playful UI</h2>
+      <h2>07 · Performance &amp; accessibility</h2>
       <p>Playful UI is where performance and accessibility go to die if you're careless. The teardowns show the fixes.</p>
 
       <h3>Mask the load — don't spin</h3>
@@ -279,8 +674,8 @@ function blip(freq = 660) {
       <h3>Scale to the GPU</h3>
       <p><span class="ref">Bruno Simon ↗</span> ships a "WebGPU / High effects" toggle with graceful fallback so the same world runs on phones and high-end desktops. Assets are GLTF + Draco-compressed (the original kept all models under ~2MB combined). Progressive enhancement on the GPU is non-optional for a public toy.</p>
 
-      <h3>Honour <code>prefers-reduced-motion</code> — including JS animation</h3>
-      <p>CSS reduced-motion is table stakes (<code>shared.css</code> already neutralises transitions). But playful UI is often JS/canvas-driven, which the media query does <em>not</em> stop. Gate your rAF loops and physics in script too:</p>
+      <h3>Honour <code>prefers-reduced-motion</code> — including JS</h3>
+      <p>CSS reduced-motion is table stakes. But playful UI is often JS/canvas-driven, which the media query does <em>not</em> stop. Gate your rAF loops and physics in script too:</p>
 
 <pre><code>const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -302,7 +697,7 @@ reduce.addEventListener('change', () =&gt; { /* pause / resume */ });</code></pr
     </section>
 
     <section id="when-not">
-      <h2>8 · Knowing when NOT to</h2>
+      <h2>08 · Knowing when NOT to</h2>
       <p>The most senior signal in this whole topic is restraint. The same teardown set that celebrates Bruno also celebrates the sites that <em>turned the toys off</em> — and they did it on purpose.</p>
 
       <p><span class="ref">Rauno Freiberg ↗</span> is the clearest case: a Vercel design engineer who shipped two flashier versions (a 2023 OS/dock metaphor with interface sounds, a 2022 build) and then <strong>downshifted</strong> to a near-monochrome filmstrip of white cards. His teardown: <em>"a confident downshift: the work speaks, the chrome disappears."</em> The old toys aren't deleted — they're preserved as live easter-egg archives at <code>2023.rauno.me</code>, "versioning your portfolio as a museum." That's the move: graduate from the toy, keep it as a footnote.</p>
@@ -328,7 +723,7 @@ reduce.addEventListener('change', () =&gt; { /* pause / resume */ });</code></pr
     </section>
 
     <section id="steal">
-      <h2>9 · Steal-this checklist</h2>
+      <h2>09 · Steal-this checklist</h2>
       <div class="callout steal">
         <ul>
           <li><strong>Pick ONE mechanic.</strong> A single signature interaction (Bruno's car, Henry's CRT) beats ten scroll effects. Commit fully or don't bother.</li>
@@ -349,8 +744,8 @@ reduce.addEventListener('change', () =&gt; { /* pause / resume */ });</code></pr
     <div class="wrap">
       <p><a class="brand" href="../PLAN.html">◆ Craft Atlas</a></p>
       <p>Mini-games, easter eggs, and the discipline of playful UI — next up: <a href="STATE-MANAGEMENT.html">State Management →</a></p>
-      <p style="margin-top:var(--s-4)"><a href="../PLAN.html">← Back to the Build Plan</a></p>
-      <p style="color:var(--ink-faint);margin-top:var(--s-3)">Craft Atlas — synthesized from 80 live site teardowns.</p>
+      <p style="margin-top:1.4rem"><a href="../PLAN.html">← Back to the Build Plan</a></p>
+      <p style="margin-top:.8rem">Craft Atlas — synthesized from 80 live site teardowns.</p>
     </div>
   </footer>
 </body>

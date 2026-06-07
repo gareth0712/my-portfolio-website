@@ -4,85 +4,492 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Microinteractions &amp; Interaction Design — Craft Atlas</title>
+  <meta name="description" content="A hands-on guide to microinteractions: hover states, custom cursors, magnetic buttons, drag physics, state feedback, and delight — synthesized from 80 live site teardowns.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ---- page-local live-demo styles only ---- */
+    /* =====================================================================
+       INTERACTIONS — Craft Atlas · 09
+       Bespoke art direction: "THE CONTROL SURFACE".
+       A dark instrument-panel / lab bench where every component reads as a
+       tactile control the pointer wants to touch. Deliberately diverges from
+       the warm-paper editorial siblings (PLAN / TYPOGRAPHY): this one is
+       dark, machined, pointer-reactive.
+       Type:  Space Grotesk (display) / Sora (body) / JetBrains Mono (signal)
+       Color: graphite + a single electric-lime accent reserved STRICTLY for
+              interactive / live elements (colour = affordance — the page's
+              own thesis, applied to itself).
+       Self-contained: no shared.css.
+       ===================================================================== */
+
+    :root {
+      /* ---- graphite base (dark, locked) ---- */
+      --bg:        #0c0d10;   /* deepest bench surface          */
+      --bg-2:      #131519;   /* panel                          */
+      --bg-3:      #181b21;   /* raised control                 */
+      --bg-4:      #1f232b;   /* hover lift                      */
+      --ink:       #f1f3f0;   /* primary text                   */
+      --ink-soft:  #c4c8c3;   /* secondary                      */
+      --ink-dim:   #82877f;   /* meta / dim                     */
+      --line:      #262b33;   /* hairline                       */
+      --line-soft: #1c2027;   /* faint divider                  */
+
+      /* ---- the ONE accent — electric lime — interactive elements ONLY --- */
+      --accent:      #c6f24e;
+      --accent-ink:  #11140a;   /* text on accent fills          */
+      --accent-soft: #aee03f;
+      --accent-glow: rgba(198,242,78,.16);
+      --accent-line: rgba(198,242,78,.45);
+
+      /* ---- type ---- */
+      --display: "Space Grotesk", system-ui, sans-serif;
+      --body:    "Sora", system-ui, -apple-system, sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+      /* fluid scale */
+      --step--1: clamp(0.78rem, 0.74rem + 0.18vw, 0.88rem);
+      --step-0:  clamp(1.0rem, 0.95rem + 0.22vw, 1.13rem);
+      --step-1:  clamp(1.2rem, 1.08rem + 0.55vw, 1.55rem);
+      --step-2:  clamp(1.55rem, 1.25rem + 1.4vw, 2.4rem);
+      --step-3:  clamp(2.0rem, 1.45rem + 2.6vw, 3.5rem);
+      --hero:    clamp(2.7rem, 1.4rem + 6vw, 6.4rem);
+
+      /* spacing */
+      --s-1:.25rem; --s-2:.5rem; --s-3:.75rem; --s-4:1rem;
+      --s-5:1.5rem; --s-6:2rem; --s-7:3rem; --s-8:4.5rem; --s-9:7rem;
+
+      /* radii — machined-square scale: tight corners, pill for controls */
+      --r-1:6px; --r-2:10px; --r-3:16px; --r-pill:999px;
+
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+      --ease-spring: cubic-bezier(.18,.9,.32,1.1);
+      --dur-fast:160ms; --dur:340ms; --dur-slow:680ms;
+
+      --maxw: 1180px;
+      --measure: 68ch;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; -webkit-text-size-adjust: 100%; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--body);
+      font-size: var(--step-0);
+      line-height: 1.68;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    /* fixed bench texture: faint grid + grain, never repaints on scroll */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(var(--line-soft) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+      background-size: 64px 64px, 64px 64px;
+      opacity: .5;
+      -webkit-mask-image: radial-gradient(circle at 50% 0%, #000 0%, transparent 75%);
+              mask-image: radial-gradient(circle at 50% 0%, #000 0%, transparent 75%);
+    }
+    body::after {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .035;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* live cursor halo — only on fine pointers (added via JS class on body) */
+    .cursor-halo {
+      position: fixed; top: 0; left: 0; width: 22px; height: 22px; z-index: 90;
+      border: 1.5px solid var(--accent-line);
+      border-radius: 50%; pointer-events: none;
+      transform: translate3d(-100px,-100px,0);
+      transition: width .25s var(--ease), height .25s var(--ease),
+                  background .25s var(--ease), border-color .25s var(--ease);
+      mix-blend-mode: screen;
+    }
+    .cursor-halo.is-hot { width: 46px; height: 46px; background: var(--accent-glow); border-color: var(--accent); }
+    body.has-halo { cursor: auto; }
+
+    ::selection { background: var(--accent); color: var(--accent-ink); }
+
+    a { color: inherit; }
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 3px;
+    }
+
+    /* ---------- header / nav ---------- */
+    .site-header {
+      position: sticky; top: 0; z-index: 80;
+      background: rgba(12,13,16,.78);
+      backdrop-filter: blur(14px) saturate(140%);
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      border-bottom: 1px solid var(--line);
+    }
+    .site-nav {
+      max-width: var(--maxw); margin: 0 auto;
+      display: flex; align-items: center; gap: .15rem;
+      padding: .7rem clamp(1rem, 3vw, 2rem);
+      overflow-x: auto; scrollbar-width: none;
+      height: 64px;
+    }
+    .site-nav::-webkit-scrollbar { display: none; }
+    .site-nav a {
+      flex: none;
+      font-family: var(--font-mono);
+      font-size: .76rem; letter-spacing: .01em;
+      text-decoration: none; color: var(--ink-dim);
+      padding: .4rem .6rem; border-radius: var(--r-1);
+      white-space: nowrap;
+      transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+    }
+    .site-nav a:hover { color: var(--ink); background: var(--bg-3); }
+    .site-nav a[aria-current="page"] { color: var(--accent); }
+    .site-nav .brand {
+      font-family: var(--display); font-weight: 700; font-size: .95rem;
+      letter-spacing: -.01em; color: var(--ink); margin-right: .5rem;
+    }
+    .site-nav .brand:hover { color: var(--accent); background: transparent; }
+    .site-nav .cta {
+      margin-left: auto; color: var(--accent-ink); background: var(--accent);
+      font-weight: 600; padding: .42rem .9rem; border-radius: var(--r-pill);
+      transition: transform var(--dur-fast) var(--ease-spring), background var(--dur-fast) var(--ease);
+    }
+    .site-nav .cta:hover { background: var(--accent-soft); transform: translateY(-1px); color: var(--accent-ink); }
+    .site-nav .cta:active { transform: translateY(0) scale(.97); }
+
+    /* ---------- layout shell ---------- */
+    .wrap {
+      position: relative; z-index: 1;
+      max-width: var(--maxw); margin: 0 auto;
+      padding: clamp(2.5rem, 6vw, 5rem) clamp(1.1rem, 4vw, 2.5rem) var(--s-9);
+    }
+
+    /* ---------- hero ---------- */
+    .hero { padding-top: clamp(1rem, 4vw, 3rem); margin-bottom: var(--s-9); }
+    .kicker {
+      display: inline-flex; align-items: center; gap: .55rem;
+      font-family: var(--font-mono); font-size: var(--step--1);
+      text-transform: uppercase; letter-spacing: .22em; color: var(--ink-dim);
+      margin-bottom: var(--s-5);
+    }
+    .kicker .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow);
+      animation: pulse 2.4s var(--ease) infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 3px var(--accent-glow); }
+      50%     { box-shadow: 0 0 0 8px transparent; }
+    }
+    h1 {
+      font-family: var(--display); font-weight: 700;
+      font-size: var(--hero); line-height: .98; letter-spacing: -.03em;
+      margin: 0 0 var(--s-6); max-width: 16ch;
+    }
+    h1 .live {
+      color: var(--accent); position: relative; white-space: nowrap;
+    }
+    .lede {
+      font-size: var(--step-1); line-height: 1.55; color: var(--ink-soft);
+      max-width: 60ch; margin: 0;
+    }
+    .lede em { color: var(--ink); font-style: italic; }
+
+    /* ---------- table of contents ---------- */
+    .toc {
+      margin: var(--s-8) 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      background: var(--bg-2);
+      padding: var(--s-5) var(--s-6);
+    }
+    .toc::before {
+      content: "// index";
+      display: block; font-family: var(--font-mono); font-size: .72rem;
+      letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim);
+      margin-bottom: var(--s-4);
+    }
+    .toc ul {
+      list-style: none; margin: 0; padding: 0;
+      display: grid; gap: .15rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+    .toc a {
+      display: block; text-decoration: none; color: var(--ink-soft);
+      font-family: var(--font-mono); font-size: .82rem;
+      padding: .5rem .7rem; border-radius: var(--r-1);
+      border: 1px solid transparent;
+      transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease),
+                  border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+    }
+    .toc a:hover {
+      color: var(--accent); background: var(--bg-3);
+      border-color: var(--line); transform: translateX(3px);
+    }
+
+    /* ---------- typography rhythm ---------- */
+    h2 {
+      font-family: var(--display); font-weight: 700;
+      font-size: var(--step-3); line-height: 1.05; letter-spacing: -.02em;
+      margin: var(--s-9) 0 var(--s-5); scroll-margin-top: 6.5rem;
+      position: relative; padding-top: var(--s-5);
+      border-top: 1px solid var(--line);
+    }
+    h2::before {
+      content: attr(data-n);
+      position: absolute; top: var(--s-5); right: 0;
+      font-family: var(--font-mono); font-weight: 500; font-size: .8rem;
+      color: var(--ink-dim); letter-spacing: .1em;
+    }
+    h3 {
+      font-family: var(--display); font-weight: 600;
+      font-size: var(--step-1); line-height: 1.2; letter-spacing: -.01em;
+      margin: var(--s-7) 0 var(--s-3); color: var(--ink);
+    }
+    p { max-width: var(--measure); margin: 0 0 var(--s-5); }
+    .lede { max-width: 62ch; }
+    strong { color: var(--ink); font-weight: 600; }
+    em { font-style: italic; }
+
+    code {
+      font-family: var(--font-mono); font-size: .86em;
+      background: var(--bg-3); color: var(--accent-soft);
+      padding: .12em .4em; border-radius: 5px;
+      border: 1px solid var(--line);
+    }
+    kbd {
+      font-family: var(--font-mono); font-size: .78em;
+      background: var(--bg-4); color: var(--ink);
+      padding: .12em .5em; border-radius: 5px;
+      border: 1px solid var(--line);
+      box-shadow: 0 1px 0 var(--line);
+    }
+
+    /* ---- the .ref site-citation chip ---- */
+    .ref {
+      font-family: var(--font-mono); font-size: .82em; font-weight: 500;
+      color: var(--accent); white-space: nowrap; cursor: default;
+      border-bottom: 1px dashed var(--accent-line);
+      transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+    }
+    .ref:hover { color: var(--accent-soft); border-bottom-color: var(--accent); }
+
+    /* ---------- code blocks ---------- */
+    pre {
+      position: relative;
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      padding: var(--s-6) var(--s-5) var(--s-5);
+      overflow-x: auto;
+      margin: var(--s-6) 0;
+      line-height: 1.7;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+    }
+    pre::before {
+      content: "";
+      position: absolute; top: 14px; left: 18px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 18px 0 0 var(--bg-4), 36px 0 0 var(--bg-4);
+    }
+    pre code {
+      background: none; border: 0; padding: 0; color: var(--ink-soft);
+      font-size: .82rem; display: block; padding-top: var(--s-3);
+    }
+
+    /* ---------- figures ---------- */
+    .figure {
+      margin: var(--s-7) 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      overflow: hidden;
+      background: var(--bg-2);
+    }
+    .figure img {
+      display: block; width: 100%; height: auto;
+      border-bottom: 1px solid var(--line);
+    }
+    figcaption {
+      font-size: var(--step--1); line-height: 1.55; color: var(--ink-dim);
+      padding: var(--s-4) var(--s-5);
+    }
+    .figure figcaption strong { color: var(--ink-soft); }
+
+    /* ---------- callouts ---------- */
+    .callout {
+      margin: var(--s-6) 0;
+      padding: var(--s-5) var(--s-5) var(--s-5) calc(var(--s-5) + .6rem);
+      border-radius: var(--r-2);
+      border: 1px solid var(--line);
+      background: var(--bg-2);
+      position: relative;
+    }
+    .callout::before {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; border-radius: 3px 0 0 3px;
+    }
+    .callout p { max-width: 66ch; margin: 0; font-size: var(--step--1); line-height: 1.62; color: var(--ink-soft); }
+    .callout p strong { color: var(--ink); }
+    .callout::after {
+      font-family: var(--font-mono); font-size: .66rem; letter-spacing: .16em;
+      text-transform: uppercase; position: absolute; top: var(--s-4); right: var(--s-5);
+    }
+    .callout.steal::before { background: var(--accent); }
+    .callout.steal::after  { content: "steal this"; color: var(--accent); }
+    .callout.tip::before   { background: #4fb3ff; }
+    .callout.tip::after    { content: "tip"; color: #4fb3ff; }
+    .callout.warn::before  { background: #ff8a5b; }
+    .callout.warn::after   { content: "watch out"; color: #ff8a5b; }
+
+    /* ---------- live demo "example" frames ---------- */
+    .example {
+      margin: var(--s-6) 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      background: linear-gradient(180deg, var(--bg-3), var(--bg-2));
+      padding: var(--s-6) var(--s-5) var(--s-5);
+      position: relative;
+      overflow: hidden;
+    }
+    .example::before {
+      content: "live · grab it";
+      position: absolute; top: 12px; right: 16px;
+      font-family: var(--font-mono); font-size: .64rem; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--accent);
+      display: inline-flex; align-items: center; gap: .4rem;
+    }
+    .example::after {
+      content: ""; position: absolute; top: 16px; right: calc(16px + 5.1rem);
+      width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      animation: pulse 2.4s var(--ease) infinite;
+    }
+    .example figcaption { padding: var(--s-4) 0 0; }
+    .demo-hint { font-family: var(--font-mono); font-size: .78rem; color: var(--ink-dim); margin: 0 0 var(--s-4); max-width: 62ch; }
+
+    /* ===== page-local live-demo component styles ===== */
 
     /* magnetic button demo */
-    .mag-stage { display:flex; gap:1.5rem; align-items:center; justify-content:center; flex-wrap:wrap; min-height:120px; }
+    .mag-stage { display:flex; gap:1.5rem; align-items:center; justify-content:center; flex-wrap:wrap; min-height:130px; }
     .mag-btn {
       font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; text-transform:uppercase;
       color:var(--accent-ink); background:var(--accent); border:0; border-radius:var(--r-pill);
-      padding:.75rem 1.6rem; cursor:pointer;
-      transition: transform .35s cubic-bezier(.18,.9,.32,1.1), background .2s var(--ease);
+      padding:.85rem 1.8rem; cursor:pointer; font-weight:600;
+      transition: transform .35s var(--ease-spring), background .2s var(--ease), box-shadow .2s var(--ease);
       will-change: transform;
+      box-shadow: 0 0 0 0 var(--accent-glow);
     }
-    .mag-btn .mag-label { display:inline-block; transition: transform .35s cubic-bezier(.18,.9,.32,1.1); }
-    .mag-btn:hover { background:var(--accent-soft); }
+    .mag-btn .mag-label { display:inline-block; transition: transform .35s var(--ease-spring); }
+    .mag-btn:hover { background:var(--accent-soft); box-shadow: 0 0 32px 0 var(--accent-glow); }
+    .mag-btn:active { transform: scale(.97); }
 
     /* hover state lab */
-    .hov-grid { display:grid; gap:.6rem; }
+    .hov-grid { display:grid; gap:.5rem; }
     .hov-row {
       display:flex; align-items:center; justify-content:space-between; gap:1rem;
-      padding:.85rem 1rem; border:1px solid var(--line); border-radius:var(--r-2);
+      padding:.95rem 1.1rem; border:1px solid var(--line); border-radius:var(--r-2);
       background:var(--bg-2); cursor:pointer;
       transition: background .25s var(--ease), border-color .25s var(--ease), opacity .25s var(--ease), transform .25s var(--ease);
     }
-    .hov-row .h-title { font-weight:600; color:var(--ink-soft); transition:color .25s var(--ease); }
-    .hov-row .h-arrow { font-family:var(--font-mono); color:var(--ink-dim); transition:transform .25s var(--ease); }
-    .hov-lab:hover .hov-row { opacity:.45; }                 /* dim all siblings… */
-    .hov-lab .hov-row:hover { opacity:1; border-color:var(--accent); transform:translateX(4px); }
+    .hov-row .h-title { font-weight:600; color:var(--ink-soft); transition:color .25s var(--ease); font-family:var(--display); }
+    .hov-row .h-arrow { font-family:var(--font-mono); color:var(--ink-dim); transition:transform .25s var(--ease), color .25s var(--ease); }
+    .hov-lab:hover .hov-row { opacity:.4; }                 /* dim all siblings… */
+    .hov-lab .hov-row:hover { opacity:1; border-color:var(--accent); transform:translateX(5px); background:var(--bg-3); }
     .hov-lab .hov-row:hover .h-title { color:var(--accent); }
-    .hov-lab .hov-row:hover .h-arrow { transform:translate(3px,-3px); color:var(--accent); }
+    .hov-lab .hov-row:hover .h-arrow { transform:translate(4px,-4px); color:var(--accent); }
 
     /* spotlight cursor demo */
     .spot {
-      position:relative; overflow:hidden; min-height:160px; border-radius:var(--r-2);
-      border:1px solid var(--line); background:var(--bg-2);
+      position:relative; overflow:hidden; min-height:170px; border-radius:var(--r-2);
+      border:1px solid var(--line); background:var(--bg);
       display:flex; align-items:center; justify-content:center; text-align:center;
     }
     .spot::before {
       content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
       transition:opacity .3s var(--ease);
-      background: radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(245,166,35,.18), transparent 65%);
+      background: radial-gradient(220px circle at var(--mx,50%) var(--my,50%), var(--accent-glow), transparent 65%);
     }
     .spot:hover::before { opacity:1; }
-    .spot p { font-family:var(--font-mono); font-size:.82rem; color:var(--ink-dim); z-index:1; padding:1rem; }
+    .spot p { font-family:var(--font-mono); font-size:.82rem; color:var(--ink-dim); z-index:1; padding:1rem; max-width:42ch; }
 
     /* copy-feedback microinteraction */
     .copy-btn {
-      font-family:var(--font-mono); font-size:.78rem; letter-spacing:.03em;
-      color:var(--ink); background:var(--bg-2); border:1px solid var(--line); border-radius:var(--r-pill);
-      padding:.55rem 1.1rem; cursor:pointer; display:inline-flex; align-items:center; gap:.5rem;
-      transition: border-color .2s var(--ease), color .2s var(--ease);
+      font-family:var(--font-mono); font-size:.8rem; letter-spacing:.03em;
+      color:var(--ink); background:var(--bg-3); border:1px solid var(--line); border-radius:var(--r-pill);
+      padding:.6rem 1.2rem; cursor:pointer; display:inline-flex; align-items:center; gap:.55rem;
+      transition: border-color .2s var(--ease), color .2s var(--ease), background .2s var(--ease);
     }
-    .copy-btn:hover { border-color:var(--accent); }
+    .copy-btn:hover { border-color:var(--accent-line); background:var(--bg-4); }
     .copy-btn.copied { color:var(--accent); border-color:var(--accent); }
 
     /* click-and-hold demo */
-    .hold-wrap { display:flex; flex-direction:column; align-items:center; gap:.9rem; }
+    .hold-wrap { display:flex; flex-direction:column; align-items:center; gap:1rem; }
     .hold-btn {
       position:relative; overflow:hidden; isolation:isolate;
       font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; text-transform:uppercase;
-      color:var(--ink); background:var(--bg-2); border:1px solid var(--line); border-radius:var(--r-pill);
-      padding:.8rem 1.8rem; cursor:pointer; user-select:none;
+      color:var(--ink); background:var(--bg-3); border:1px solid var(--line); border-radius:var(--r-pill);
+      padding:.9rem 2rem; cursor:pointer; user-select:none; font-weight:600;
+      transition: border-color .2s var(--ease);
     }
+    .hold-btn:hover { border-color:var(--accent-line); }
     .hold-btn .hold-fill {
       position:absolute; inset:0; z-index:-1; transform-origin:left center;
-      transform:scaleX(0); background:var(--accent); opacity:.9;
+      transform:scaleX(0); background:var(--accent); opacity:.95;
     }
     .hold-btn.holding .hold-fill { transition: transform 1s linear; transform:scaleX(1); }
-    .hold-btn.done { color:var(--accent-ink); }
-    .hold-msg { font-family:var(--font-mono); font-size:.78rem; color:var(--ink-dim); min-height:1.2em; }
+    .hold-btn.done { color:var(--accent-ink); border-color:var(--accent); }
+    .hold-msg { font-family:var(--font-mono); font-size:.8rem; color:var(--ink-dim); min-height:1.2em; }
 
-    .demo-hint { font-family:var(--font-mono); font-size:.8rem; color:var(--ink-dim); margin-bottom:.75rem; }
+    /* ---------- footer ---------- */
+    .ftr {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--line);
+      background: var(--bg-2);
+      padding: var(--s-8) 0;
+      margin-top: var(--s-9);
+    }
+    .ftr .wrap { padding-top: 0; padding-bottom: 0; }
+    .ftr a {
+      color: var(--accent); text-decoration: none;
+      font-family: var(--font-mono); font-size: .85rem;
+      border-bottom: 1px solid transparent;
+      transition: border-color var(--dur-fast) var(--ease);
+    }
+    .ftr a:hover { border-bottom-color: var(--accent); }
+    .ftr .brand { font-family: var(--display); font-weight: 700; color: var(--ink); }
+    .ftr p { color: var(--ink-dim); font-size: var(--step--1); }
+
+    /* ---------- scroll-reveal ---------- */
+    .reveal { opacity: 0; transform: translateY(22px); }
+    .reveal.in { opacity: 1; transform: none; transition: opacity .7s var(--ease), transform .7s var(--ease); }
+
+    /* ---------- responsive ---------- */
+    @media (max-width: 640px) {
+      .toc ul { grid-template-columns: 1fr; }
+      h2::before { position: static; display: block; margin-bottom: .4rem; }
+      pre { padding-left: var(--s-4); padding-right: var(--s-4); }
+    }
 
     @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
       .mag-btn, .mag-btn .mag-label, .hov-row, .spot::before, .hold-btn .hold-fill { transition:none !important; }
       .mag-btn { transform:none !important; }
+      .cursor-halo { display: none !important; }
+    }
+    @media (hover: none), (pointer: coarse) {
+      .cursor-halo { display: none !important; }
     }
   </style>
 </head>
@@ -97,7 +504,7 @@
       <a href="STYLING.html">Styling</a>
       <a href="MOTIONS.html">Motion</a>
       <a href="ANIMATIONS.html">Animation</a>
-      <a href="INTERACTIONS.html">Interaction</a>
+      <a href="INTERACTIONS.html" aria-current="page">Interaction</a>
       <a href="SPATIAL.html">3D / Spatial</a>
       <a href="MINI-GAMES.html">Mini-Games</a>
       <a href="STATE-MANAGEMENT.html">State</a>
@@ -110,24 +517,26 @@
   </header>
 
 <main class="wrap">
-  <span class="kicker">Craft Atlas · 09</span>
-  <h1>Microinteractions &amp; Interaction Design</h1>
-  <p class="lede">A page can look perfect frozen and still feel dead. Interaction is the conversation between pointer and pixel — the hover that confirms "yes, this is clickable," the button that leans toward your cursor, the copy that flips to "Copied," the hold that fills before it commits. This is the craft of <em>affordance</em> (telling the user what's possible) and <em>feedback</em> (confirming what just happened), garnished with <em>delight</em>. Here is how the best 80 sites make the interface feel alive under the hand.</p>
+  <section class="hero">
+    <span class="kicker"><span class="dot" aria-hidden="true"></span>Craft Atlas · 09 · Interaction</span>
+    <h1>The interface should feel alive <span class="live">under the hand</span>.</h1>
+    <p class="lede">A page can look perfect frozen and still feel dead. Interaction is the conversation between pointer and pixel — the hover that confirms "yes, this is clickable," the button that leans toward your cursor, the copy that flips to "Copied," the hold that fills before it commits. This is the craft of <em>affordance</em> (telling the user what's possible) and <em>feedback</em> (confirming what just happened), garnished with <em>delight</em>. Here is how the best 80 sites make the interface feel alive under the hand.</p>
+  </section>
 
   <nav class="toc" aria-label="On this page">
     <ul>
-      <li><a href="#first-rule">1 · Affordance &amp; feedback — the two jobs</a></li>
-      <li><a href="#hover">2 · Hover states &amp; focus-by-contrast</a></li>
-      <li><a href="#cursor">3 · Custom cursors</a></li>
-      <li><a href="#magnetic">4 · Magnetic buttons</a></li>
-      <li><a href="#drag">5 · Drag, scrub &amp; physics</a></li>
-      <li><a href="#hold">6 · Click-and-hold &amp; state feedback</a></li>
-      <li><a href="#delight">7 · Delight, sound &amp; easter eggs</a></li>
-      <li><a href="#pitfalls">8 · A11y, perf &amp; the overuse trap</a></li>
+      <li><a href="#first-rule">01 · Affordance &amp; feedback — the two jobs</a></li>
+      <li><a href="#hover">02 · Hover states &amp; focus-by-contrast</a></li>
+      <li><a href="#cursor">03 · Custom cursors</a></li>
+      <li><a href="#magnetic">04 · Magnetic buttons</a></li>
+      <li><a href="#drag">05 · Drag, scrub &amp; physics</a></li>
+      <li><a href="#hold">06 · Click-and-hold &amp; state feedback</a></li>
+      <li><a href="#delight">07 · Delight, sound &amp; easter eggs</a></li>
+      <li><a href="#pitfalls">08 · A11y, perf &amp; the overuse trap</a></li>
     </ul>
   </nav>
 
-  <h2 id="first-rule">1 · Affordance &amp; feedback — the two jobs</h2>
+  <h2 id="first-rule" data-n="01">Affordance &amp; feedback — the two jobs</h2>
   <p>Every microinteraction does one of two things, and the great ones do both. <strong>Affordance</strong> signals possibility <em>before</em> you act (the cursor turns into a hand, the link underlines, the button glows). <strong>Feedback</strong> confirms the result <em>after</em> you act (the toggle slides, the row highlights, the text says "Copied"). A click with no feedback feels broken; an element with no affordance feels invisible. Everything below is a variation on these two jobs.</p>
   <p>The cheapest, highest-signal version of this is colour-as-affordance. <span class="ref">jhey tompkins ↗</span> reserves a single hot OKLCH coral <em>strictly</em> for interactive and live elements — so the moment something is that colour, you know it does something, with zero UI chrome. <span class="ref">Linear ↗</span> goes the opposite, monochrome route: kill brand colour in the chrome so colour only ever appears <em>inside</em> the product UI, making "colour = the product." <span class="ref">Mike Hall ↗</span> proves the typographer's version — links inherit text colour and earn their affordance from <em>underline + context</em>, not default blue.</p>
 
@@ -135,7 +544,7 @@
     <p><strong>The whole discipline in one line:</strong> tell the user what's possible (affordance), then confirm what happened (feedback) — within ~100ms, on a property that doesn't cost a layout. Everything fancier (cursors, magnetism, hold-to-confirm) is just these two jobs wearing a costume.</p>
   </div>
 
-  <h2 id="hover">2 · Hover states &amp; focus-by-contrast</h2>
+  <h2 id="hover" data-n="02">Hover states &amp; focus-by-contrast</h2>
   <p>Hover is the workhorse. The amateur move is to highlight the thing you're hovering. The senior move, seen again and again in the corpus, is <strong>focus-by-contrast</strong>: brighten the hovered item <em>and dim its siblings</em>, so attention is sculpted, not just pointed.</p>
   <p><span class="ref">Brittany Chiang ↗</span> is the reference implementation — hovering an experience or project row turns its title teal and fades a faint card behind it, while <em>sibling rows dim slightly</em>. Her external-link arrows (<code>↗</code>) nudge up-right on hover, a tiny directional affordance. <span class="ref">Cuberto ↗</span> swaps nav labels with a vertical text-slide (a duplicated label slides up as the original slides out). <span class="ref">Aristide Benoist ↗</span> runs a "default grayscale, colour on focus" world — desaturating everything until interaction, so the active project is the only colourful thing on screen. <span class="ref">Family ↗</span> keeps it soft and bouncy to match its rounded illustration vocabulary; <span class="ref">Jesper Landberg ↗</span> ships a reusable <code>js-scale</code> hover primitive instead of bespoke per-element code.</p>
 
@@ -145,7 +554,7 @@
   </figure>
 
   <div class="example">
-    <p class="demo-hint">Focus-by-contrast — hover any row. Note the siblings dim, the active row leans, arrow and title go amber:</p>
+    <p class="demo-hint">Focus-by-contrast — hover any row. Note the siblings dim, the active row leans, arrow and title go lime:</p>
     <div class="hov-lab hov-grid">
       <div class="hov-row"><span class="h-title">Spatial computing primer</span><span class="h-arrow">↗</span></div>
       <div class="hov-row"><span class="h-title">Designing for the GPU</span><span class="h-arrow">↗</span></div>
@@ -165,7 +574,7 @@
     <p><strong>Hover is a desktop-only luxury — gate it.</strong> Touch devices have no hover; a <code>:hover</code> state that "sticks" after a tap is a classic mobile bug. Wrap hover-only flourishes in <code>@media (hover: hover) and (pointer: fine)</code> so phones never inherit them, and make sure the <em>resting</em> state is already usable.</p>
   </div>
 
-  <h2 id="cursor">3 · Custom cursors</h2>
+  <h2 id="cursor" data-n="03">Custom cursors</h2>
   <p>Replacing the OS arrow is the single loudest interaction signal a site can send — and the most over-abused. Done with intent it becomes brand identity; done thoughtlessly it adds lag and breaks affordance. The corpus splits into two schools.</p>
   <p><strong>The signature follower.</strong> <span class="ref">Cuberto ↗</span> open-sourced its own <code>mouse-follower</code> library: a skewing, state-changing dot that morphs into text labels, scales up, and shows drag hints on hover — it <em>is</em> the Cuberto trademark. <span class="ref">Jesper Landberg ↗</span>'s calling card is a circular cursor "mask" that reveals the next project underneath and "pulls up" into a page transition. <span class="ref">Active Theory ↗</span> handles pointer feedback entirely inside its WebGL UI layer (so the CSS cursor stays <code>auto</code> while hit-testing happens in GL space).</p>
   <p><strong>The tactile, low-cost cursor.</strong> <span class="ref">Rauno Freiberg ↗</span> uses a fine blue crosshair on the canvas that swaps to a <em>retro pixel pointing-hand</em> over interactive cards — nostalgic, and it reinforces what's clickable. <span class="ref">Brittany Chiang ↗</span> doesn't replace the cursor at all; she <em>tracks</em> it with a large radial-gradient spotlight on the dark background — cheap to build, high perceived polish, and it never interferes with affordance.</p>
@@ -201,7 +610,7 @@ document.querySelectorAll('[data-cursor]').forEach((el) => {
     <p><strong>A custom cursor must never hide affordance or break a11y.</strong> If you set <code>cursor:none</code> globally and your follower lags or fails to load, the user can't tell what's clickable. Keep a real <code>cursor:pointer</code> fallback, never hijack the cursor on form fields or text-selection, and disable the whole thing for touch and reduced-motion. The cursor is the user's hand — borrow it, don't steal it.</p>
   </div>
 
-  <h2 id="magnetic">4 · Magnetic buttons</h2>
+  <h2 id="magnetic" data-n="04">Magnetic buttons</h2>
   <p>A magnetic element bends toward the cursor as it approaches and snaps back on exit — it makes a target feel like it <em>wants</em> to be clicked. It's one of the most-copied agency interactions, and three of our teardowns name it explicitly.</p>
   <p><span class="ref">Cuberto ↗</span> ships magnetic pill buttons ("What we do", "Get in touch") that attract the cursor, alongside its magnetic cursor. <span class="ref">Dennis Snellenberg ↗</span> makes nav links <em>and</em> buttons magnetic (a literal <code>magnet</code> class) so they bend toward the pointer and snap back — his tactile hover feedback without even needing a custom cursor. <span class="ref">Hakim El Hattab ↗</span>, whose whole reputation is "animated, interactive and sometimes unexpected," uses magnetic pulls among his microinteraction vocabulary.</p>
 
@@ -213,7 +622,7 @@ document.querySelectorAll('[data-cursor]').forEach((el) => {
   <div class="example">
     <p class="demo-hint">Magnetic button — move your cursor near it; the button and its label lean toward you, then snap back:</p>
     <div class="mag-stage">
-      <button class="mag-btn" type="button" data-magnetic><span class="mag-label">Get in touch</span></button>
+      <button class="mag-btn" type="button" data-magnetic data-cursor-hot><span class="mag-label">Get in touch</span></button>
     </div>
     <figcaption>The button translates a fraction of the cursor's offset; the inner label translates a touch more for parallax depth. A springy ease-back sells the "snap."</figcaption>
   </div>
@@ -239,7 +648,7 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches)
     <p><strong>Keep <code>strength</code> under ~0.4 and the snap-back springy.</strong> Too much pull and the button outruns the cursor; too stiff a return and it feels mechanical. A <code>cubic-bezier(.18,.9,.32,1.1)</code> ease-back (slight overshoot) is what reads as "magnetic" rather than "sliding." Reserve magnetism for primary CTAs and nav — making <em>everything</em> magnetic destroys the signal.</p>
   </div>
 
-  <h2 id="drag">5 · Drag, scrub &amp; physics</h2>
+  <h2 id="drag" data-n="05">Drag, scrub &amp; physics</h2>
   <p>Drag turns the pointer into a direct-manipulation handle — grab the world and throw it. The corpus uses it for galleries, scrubbers, and physics toys, almost always with <strong>inertia</strong> so a flick keeps coasting.</p>
   <p><span class="ref">Aristide Benoist ↗</span> drives a WebGL horizontal filmstrip where scroll/drag <em>velocity</em> warps the blades (the classic "scroll velocity → vertex distortion" technique), with a tick-ruler that animates as a live position scrubber. <span class="ref">Rauno Freiberg ↗</span> makes horizontal drag through a card track the core interaction, with a draggable scrubber tied to scroll position. <span class="ref">Off Menu ↗</span> turns its portfolio into a draggable scatter field / orbit where dragging repositions thumbnails around a centre stage. <span class="ref">Cassie Evans ↗</span> and <span class="ref">Jesper Landberg ↗</span> both ship drag-based horizontal navigation (Jesper's locked against vertically-scrolling titles). <span class="ref">Things / Cultured Code ↗</span> is the counterpoint: its famous drag delight lives <em>inside the app</em>, and the marketing site deliberately doesn't fake it on the web — knowing when <em>not</em> to is also craft.</p>
 
@@ -272,7 +681,7 @@ track.addEventListener('pointerup', () => {
     <p><strong>Make drag <em>look</em> draggable.</strong> A scatter field or filmstrip with no affordance just looks broken until someone accidentally grabs it. Swap to <code>cursor: grab</code> (then <code>grabbing</code> while held), show a ruler/scrubber or peeking next-card edge, and consider a one-time "drag" hint on the custom cursor — exactly Cuberto's drag-hint cursor state.</p>
   </div>
 
-  <h2 id="hold">6 · Click-and-hold &amp; state feedback</h2>
+  <h2 id="hold" data-n="06">Click-and-hold &amp; state feedback</h2>
   <p>A plain click is instant and irreversible. <strong>Click-and-hold</strong> inserts a deliberate, cancellable progress window — the user presses, a fill animates, and only a completed hold commits. It's an affordance for intent (great for destructive or high-stakes actions) and a delight beat in its own right. It's also the gateway to the broader topic this section closes on: <strong>buttons that report their own state</strong>.</p>
   <p>The everyday hero of state feedback is the <strong>copy-to-clipboard flip</strong>. <span class="ref">Rauno Freiberg ↗</span> is known for the copy-email button that flips to a "Copied" state instead of a raw <code>mailto:</code> — a tiny detail that signals care. <span class="ref">Hakim El Hattab ↗</span>'s inline <code>+++</code> expanders reveal more text in place on click, keeping the reader in flow rather than navigating away. <span class="ref">Linear ↗</span> wires up live priority pickers, label chips, and "Set priority" buttons whose press states <em>communicate product capability through touch</em>. Across the board, the rule is the same: a button must visibly acknowledge the press, then report its new state.</p>
 
@@ -323,7 +732,7 @@ copyBtn.addEventListener('click', async () => {
     <p><strong>Hold-to-confirm needs a keyboard equivalent.</strong> A keyboard user can't "hold" a pointer — provide a focusable fallback (e.g. <kbd>Enter</kbd> opens a confirm step) and announce state changes via <code>aria-live</code> (note the <code>role="status"</code> above) so screen-reader users hear "Deleted," "Copied," etc. A microinteraction nobody-with-a-screen-reader can perceive is decoration, not feedback.</p>
   </div>
 
-  <h2 id="delight">7 · Delight, sound &amp; easter eggs</h2>
+  <h2 id="delight" data-n="07">Delight, sound &amp; easter eggs</h2>
   <p>Once affordance and feedback are solid, <strong>delight</strong> is the surplus — the unrequested moment that makes someone smile and remember the site. The corpus is full of it, and the pattern is always the same: small, in-character, and never blocking the task.</p>
   <p><span class="ref">Josh Comeau ↗</span> goes furthest: optional UI <em>sound</em> behind a global "Disable sounds" toggle, editable generative hero art, spring-based hover playfulness, and a footer easter egg (upside-down avatar) — the homepage <em>is</em> a live demo of his craft. <span class="ref">Brittany Chiang ↗</span> hides a Tardis time-travel easter egg that injects personality without breaking her minimalist tone. <span class="ref">jhey tompkins ↗</span> animates a blinking bear mascot and a live "now" status block (location, weather, local time, current song and game) that makes a static page feel present-tense and human. <span class="ref">Dennis Snellenberg ↗</span> seeds tiny meta-details — a live local-time clock and a multilingual greeting preloader — as personality moments. <span class="ref">Robb Owen ↗</span> earns "elegant motion design" praise with an emoji-prefilled <code>mailto:</code> (subject: <code>🤘 Hi Robb, I'd like to hire you</code>) — delight with zero backend.</p>
 
@@ -346,7 +755,7 @@ spot.addEventListener('pointermove', (e) => {
     <p>Delight that lands shares three traits: it's <strong>discoverable, not mandatory</strong> (the user can ignore it), <strong>in-character</strong> (jhey's bear, Josh's sounds, Robb's emoji mailto — each matches its brand), and <strong>cheap to skip</strong> (toggleable sound, a fallback <code>mailto:</code>). Delight is seasoning. Solve affordance and feedback first; sprinkle delight last.</p>
   </div>
 
-  <h2 id="pitfalls">8 · Accessibility, performance &amp; the overuse trap</h2>
+  <h2 id="pitfalls" data-n="08">Accessibility, performance &amp; the overuse trap</h2>
   <p>Every interaction on this page can become a liability. The discipline that separates elite work from the demo-reel is knowing the cost.</p>
 
   <h3>Don't let interaction lock out the keyboard or screen reader</h3>
@@ -385,6 +794,26 @@ spot.addEventListener('pointermove', (e) => {
 <script>
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- live cursor halo (the page's own "colour = affordance" demo) ----
+  if (finePointer && !reduce) {
+    const halo = document.createElement('div');
+    halo.className = 'cursor-halo';
+    document.body.appendChild(halo);
+    document.body.classList.add('has-halo');
+    let hx = -100, hy = -100, tx = -100, ty = -100, hraf;
+    addEventListener('pointermove', (e) => { tx = e.clientX; ty = e.clientY; });
+    const isInteractive = (el) =>
+      el && el.closest && el.closest('a, button, .hov-row, .ref, .toc a, [data-cursor-hot]');
+    addEventListener('pointerover', (e) => {
+      halo.classList.toggle('is-hot', !!isInteractive(e.target));
+    });
+    (function follow() {
+      hx += (tx - hx) * 0.22; hy += (ty - hy) * 0.22;
+      halo.style.transform = `translate3d(${hx - 11}px, ${hy - 11}px, 0)`;
+      hraf = requestAnimationFrame(follow);
+    })();
+  }
 
   // ---- magnetic button ----
   if (finePointer && !reduce) {
@@ -456,6 +885,16 @@ spot.addEventListener('pointermove', (e) => {
     spot.style.setProperty('--mx', `${e.clientX - r.left}px`);
     spot.style.setProperty('--my', `${e.clientY - r.top}px`);
   });
+
+  // ---- scroll-reveal (IntersectionObserver, no scroll handler) ----
+  if (!reduce) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { threshold: 0.14 });
+    document.querySelectorAll('h2, .example, .figure, .callout, pre').forEach((el) => {
+      el.classList.add('reveal'); io.observe(el);
+    });
+  }
 </script>
 </body>
 </html>

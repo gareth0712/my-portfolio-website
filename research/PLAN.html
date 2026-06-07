@@ -7,261 +7,978 @@
   <meta name="description" content="An opinionated, concrete plan for building a world-class developer portfolio on Nuxt 4 — synthesized from 80 elite-site teardowns." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="best-practices/shared.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       BUILD PLAN — bespoke editorial capstone art direction
+       Palette: warm bone paper + true ink + single cobalt accent
+       Type: Fraunces (display serif) / Archivo (grotesk body) / JetBrains Mono (meta)
+       ============================================================ */
+
+    :root {
+      /* ---- color: warm-paper light base ---- */
+      --paper:      #f3efe6;
+      --paper-2:    #ece6d8;
+      --card:       #faf7f0;
+      --ink:        #16140f;
+      --ink-soft:   #45413a;
+      --ink-dim:    #7c766b;
+      --line:       #d8d0bf;
+      --line-soft:  #e4ddce;
+      --accent:     #1f3fd6;   /* cobalt — the one accent, locked */
+      --accent-ink: #15309e;
+      --accent-wash:#e7ebfb;
+
+      /* ---- type ---- */
+      --display: "Fraunces", Georgia, "Times New Roman", serif;
+      --body:    "Archivo", system-ui, -apple-system, sans-serif;
+      --mono:    "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+      /* fluid scale */
+      --step--1: clamp(0.78rem, 0.75rem + 0.15vw, 0.86rem);
+      --step-0:  clamp(1.0rem, 0.96rem + 0.2vw, 1.12rem);
+      --step-1:  clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+      --step-2:  clamp(1.6rem, 1.35rem + 1.2vw, 2.4rem);
+      --step-3:  clamp(2.1rem, 1.6rem + 2.4vw, 3.6rem);
+      --hero:    clamp(2.8rem, 1.6rem + 5.6vw, 6.6rem);
+
+      /* spacing */
+      --s-1:.25rem; --s-2:.5rem; --s-3:.75rem; --s-4:1rem;
+      --s-5:1.5rem; --s-6:2rem; --s-7:3rem; --s-8:4.5rem; --s-9:7rem;
+
+      --r-2:8px; --r-3:14px; --r-4:22px; --r-pill:999px;
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+      --dur-fast:180ms; --dur:380ms; --dur-slow:760ms;
+
+      --maxw: 1240px;
+      --measure: 68ch;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper:      #14130f;
+        --paper-2:    #1b1a14;
+        --card:       #1e1c16;
+        --ink:        #f1ece0;
+        --ink-soft:   #c4bdac;
+        --ink-dim:    #8f897b;
+        --line:       #322f26;
+        --line-soft:  #28261f;
+        --accent:     #8aa2ff;
+        --accent-ink: #b0c0ff;
+        --accent-wash:#1d2440;
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--body);
+      font-size: var(--step-0);
+      line-height: 1.65;
+      font-feature-settings: "ss01","cv01";
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    /* subtle paper grain — fixed pseudo, pointer-events none */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: .035;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+    @media (prefers-color-scheme: dark) { body::before { mix-blend-mode: screen; opacity:.05; } }
+
+    a { color: inherit; }
+
+    ::selection { background: var(--accent); color: #fff; }
+
+    :focus-visible {
+      outline: 2.5px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 3px;
+    }
+
+    .skip {
+      position: absolute;
+      left: -999px; top: 0;
+      background: var(--ink); color: var(--paper);
+      padding: .7rem 1.1rem; border-radius: 0 0 var(--r-2) 0;
+      z-index: 200; font-weight: 600;
+    }
+    .skip:focus { left: 0; }
+
+    /* ============================================================
+       NAV — floating editorial rail, horizontal scroll on overflow
+       ============================================================ */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: color-mix(in srgb, var(--paper) 86%, transparent);
+      backdrop-filter: blur(14px) saturate(1.3);
+      -webkit-backdrop-filter: blur(14px) saturate(1.3);
+      border-bottom: 1px solid var(--line);
+    }
+    @supports not (backdrop-filter: blur(1px)) { .topbar { background: var(--paper); } }
+
+    .topbar-inner {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: var(--s-5);
+      padding: .7rem clamp(1rem, 3vw, 2.2rem);
+    }
+
+    .brand {
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: 1.18rem;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      flex-shrink: 0;
+    }
+    .brand .mark {
+      width: 11px; height: 11px;
+      background: var(--accent);
+      border-radius: 3px;
+      transform: rotate(45deg);
+      transition: transform var(--dur) var(--ease);
+    }
+    .brand:hover .mark { transform: rotate(135deg); }
+
+    .navlinks {
+      display: flex;
+      align-items: center;
+      gap: .15rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      margin-left: auto;
+      padding-bottom: 1px;
+      mask-image: linear-gradient(to right, transparent 0, #000 1.4rem, #000 calc(100% - 1.4rem), transparent 100%);
+    }
+    .navlinks::-webkit-scrollbar { display: none; }
+
+    .navlinks a {
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+      text-decoration: none;
+      white-space: nowrap;
+      padding: .4rem .62rem;
+      border-radius: var(--r-pill);
+      transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+    }
+    .navlinks a:hover { color: var(--ink); background: var(--paper-2); }
+
+    .navlinks a.cta {
+      background: var(--ink);
+      color: var(--paper);
+      font-weight: 600;
+      padding: .42rem .9rem;
+    }
+    .navlinks a.cta:hover { background: var(--accent); color: #fff; }
+
+    /* ============================================================
+       LAYOUT SHELL
+       ============================================================ */
+    main { position: relative; z-index: 2; }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 clamp(1rem, 4vw, 2.4rem);
+    }
+
+    /* generic prose rhythm inside content sections */
+    .prose p {
+      max-width: var(--measure);
+      color: var(--ink-soft);
+      margin: 0 0 var(--s-5);
+    }
+    .prose strong { color: var(--ink); font-weight: 600; }
+    .prose em { color: var(--ink); }
+
+    h2, h3, h4 {
+      font-family: var(--display);
+      color: var(--ink);
+      line-height: 1.08;
+      letter-spacing: -0.018em;
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       HERO
+       ============================================================ */
+    .hero {
+      position: relative;
+      padding: clamp(3.5rem, 7vw, 6rem) 0 clamp(2.5rem, 5vw, 4rem);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+    }
+    @media (min-width: 940px) {
+      .hero-grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.75fr); align-items: end; gap: var(--s-8); }
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      font-family: var(--mono);
+      font-size: .72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent-ink);
+      margin-bottom: var(--s-5);
+    }
+    .eyebrow::before {
+      content: "";
+      width: 26px; height: 1.5px;
+      background: var(--accent);
+    }
+
+    .hero h1 {
+      font-family: var(--display);
+      font-weight: 400;
+      font-size: var(--hero);
+      line-height: 0.97;
+      letter-spacing: -0.03em;
+      margin: 0 0 var(--s-6);
+      color: var(--ink);
+      max-width: 16ch;
+    }
+    .hero h1 em {
+      font-style: italic;
+      font-weight: 500;
+      color: var(--accent-ink);
+      padding-bottom: .06em;
+    }
+
+    .lede {
+      font-size: var(--step-1);
+      line-height: 1.5;
+      color: var(--ink-soft);
+      max-width: 54ch;
+      margin: 0;
+    }
+
+    .hero-aside {
+      border-left: 2px solid var(--accent);
+      padding: var(--s-4) 0 var(--s-2) var(--s-5);
+    }
+    .hero-aside .stat {
+      margin-bottom: var(--s-5);
+    }
+    .hero-aside .stat:last-child { margin-bottom: 0; }
+    .hero-aside .num {
+      font-family: var(--display);
+      font-size: clamp(2.2rem, 1.5rem + 2vw, 3rem);
+      line-height: 1;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      display: block;
+    }
+    .hero-aside .lbl {
+      font-family: var(--mono);
+      font-size: .74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ink-dim);
+      margin-top: .35rem;
+    }
+
+    /* ============================================================
+       TOC — horizontal index strip
+       ============================================================ */
+    .toc {
+      margin: var(--s-7) 0 var(--s-8);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: var(--s-5) 0;
+    }
+    .toc ol {
+      list-style: none;
+      margin: 0; padding: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: .3rem 1.5rem;
+      counter-reset: toc;
+    }
+    @media (min-width: 720px) { .toc ol { grid-template-columns: repeat(4, 1fr); } }
+    .toc a {
+      display: flex;
+      align-items: baseline;
+      gap: .6rem;
+      text-decoration: none;
+      color: var(--ink-soft);
+      font-size: .9rem;
+      font-weight: 500;
+      padding: .45rem 0;
+      border-bottom: 1.5px solid transparent;
+      transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+    }
+    .toc a::before {
+      content: counter(toc, decimal-leading-zero);
+      counter-increment: toc;
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--accent-ink);
+      font-weight: 600;
+    }
+    .toc a:hover { color: var(--ink); border-color: var(--accent); }
+
+    /* ============================================================
+       SECTION HEADERS — numbered editorial
+       ============================================================ */
+    .section { padding: clamp(2.5rem, 5vw, 4.5rem) 0; }
+    .section + .section { border-top: 1px solid var(--line-soft); }
+
+    .sec-head {
+      display: grid;
+      gap: var(--s-3);
+      margin-bottom: var(--s-7);
+      scroll-margin-top: 90px;
+    }
+    .sec-num {
+      font-family: var(--mono);
+      font-size: .8rem;
+      letter-spacing: 0.16em;
+      color: var(--accent-ink);
+      font-weight: 600;
+    }
+    .sec-head h2 {
+      font-size: var(--step-3);
+      margin: 0;
+      max-width: 18ch;
+    }
+
+    h3 {
+      font-size: var(--step-2);
+      margin: var(--s-8) 0 var(--s-4);
+      max-width: 24ch;
+    }
+    h4 {
+      font-size: var(--step-1);
+      margin: 0 0 var(--s-3);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    /* ============================================================
+       TABLES — editorial, hairline-light
+       ============================================================ */
+    .table-scroll { overflow-x: auto; margin: var(--s-5) 0 var(--s-6); -webkit-overflow-scrolling: touch; }
+    table {
+      width: 100%;
+      min-width: 540px;
+      border-collapse: collapse;
+      font-size: .96rem;
+    }
+    thead th {
+      text-align: left;
+      font-family: var(--mono);
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-dim);
+      font-weight: 600;
+      padding: 0 var(--s-5) var(--s-3);
+      border-bottom: 2px solid var(--ink);
+      vertical-align: bottom;
+    }
+    tbody td {
+      padding: var(--s-4) var(--s-5);
+      border-bottom: 1px solid var(--line-soft);
+      color: var(--ink-soft);
+      vertical-align: top;
+    }
+    tbody tr:hover td { background: var(--card); }
+    tbody td:first-child { color: var(--ink); font-weight: 600; }
+    tbody strong { color: var(--ink); }
+
+    /* ============================================================
+       CALLOUTS
+       ============================================================ */
+    .callout {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      padding: var(--s-6);
+      margin: var(--s-6) 0;
+    }
+    .callout::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--accent);
+      border-radius: var(--r-3) 0 0 var(--r-3);
+    }
+    .callout p { margin: 0 0 var(--s-4); color: var(--ink-soft); max-width: var(--measure); }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout strong { color: var(--ink); }
+    .callout ul { margin: 0; padding-left: 1.2rem; color: var(--ink-soft); }
+    .callout ul li { margin-bottom: var(--s-3); }
+    .callout.steal::before { background: var(--accent); }
+    .callout.warn { background: color-mix(in srgb, #c0531f 8%, var(--card)); }
+    .callout.warn::before { background: #c0531f; }
+    .callout.tip::before { background: #1f9d6b; }
+
+    /* ============================================================
+       REFERENCE BOARD GRID
+       ============================================================ */
+    .board {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--s-4);
+    }
+    @media (min-width: 640px) { .board { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1000px) { .board { grid-template-columns: repeat(3, 1fr); } }
+
+    .card {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      padding: var(--s-5);
+      transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+      display: flex;
+      flex-direction: column;
+    }
+    .card::after {
+      content: "";
+      position: absolute;
+      top: var(--s-5); right: var(--s-5);
+      width: 7px; height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity var(--dur) var(--ease);
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -24px color-mix(in srgb, var(--ink) 50%, transparent); }
+    }
+    .card:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+    .card:hover::after { opacity: 1; }
+
+    .card h3 {
+      font-family: var(--display);
+      font-size: 1.32rem;
+      margin: 0 0 var(--s-3);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    .card h4 {
+      font-family: var(--display);
+      font-size: 1.18rem;
+      margin: 0 0 var(--s-3);
+      font-weight: 500;
+    }
+    .card p {
+      margin: 0 0 var(--s-4);
+      font-size: .92rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+    }
+    .card p:last-child { margin-top: auto; margin-bottom: 0; }
+    .card strong { color: var(--ink); }
+
+    /* one-signature grid (the A/B pick) */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--s-4);
+      margin: var(--s-5) 0;
+    }
+    @media (min-width: 760px) { .grid { grid-template-columns: 1fr 1fr; } }
+    .grid .card p:last-child { margin-top: 0; }
+
+    /* ============================================================
+       REF CHIPS
+       ============================================================ */
+    .ref {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      font-family: var(--mono);
+      font-size: .73rem;
+      font-weight: 500;
+      color: var(--accent-ink);
+      text-decoration: none;
+      background: var(--accent-wash);
+      padding: .18rem .55rem;
+      border-radius: var(--r-pill);
+      margin: .12rem .25rem .12rem 0;
+      transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+      white-space: nowrap;
+    }
+    a.ref:hover { background: var(--accent); color: #fff; }
+    span.ref { background: transparent; color: var(--ink-dim); padding-left: 0; }
+    span.ref::before { content: "↳ "; }
+
+    .card p .ref { margin-right: .3rem; }
+
+    /* ============================================================
+       FIGURES
+       ============================================================ */
+    .figure {
+      margin: var(--s-7) 0;
+    }
+    .figure img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: var(--r-3);
+      border: 1px solid var(--line);
+      background: var(--card);
+    }
+    .figure figcaption {
+      margin-top: var(--s-4);
+      font-size: .9rem;
+      color: var(--ink-dim);
+      max-width: var(--measure);
+      line-height: 1.55;
+      padding-left: var(--s-4);
+      border-left: 2px solid var(--accent);
+    }
+    .figure figcaption strong { color: var(--ink); font-family: var(--display); font-weight: 500; }
+
+    .figure-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--s-6);
+      margin: var(--s-7) 0;
+    }
+    @media (min-width: 860px) { .figure-row { grid-template-columns: repeat(3, 1fr); align-items: start; } }
+    .figure-row .figure { margin: 0; }
+    .figure-row figcaption { font-size: .82rem; }
+
+    /* ============================================================
+       LISTS
+       ============================================================ */
+    .prose ul, .section > ul, h3 + ul {
+      max-width: var(--measure);
+      color: var(--ink-soft);
+      padding-left: 0;
+      list-style: none;
+      margin: var(--s-4) 0 var(--s-6);
+    }
+    .section ul li {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-bottom: var(--s-3);
+    }
+    .section ul li::before {
+      content: "";
+      position: absolute;
+      left: 0; top: .62em;
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 2px;
+      transform: rotate(45deg);
+    }
+    .callout ul li::before { display: none; }
+    .callout ul { list-style: disc; }
+    .callout ul li { padding-left: 0; }
+    .section ul li strong { color: var(--ink); }
+
+    /* ============================================================
+       CODE
+       ============================================================ */
+    code {
+      font-family: var(--mono);
+      font-size: .86em;
+      background: var(--paper-2);
+      padding: .12em .4em;
+      border-radius: 5px;
+      color: var(--accent-ink);
+    }
+    pre {
+      background: var(--ink);
+      color: #f3efe6;
+      border-radius: var(--r-3);
+      padding: var(--s-5);
+      overflow-x: auto;
+      margin: var(--s-5) 0;
+      font-size: .82rem;
+      line-height: 1.6;
+      border: 1px solid var(--line);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+    @media (prefers-color-scheme: dark) {
+      pre { background: #0c0b08; }
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .ftr {
+      position: relative;
+      z-index: 2;
+      margin-top: var(--s-8);
+      border-top: 1px solid var(--line);
+      background: var(--paper-2);
+      padding: var(--s-8) 0 var(--s-7);
+    }
+    .ftr .brand { margin-bottom: var(--s-4); font-size: 1.3rem; }
+    .ftr p { color: var(--ink-soft); font-size: .92rem; max-width: 70ch; margin: 0 0 var(--s-4); }
+    .ftr a { color: var(--accent-ink); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color var(--dur-fast) var(--ease); }
+    .ftr a:hover { border-color: var(--accent); }
+    .ftr .guides { font-size: .85rem; color: var(--ink-dim); line-height: 2; }
+
+    /* ============================================================
+       SCROLL REVEAL
+       ============================================================ */
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease);
+        will-change: opacity, transform;
+      }
+      .reveal.in { opacity: 1; transform: none; }
+      .reveal.d1 { transition-delay: .06s; }
+      .reveal.d2 { transition-delay: .12s; }
+      .reveal.d3 { transition-delay: .18s; }
+    }
+
+    /* reading progress bar */
+    .progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--accent);
+      z-index: 150;
+      transition: width 90ms linear;
+    }
+    @media (prefers-reduced-motion: reduce) { .progress { display: none; } }
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <nav class="site-nav" aria-label="Best practices">
-      <a class="brand" href="PLAN.html">◆ Craft Atlas</a>
-      <a href="best-practices/UI-DESIGN.html">UI Design</a>
-      <a href="best-practices/UX.html">UX</a>
-      <a href="best-practices/TYPOGRAPHY.html">Typography</a>
-      <a href="best-practices/COLOR.html">Color</a>
-      <a href="best-practices/STYLING.html">Styling</a>
-      <a href="best-practices/MOTIONS.html">Motion</a>
-      <a href="best-practices/ANIMATIONS.html">Animation</a>
-      <a href="best-practices/INTERACTIONS.html">Interaction</a>
-      <a href="best-practices/SPATIAL.html">3D / Spatial</a>
-      <a href="best-practices/MINI-GAMES.html">Mini-Games</a>
-      <a href="best-practices/STATE-MANAGEMENT.html">State</a>
-      <a href="best-practices/NEXTJS.html">Meta-Framework</a>
-      <a href="references/PORTFOLIO.html">Portfolio</a>
-      <a href="references/TOP-LIST.html">Top List</a>
-      <a href="references/MOTION-GALLERY.html">Motion Reel</a>
-      <a class="cta" href="PLAN.html">Build Plan →</a>
-    </nav>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="PLAN.html"><span class="mark" aria-hidden="true"></span> Craft Atlas</a>
+      <nav class="navlinks" aria-label="Craft Atlas">
+        <a href="best-practices/UI-DESIGN.html">UI Design</a>
+        <a href="best-practices/UX.html">UX</a>
+        <a href="best-practices/TYPOGRAPHY.html">Typography</a>
+        <a href="best-practices/COLOR.html">Color</a>
+        <a href="best-practices/STYLING.html">Styling</a>
+        <a href="best-practices/MOTIONS.html">Motion</a>
+        <a href="best-practices/ANIMATIONS.html">Animation</a>
+        <a href="best-practices/INTERACTIONS.html">Interaction</a>
+        <a href="best-practices/SPATIAL.html">3D / Spatial</a>
+        <a href="best-practices/MINI-GAMES.html">Mini-Games</a>
+        <a href="best-practices/STATE-MANAGEMENT.html">State</a>
+        <a href="best-practices/NEXTJS.html">Meta-Framework</a>
+        <a href="references/PORTFOLIO.html">Portfolio</a>
+        <a href="references/TOP-LIST.html">Top List</a>
+        <a href="references/MOTION-GALLERY.html">Motion Reel</a>
+        <a class="cta" href="PLAN.html">Build Plan →</a>
+      </nav>
+    </div>
   </header>
 
-  <main class="wrap">
+  <main id="main">
 
     <!-- ===================== HERO ===================== -->
     <section class="hero">
-      <span class="kicker">The Capstone · Build Plan</span>
-      <h1>Build a portfolio that proves the pitch — on Nuxt 4.</h1>
-      <p class="lede">Eighty teardowns of the best sites on the web converge on one lesson: world-class is restraint plus one flawless signature move. This is the concrete plan to ship that, on a Vue&nbsp;3 + TypeScript stack you can actually maintain.</p>
+      <div class="wrap">
+        <div class="hero-grid">
+          <div class="reveal in">
+            <span class="eyebrow">The Capstone · Build Plan</span>
+            <h1>Build a portfolio that <em>proves</em> the pitch — on Nuxt 4.</h1>
+            <p class="lede">Eighty teardowns of the best sites on the web converge on one lesson: world-class is restraint plus one flawless signature move. This is the concrete plan to ship that, on a Vue&nbsp;3 + TypeScript stack you can actually maintain.</p>
+          </div>
+          <aside class="hero-aside reveal d2 in" aria-label="At a glance">
+            <div class="stat">
+              <span class="num">80</span>
+              <span class="lbl">Sites torn down</span>
+            </div>
+            <div class="stat">
+              <span class="num">1</span>
+              <span class="lbl">Signature moment</span>
+            </div>
+            <div class="stat">
+              <span class="num">3</span>
+              <span class="lbl">Build phases</span>
+            </div>
+          </aside>
+        </div>
+
+        <nav class="toc" aria-label="On this page">
+          <ol>
+            <li><a href="#vision">Vision &amp; positioning</a></li>
+            <li><a href="#board">Reference board</a></li>
+            <li><a href="#ia">Architecture &amp; content</a></li>
+            <li><a href="#system">Design system</a></li>
+            <li><a href="#motion">Motion budget</a></li>
+            <li><a href="#tech">Tech (Nuxt 4)</a></li>
+            <li><a href="#budget">Perf &amp; a11y budget</a></li>
+            <li><a href="#roadmap">Build roadmap</a></li>
+          </ol>
+        </nav>
+      </div>
     </section>
 
-    <nav class="toc" aria-label="On this page">
-      <ol>
-        <li><a href="#vision">1 · Vision &amp; positioning</a></li>
-        <li><a href="#board">2 · Reference board — what to steal</a></li>
-        <li><a href="#ia">3 · Information architecture &amp; content</a></li>
-        <li><a href="#system">4 · Design system &amp; tokens</a></li>
-        <li><a href="#motion">5 · Motion &amp; interaction budget</a></li>
-        <li><a href="#tech">6 · Tech architecture (Nuxt 4)</a></li>
-        <li><a href="#budget">7 · Performance &amp; a11y budget</a></li>
-        <li><a href="#roadmap">8 · Phased build roadmap</a></li>
-      </ol>
-    </nav>
+    <div class="wrap">
 
-    <!-- ===================== 1. VISION ===================== -->
-    <h2 id="vision">1 · Vision &amp; positioning</h2>
+      <!-- ===================== 1. VISION ===================== -->
+      <section class="section prose" id="vision">
+        <header class="sec-head reveal">
+          <span class="sec-num">01 / Vision</span>
+          <h2>Vision &amp; positioning</h2>
+        </header>
 
-    <p>A top-tier developer portfolio has exactly three jobs, in order: <strong>establish credibility in the first second</strong>, <strong>make the work legible and specific</strong>, and <strong>make contacting you frictionless</strong>. Everything else is decoration. Across the 80 teardowns the failure mode is always the same — sites that scatter ten half-finished effects read as junior; sites that execute <em>one</em> idea flawlessly read as senior.</p>
+        <p class="reveal">A top-tier developer portfolio has exactly three jobs, in order: <strong>establish credibility in the first second</strong>, <strong>make the work legible and specific</strong>, and <strong>make contacting you frictionless</strong>. Everything else is decoration. Across the 80 teardowns the failure mode is always the same — sites that scatter ten half-finished effects read as junior; sites that execute <em>one</em> idea flawlessly read as senior.</p>
 
-    <div class="callout">
-      <p>The meta-pattern, stated once: <strong>restraint reads as seniority; one signature move reads as craft; specificity reads as competence.</strong> Spectacle without those three is noise.</p>
-    </div>
+        <div class="callout reveal">
+          <p>The meta-pattern, stated once: <strong>restraint reads as seniority; one signature move reads as craft; specificity reads as competence.</strong> Spectacle without those three is noise.</p>
+        </div>
 
-    <h3>The chosen direction: restrained editorial + one signature interactive moment</h3>
+        <h3 class="reveal">The chosen direction: restrained editorial + one signature interactive moment</h3>
 
-    <p>There are four defensible archetypes in the data. We pick deliberately, and reject the rest <em>for this project</em>:</p>
+        <p class="reveal">There are four defensible archetypes in the data. We pick deliberately, and reject the rest <em>for this project</em>:</p>
 
-    <table>
-      <thead>
-        <tr><th>Archetype</th><th>Exemplars</th><th>Verdict for you</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Calm editorial engineer</td>
-          <td>Brittany Chiang, Sara Soueidan, Lee Robinson, Pol Piella</td>
-          <td><strong>Adopt as the base.</strong> Highest signal-to-effort, ages well, a11y-friendly, maintainable solo.</td>
-        </tr>
-        <tr>
-          <td>The site IS the demo reel</td>
-          <td>Cassie Evans, Josh Comeau, Bruno Simon</td>
-          <td>Borrow the <em>principle</em> (prove, don't claim) via ONE moment — not a whole WebGL site.</td>
-        </tr>
-        <tr>
-          <td>Full WebGL / 3D world</td>
-          <td>Henry Heffernan, Tim Roussilhe, Lusion</td>
-          <td><strong>Reject as the whole site.</strong> Huge build + maintenance cost, real a11y/SEO tax (see §7).</td>
-        </tr>
-        <tr>
-          <td>Radical prose-first</td>
-          <td>Lee Robinson, Manu Arora, Olaolu</td>
-          <td>Only wins if your writing carries it. Mine for confidence, not as the template.</td>
-        </tr>
-      </tbody>
-    </table>
+        <div class="table-scroll reveal">
+          <table>
+            <thead>
+              <tr><th>Archetype</th><th>Exemplars</th><th>Verdict for you</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Calm editorial engineer</td>
+                <td>Brittany Chiang, Sara Soueidan, Lee Robinson, Pol Piella</td>
+                <td><strong>Adopt as the base.</strong> Highest signal-to-effort, ages well, a11y-friendly, maintainable solo.</td>
+              </tr>
+              <tr>
+                <td>The site IS the demo reel</td>
+                <td>Cassie Evans, Josh Comeau, Bruno Simon</td>
+                <td>Borrow the <em>principle</em> (prove, don't claim) via ONE moment, not a whole WebGL site.</td>
+              </tr>
+              <tr>
+                <td>Full WebGL / 3D world</td>
+                <td>Henry Heffernan, Tim Roussilhe, Lusion</td>
+                <td><strong>Reject as the whole site.</strong> Huge build + maintenance cost, real a11y/SEO tax (see §7).</td>
+              </tr>
+              <tr>
+                <td>Radical prose-first</td>
+                <td>Lee Robinson, Manu Arora, Olaolu</td>
+                <td>Only wins if your writing carries it. Mine for confidence, not as the template.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-    <p><strong>The direction:</strong> a near-monochrome, type-led editorial layout (the calm-engineer base) with exactly <em>one</em> concentrated interactive moment that performs your craft — a generative or motion-driven hero set piece — and disciplined micro-interactions everywhere else. This is the "Cassie/Josh principle on a Chiang skeleton."</p>
+        <p class="reveal"><strong>The direction:</strong> a near-monochrome, type-led editorial layout (the calm-engineer base) with exactly <em>one</em> concentrated interactive moment that performs your craft — a generative or motion-driven hero set piece — and disciplined micro-interactions everywhere else. This is the "Cassie/Josh principle on a Chiang skeleton."</p>
 
-    <p><strong>Why this is defensible for you specifically:</strong> you are a full-stack developer, not a 3D specialist, shipping a <strong>static Nuxt 4 site to GitHub Pages</strong> <span class="ref">workings/SPEC</span>. A drivable-car WebGL world (Bruno Simon) would be a six-month project you can't maintain; a Hugo template (Caleb Brown) is the floor. The editorial-plus-one-moment direction is the only one that is simultaneously <em>achievable solo</em>, <em>maintainable</em>, <em>fast on a static host</em>, and still <em>memorable</em>. It maximizes craft-per-line-of-code.</p>
+        <p class="reveal"><strong>Why this is defensible for you specifically:</strong> you are a full-stack developer, not a 3D specialist, shipping a <strong>static Nuxt 4 site to GitHub Pages</strong> <span class="ref">workings/SPEC</span>. A drivable-car WebGL world (Bruno Simon) would be a six-month project you can't maintain; a Hugo template (Caleb Brown) is the floor. The editorial-plus-one-moment direction is the only one that is simultaneously <em>achievable solo</em>, <em>maintainable</em>, <em>fast on a static host</em>, and still <em>memorable</em>. It maximizes craft-per-line-of-code.</p>
+      </section>
 
-    <!-- ===================== 2. REFERENCE BOARD ===================== -->
-    <h2 id="board">2 · Reference board — the 10 to emulate</h2>
+      <!-- ===================== 2. REFERENCE BOARD ===================== -->
+      <section class="section prose" id="board">
+        <header class="sec-head reveal">
+          <span class="sec-num">02 / Reference board</span>
+          <h2>The 10 to emulate</h2>
+        </header>
 
-    <p>Not "sites we like" — sites we pulled apart at the DOM level. Each card names the <strong>one thing to borrow</strong>. Open the teardown for the how. Resist taking more than one move per site; that's how pages get noisy.</p>
+        <p class="reveal">Not "sites we like" — sites we pulled apart at the DOM level. Each card names the <strong>one thing to borrow</strong>. Open the teardown for the how. Resist taking more than one move per site; that's how pages get noisy.</p>
 
-    <div class="grid">
+        <div class="board">
 
-      <div class="card">
-        <h3>Brittany Chiang</h3>
-        <p><strong>Steal:</strong> the sticky split-screen — left rail holds name / role / nav / socials and stays pinned; right column scrolls. Scroll-spy highlights the active section. The single most-cloned dev layout for a reason.</p>
-        <p>
-          <a class="ref" href="workings/brittany-chiang.md">workings/brittany-chiang</a>
-          <a class="ref" href="best-practices/UI-DESIGN.html">UI Design</a>
-        </p>
-      </div>
+          <div class="card reveal">
+            <h3>Brittany Chiang</h3>
+            <p><strong>Steal:</strong> the sticky split-screen — left rail holds name / role / nav / socials and stays pinned; right column scrolls. Scroll-spy highlights the active section. The single most-cloned dev layout for a reason.</p>
+            <p>
+              <a class="ref" href="workings/brittany-chiang.md">workings/brittany-chiang</a>
+              <a class="ref" href="best-practices/UI-DESIGN.html">UI Design</a>
+            </p>
+          </div>
 
-      <div class="card">
-        <h3>Josh Comeau</h3>
-        <p><strong>Steal:</strong> "prove, don't claim" — the homepage <em>is</em> a live demo of the whimsical craft he teaches. Plus textbook dark-mode handling with zero flash. Your one signature moment should do this.</p>
-        <p>
-          <a class="ref" href="workings/josh-comeau.md">workings/josh-comeau</a>
-          <a class="ref" href="best-practices/INTERACTIONS.html">Interaction</a>
-        </p>
-      </div>
+          <div class="card reveal d1">
+            <h3>Josh Comeau</h3>
+            <p><strong>Steal:</strong> "prove, don't claim" — the homepage <em>is</em> a live demo of the whimsical craft he teaches. Plus textbook dark-mode handling with zero flash. Your one signature moment should do this.</p>
+            <p>
+              <a class="ref" href="workings/josh-comeau.md">workings/josh-comeau</a>
+              <a class="ref" href="best-practices/INTERACTIONS.html">Interaction</a>
+            </p>
+          </div>
 
-      <div class="card">
-        <h3>Cassie Evans</h3>
-        <p><strong>Steal:</strong> the site as demo reel — GSAP physics + hand-drawn SVG, zero stock imagery. Don't copy the whole thing; copy the conviction that <em>one</em> animated set piece can carry the brand.</p>
-        <p>
-          <a class="ref" href="workings/cassie-evans.md">workings/cassie-evans</a>
-          <a class="ref" href="best-practices/ANIMATIONS.html">Animation</a>
-        </p>
-      </div>
+          <div class="card reveal d2">
+            <h3>Cassie Evans</h3>
+            <p><strong>Steal:</strong> the site as demo reel — GSAP physics + hand-drawn SVG, zero stock imagery. Don't copy the whole thing; copy the conviction that <em>one</em> animated set piece can carry the brand.</p>
+            <p>
+              <a class="ref" href="workings/cassie-evans.md">workings/cassie-evans</a>
+              <a class="ref" href="best-practices/ANIMATIONS.html">Animation</a>
+            </p>
+          </div>
 
-      <div class="card">
-        <h3>Dennis Snellenberg</h3>
-        <p><strong>Steal:</strong> magnetic links/buttons + page transitions — award-tier feel from motion <em>polish</em> alone, near-monochrome palette. Magnetic hover is ~20 lines for a disproportionately premium feel.</p>
-        <p>
-          <a class="ref" href="workings/dennis-snellenberg.md">workings/dennis-snellenberg</a>
-          <a class="ref" href="best-practices/MOTIONS.html">Motion</a>
-        </p>
-      </div>
+          <div class="card reveal">
+            <h3>Dennis Snellenberg</h3>
+            <p><strong>Steal:</strong> magnetic links/buttons + page transitions — award-tier feel from motion <em>polish</em> alone, near-monochrome palette. Magnetic hover is ~20 lines for a disproportionately premium feel.</p>
+            <p>
+              <a class="ref" href="workings/dennis-snellenberg.md">workings/dennis-snellenberg</a>
+              <a class="ref" href="best-practices/MOTIONS.html">Motion</a>
+            </p>
+          </div>
 
-      <div class="card">
-        <h3>Sara Soueidan</h3>
-        <p><strong>Steal:</strong> a11y &amp; semantics <em>as</em> the credibility — skip-link first, real landmarks, AA contrast, whitespace-as-hierarchy, near-zero font payload. The DOM itself is the demo for an engineer audience.</p>
-        <p>
-          <a class="ref" href="workings/sara-soueidan.md">workings/sara-soueidan</a>
-          <a class="ref" href="best-practices/UX.html">UX</a>
-        </p>
-      </div>
+          <div class="card reveal d1">
+            <h3>Sara Soueidan</h3>
+            <p><strong>Steal:</strong> a11y &amp; semantics <em>as</em> the credibility — skip-link first, real landmarks, AA contrast, whitespace-as-hierarchy, near-zero font payload. The DOM itself is the demo for an engineer audience.</p>
+            <p>
+              <a class="ref" href="workings/sara-soueidan.md">workings/sara-soueidan</a>
+              <a class="ref" href="best-practices/UX.html">UX</a>
+            </p>
+          </div>
 
-      <div class="card">
-        <h3>Rauno Freiberg</h3>
-        <p><strong>Steal:</strong> obsessive micro-interaction detail — tuned easing, "copy email" that flips to "Copied", spring physics. Restraint + small-stuff polish beats flashy WebGL. The taste signal.</p>
-        <p>
-          <a class="ref" href="workings/rauno-freiberg.md">workings/rauno-freiberg</a>
-          <a class="ref" href="best-practices/INTERACTIONS.html">Interaction</a>
-        </p>
-      </div>
+          <div class="card reveal d2">
+            <h3>Rauno Freiberg</h3>
+            <p><strong>Steal:</strong> obsessive micro-interaction detail — tuned easing, "copy email" that flips to "Copied", spring physics. Restraint + small-stuff polish beats flashy WebGL. The taste signal.</p>
+            <p>
+              <a class="ref" href="workings/rauno-freiberg.md">workings/rauno-freiberg</a>
+              <a class="ref" href="best-practices/INTERACTIONS.html">Interaction</a>
+            </p>
+          </div>
 
-      <div class="card">
-        <h3>Linear</h3>
-        <p><strong>Steal:</strong> the dark-mode SaaS discipline — surgical type, near-zero chrome, generous restraint. Your project case-studies can borrow its "show the real artifact, not a stock mockup" stance.</p>
-        <p>
-          <a class="ref" href="workings/linear.md">workings/linear</a>
-          <a class="ref" href="best-practices/STYLING.html">Styling</a>
-        </p>
-      </div>
+          <div class="card reveal">
+            <h3>Linear</h3>
+            <p><strong>Steal:</strong> the dark-mode SaaS discipline — surgical type, near-zero chrome, generous restraint. Your project case-studies can borrow its "show the real artifact, not a stock mockup" stance.</p>
+            <p>
+              <a class="ref" href="workings/linear.md">workings/linear</a>
+              <a class="ref" href="best-practices/STYLING.html">Styling</a>
+            </p>
+          </div>
 
-      <div class="card">
-        <h3>Mercury</h3>
-        <p><strong>Steal:</strong> treat your "brand" like luxury — one variable/display face, cinematic near-black, a single hero object that levitates. Proof that type + palette discipline alone reads premium.</p>
-        <p>
-          <a class="ref" href="workings/mercury.md">workings/mercury</a>
-          <a class="ref" href="best-practices/TYPOGRAPHY.html">Typography</a>
-        </p>
-      </div>
+          <div class="card reveal d1">
+            <h3>Mercury</h3>
+            <p><strong>Steal:</strong> treat your "brand" like luxury — one variable/display face, cinematic near-black, a single hero object that levitates. Proof that type + palette discipline alone reads premium.</p>
+            <p>
+              <a class="ref" href="workings/mercury.md">workings/mercury</a>
+              <a class="ref" href="best-practices/TYPOGRAPHY.html">Typography</a>
+            </p>
+          </div>
 
-      <div class="card">
-        <h3>Teenage Engineering</h3>
-        <p><strong>Steal:</strong> product-as-hero on a strict Swiss grid + one bold accent. The restraint-with-a-system playbook — every element earns its place; the grid does the heavy lifting.</p>
-        <p>
-          <a class="ref" href="workings/teenage-engineering.md">workings/teenage-engineering</a>
-          <a class="ref" href="best-practices/COLOR.html">Color</a>
-        </p>
-      </div>
+          <div class="card reveal d2">
+            <h3>Teenage Engineering</h3>
+            <p><strong>Steal:</strong> product-as-hero on a strict Swiss grid + one bold accent. The restraint-with-a-system playbook — every element earns its place; the grid does the heavy lifting.</p>
+            <p>
+              <a class="ref" href="workings/teenage-engineering.md">workings/teenage-engineering</a>
+              <a class="ref" href="best-practices/COLOR.html">Color</a>
+            </p>
+          </div>
 
-      <div class="card">
-        <h3>Lee Robinson</h3>
-        <p><strong>Steal:</strong> radical reductive confidence — three paragraphs of serif prose, the nouns <em>are</em> the links. A reminder that subtraction is a senior move, not laziness. Your About can do this.</p>
-        <p>
-          <a class="ref" href="workings/lee-robinson.md">workings/lee-robinson</a>
-          <a class="ref" href="best-practices/UX.html">UX</a>
-        </p>
-      </div>
+          <div class="card reveal">
+            <h3>Lee Robinson</h3>
+            <p><strong>Steal:</strong> radical reductive confidence — three paragraphs of serif prose, the nouns <em>are</em> the links. A reminder that subtraction is a senior move, not laziness. Your About can do this.</p>
+            <p>
+              <a class="ref" href="workings/lee-robinson.md">workings/lee-robinson</a>
+              <a class="ref" href="best-practices/UX.html">UX</a>
+            </p>
+          </div>
 
-    </div>
+        </div>
 
-    <p style="margin-top:var(--s-6)"><strong>Two more on standby</strong> if you want a specific flourish: <a class="ref" href="workings/jhey-tompkins.md">workings/jhey-tompkins</a> for a live "now" status island, and <a class="ref" href="workings/mike-hall-mikemai-net.md">workings/mike-hall</a> for a CSS-only multi-mode theme switcher (near-zero JS). Both are cheap, characterful single ideas.</p>
+        <p class="reveal" style="margin-top:var(--s-6)"><strong>Two more on standby</strong> if you want a specific flourish: <a class="ref" href="workings/jhey-tompkins.md">workings/jhey-tompkins</a> for a live "now" status island, and <a class="ref" href="workings/mike-hall-mikemai-net.md">workings/mike-hall</a> for a CSS-only multi-mode theme switcher (near-zero JS). Both are cheap, characterful single ideas.</p>
 
-    <figure class="figure">
-      <img src="workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang homepage hero — sticky left rail with name, role and nav beside a scrolling content column" loading="lazy" />
-      <figcaption><strong>Brittany Chiang</strong> — the sticky split-screen archetype. The identity rail stays pinned (left) while project/experience content scrolls past on the right. This is the skeleton to adopt.</figcaption>
-    </figure>
+        <div class="figure-row">
+          <figure class="figure reveal">
+            <img src="workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang homepage hero — sticky left rail with name, role and nav beside a scrolling content column" loading="lazy" />
+            <figcaption><strong>Brittany Chiang.</strong> The sticky split-screen archetype. The identity rail stays pinned while project content scrolls past on the right. The skeleton to adopt.</figcaption>
+          </figure>
+          <figure class="figure reveal d1">
+            <img src="workings/shots/josh-comeau/01-hero.png" alt="Josh Comeau homepage hero — playful, interactive, demonstrating the craft it teaches" loading="lazy" />
+            <figcaption><strong>Josh Comeau.</strong> "Prove, don't claim." The homepage performs the whimsical, interactive craft rather than describing it. The spirit of your one signature moment.</figcaption>
+          </figure>
+          <figure class="figure reveal d2">
+            <img src="workings/shots/rauno-freiberg/01-hero.png" alt="Rauno Freiberg homepage — restrained typographic filmstrip with tuned micro-interactions" loading="lazy" />
+            <figcaption><strong>Rauno Freiberg.</strong> Restraint plus obsessive interaction detail (easing, copy-to-clipboard tells, spring physics). The taste-over-spectacle reference.</figcaption>
+          </figure>
+        </div>
+      </section>
 
-    <figure class="figure">
-      <img src="workings/shots/josh-comeau/01-hero.png" alt="Josh Comeau homepage hero — playful, interactive, demonstrating the craft it teaches" loading="lazy" />
-      <figcaption><strong>Josh Comeau</strong> — "prove, don't claim." The homepage performs the whimsical, interactive craft rather than describing it. This is the spirit of your one signature moment.</figcaption>
-    </figure>
+      <!-- ===================== 3. IA ===================== -->
+      <section class="section prose" id="ia">
+        <header class="sec-head reveal">
+          <span class="sec-num">03 / Architecture</span>
+          <h2>Information architecture &amp; content plan</h2>
+        </header>
 
-    <figure class="figure">
-      <img src="workings/shots/rauno-freiberg/01-hero.png" alt="Rauno Freiberg homepage — restrained typographic filmstrip with tuned micro-interactions" loading="lazy" />
-      <figcaption><strong>Rauno Freiberg</strong> — restraint plus obsessive interaction detail (easing, copy-to-clipboard tells, spring physics). The taste-over-spectacle reference.</figcaption>
-    </figure>
+        <p class="reveal">Single-page-first, with content-driven sub-routes only where the writing earns them. The Nuxt 4 SPEC <span class="ref">workings/SPEC</span> already commits to a hero + content-driven section; this expands that into a complete IA without bloating the build.</p>
 
-    <!-- ===================== 3. IA ===================== -->
-    <h2 id="ia">3 · Information architecture &amp; content plan</h2>
+        <h3 class="reveal">Page / section map</h3>
 
-    <p>Single-page-first, with content-driven sub-routes only where the writing earns them. The Nuxt 4 SPEC <span class="ref">workings/SPEC</span> already commits to a hero + content-driven section; this expands that into a complete IA without bloating the build.</p>
+        <div class="table-scroll reveal">
+          <table>
+            <thead>
+              <tr><th>Section</th><th>What it does</th><th>What to show</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Hero</td>
+                <td>Credibility in 1 second + the signature moment</td>
+                <td>Name, one-line role thesis ("Full-stack developer who helps clients ship applications"), the ONE interactive set piece, a primary CTA.</td>
+              </tr>
+              <tr>
+                <td>About</td>
+                <td>The human + the proof</td>
+                <td>3–5 sentences of voice (Lee/Sara register), current focus, a "now" line. Authored in <code>content/about.md</code>.</td>
+              </tr>
+              <tr>
+                <td>Selected work</td>
+                <td>The portfolio proper</td>
+                <td>3–6 case studies, numbered (01–06), year-tagged, mono metadata. Real screenshots / live links, never abstract placeholders.</td>
+              </tr>
+              <tr>
+                <td>Experience / writing</td>
+                <td>Specificity = competence</td>
+                <td>Dated list of roles, talks, shipped apps with named companies + quantified impact. Optional blog index if you write.</td>
+              </tr>
+              <tr>
+                <td>Contact</td>
+                <td>Frictionless reach</td>
+                <td>The 3 existing icon links (Instagram, LinkedIn, email) + a "copy email" tell. No cold form where a one-liner works.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-    <h3>Page / section map</h3>
+        <h3 class="reveal">Narrative arc</h3>
+        <p class="reveal">Hero (who + a spark) → About (why trust you) → Work (the evidence) → Experience (the receipts) → Contact (the close). Each section is one scroll-spy node in the right column of the Chiang layout. Wayfinding is editorial: numbered grids, <code>NN / total</code> counters, year tags, monospace metadata — cheap, high-signal, and on-brand for a dev audience.</p>
 
-    <table>
-      <thead>
-        <tr><th>Section</th><th>What it does</th><th>What to show</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Hero</td>
-          <td>Credibility in 1 second + the signature moment</td>
-          <td>Name, one-line role thesis ("Full-stack developer who helps clients ship applications"), the ONE interactive set piece, a primary CTA.</td>
-        </tr>
-        <tr>
-          <td>About</td>
-          <td>The human + the proof</td>
-          <td>3–5 sentences of voice (Lee/Sara register), current focus, a "now" line. Authored in <code>content/about.md</code>.</td>
-        </tr>
-        <tr>
-          <td>Selected work</td>
-          <td>The portfolio proper</td>
-          <td>3–6 case studies, numbered (01–06), year-tagged, mono metadata. Real screenshots / live links, never abstract placeholders.</td>
-        </tr>
-        <tr>
-          <td>Experience / writing</td>
-          <td>Specificity = competence</td>
-          <td>Dated list of roles, talks, shipped apps with named companies + quantified impact. Optional blog index if you write.</td>
-        </tr>
-        <tr>
-          <td>Contact</td>
-          <td>Frictionless reach</td>
-          <td>The 3 existing icon links (Instagram, LinkedIn, email) + a "copy email" tell. No cold form where a one-liner works.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3>Narrative arc</h3>
-    <p>Hero (who + a spark) → About (why trust you) → Work (the evidence) → Experience (the receipts) → Contact (the close). Each section is one scroll-spy node in the right column of the Chiang layout. Wayfinding is editorial: numbered grids, <code>NN / total</code> counters, year tags, monospace metadata — cheap, high-signal, and on-brand for a dev audience.</p>
-
-    <div class="callout steal">
-      <p><strong>Project case-study template</strong> — author each as one <code>content/work/&lt;slug&gt;.md</code> with frontmatter. Render with <code>&lt;ContentRenderer&gt;</code>. Fields:</p>
-      <pre><code>---
+        <div class="callout steal reveal">
+          <p><strong>Project case-study template</strong> — author each as one <code>content/work/&lt;slug&gt;.md</code> with frontmatter. Render with <code>&lt;ContentRenderer&gt;</code>. Fields:</p>
+          <pre><code>---
 title: "Realtime Chat App"
 slug: "chat-app"
 year: 2025
@@ -277,17 +994,22 @@ order: 1
 **Approach** — 2–3 sentences, the key technical decision (and the trade-off).
 **Outcome** — quantified: "cut p95 latency 280ms→40ms", "1.2k MAU".
 **Artifact** — a real screenshot or an embedded live demo, not a mockup.</code></pre>
-      <p>Keep it to four beats: Problem / Approach / Outcome / Artifact. Specificity over adjectives — "passionate developer" is worth nothing; "cut latency 7×" is worth everything.</p>
-    </div>
+          <p>Keep it to four beats: Problem / Approach / Outcome / Artifact. Specificity over adjectives — "passionate developer" is worth nothing; "cut latency 7×" is worth everything.</p>
+        </div>
+      </section>
 
-    <!-- ===================== 4. DESIGN SYSTEM ===================== -->
-    <h2 id="system">4 · Design system &amp; tokens</h2>
+      <!-- ===================== 4. DESIGN SYSTEM ===================== -->
+      <section class="section prose" id="system">
+        <header class="sec-head reveal">
+          <span class="sec-num">04 / Design system</span>
+          <h2>Design system &amp; tokens</h2>
+        </header>
 
-    <p>One face for display, system stack for body, one accent. The discipline matters more than the values. Define tokens once as CSS custom properties (or Tailwind v4 <code>@theme</code>, since the SPEC uses <code>@nuxt/ui</code> 4 on Tailwind v4) and never hardcode again. See <a class="ref" href="best-practices/TYPOGRAPHY.html">Typography</a>, <a class="ref" href="best-practices/COLOR.html">Color</a>, and <a class="ref" href="best-practices/STYLING.html">Styling</a>.</p>
+        <p class="reveal">One face for display, system stack for body, one accent. The discipline matters more than the values. Define tokens once as CSS custom properties (or Tailwind v4 <code>@theme</code>, since the SPEC uses <code>@nuxt/ui</code> 4 on Tailwind v4) and never hardcode again. See <a class="ref" href="best-practices/TYPOGRAPHY.html">Typography</a>, <a class="ref" href="best-practices/COLOR.html">Color</a>, and <a class="ref" href="best-practices/STYLING.html">Styling</a>.</p>
 
-    <h3>Type scale</h3>
-    <p>Fluid <code>clamp()</code> scale, hierarchy from <strong>weight + size</strong>, not from many sizes. Your existing NeuzeitGro + Quicksand stack carries over <span class="ref">workings/SPEC</span> — treat NeuzeitGro as the one characterful display face doing the brand work; keep the body stack near-system for payload.</p>
-    <pre><code>/* tokens.css — type */
+        <h3 class="reveal">Type scale</h3>
+        <p class="reveal">Fluid <code>clamp()</code> scale, hierarchy from <strong>weight + size</strong>, not from many sizes. Your existing NeuzeitGro + Quicksand stack carries over <span class="ref">workings/SPEC</span> — treat NeuzeitGro as the one characterful display face doing the brand work; keep the body stack near-system for payload.</p>
+        <pre class="reveal"><code>/* tokens.css — type */
 --font-display: "NeuzeitGro", Georgia, serif;   /* hero + headings */
 --font-body:    "Quicksand", system-ui, sans-serif;
 --font-mono:    "JetBrains Mono", ui-monospace, monospace; /* metadata */
@@ -296,66 +1018,76 @@ order: 1
 --step-0:  clamp(1.00rem, 0.95rem + 0.22vw, 1.125rem);  /* body */
 --step-3:  clamp(1.80rem, 1.45rem + 1.70vw, 3.05rem);   /* section h */
 --step-4:  clamp(2.30rem, 1.70rem + 2.90vw, 4.40rem);   /* hero */</code></pre>
-    <p>Apply aggressive negative tracking on the oversized hero (<code>letter-spacing: -0.025em</code>) — the recurring "premium type" tell across Mercury, Vercel, Robin Noguier.</p>
+        <p class="reveal">Apply aggressive negative tracking on the oversized hero (<code>letter-spacing: -0.025em</code>) — the recurring "premium type" tell across Mercury, Vercel, Robin Noguier.</p>
 
-    <h3>Color</h3>
-    <p>Near-monochrome base + <strong>one</strong> accent. Your current cosmic/dark-orchid background gives you a natural dark base; pick a single accent that survives both modes (dark-mode toggle is a real SPEC feature). Light-mode and dark-mode are two token sets behind <code>@nuxtjs/color-mode</code>.</p>
-    <pre><code>--bg: #0b0c0e; --surface: #16191e; --line: #23272e;
+        <h3 class="reveal">Color</h3>
+        <p class="reveal">Near-monochrome base + <strong>one</strong> accent. Your current cosmic/dark-orchid background gives you a natural dark base; pick a single accent that survives both modes (dark-mode toggle is a real SPEC feature). Light-mode and dark-mode are two token sets behind <code>@nuxtjs/color-mode</code>.</p>
+        <pre class="reveal"><code>--bg: #0b0c0e; --surface: #16191e; --line: #23272e;
 --ink: #e9eaec; --ink-soft: #b7bcc4; --ink-dim: #888f9a;
 --accent: #f5a623;            /* exactly one — see Dept/Ramp/Nike */
 /* AA contrast is non-negotiable; verify every pair (see §7) */</code></pre>
 
-    <h3>Spacing &amp; motion tokens</h3>
-    <pre><code>--s-1:.25rem --s-2:.5rem --s-3:.75rem --s-4:1rem --s-5:1.5rem --s-6:2rem --s-7:3rem
+        <h3 class="reveal">Spacing &amp; motion tokens</h3>
+        <pre class="reveal"><code>--s-1:.25rem --s-2:.5rem --s-3:.75rem --s-4:1rem --s-5:1.5rem --s-6:2rem --s-7:3rem
 --r-2:8px --r-3:12px --r-pill:999px
 --ease: cubic-bezier(0.22, 0.61, 0.36, 1);   /* one signature easing */
 --dur-fast: 180ms; --dur-base: 320ms; --dur-slow: 600ms;</code></pre>
-    <p>One easing curve used everywhere is itself a coherence signal (Andrei Terteci's "one gradient" lesson, applied to motion).</p>
+        <p class="reveal">One easing curve used everywhere is itself a coherence signal (Andrei Terteci's "one gradient" lesson, applied to motion).</p>
+      </section>
 
-    <!-- ===================== 5. MOTION BUDGET ===================== -->
-    <h2 id="motion">5 · Motion &amp; interaction budget</h2>
+      <!-- ===================== 5. MOTION BUDGET ===================== -->
+      <section class="section prose" id="motion">
+        <header class="sec-head reveal">
+          <span class="sec-num">05 / Motion</span>
+          <h2>Motion &amp; interaction budget</h2>
+        </header>
 
-    <p>The single highest-leverage decision in the whole build: <strong>spend the wow on ONE thing, stay disciplined everywhere else.</strong> See <a class="ref" href="best-practices/MOTIONS.html">Motion</a>, <a class="ref" href="best-practices/ANIMATIONS.html">Animation</a>, <a class="ref" href="best-practices/INTERACTIONS.html">Interaction</a>.</p>
+        <p class="reveal">The single highest-leverage decision in the whole build: <strong>spend the wow on ONE thing, stay disciplined everywhere else.</strong> See <a class="ref" href="best-practices/MOTIONS.html">Motion</a>, <a class="ref" href="best-practices/ANIMATIONS.html">Animation</a>, <a class="ref" href="best-practices/INTERACTIONS.html">Interaction</a>.</p>
 
-    <h3>The one signature moment — pick A or B</h3>
-    <div class="grid">
-      <div class="card">
-        <h4>A · Particle / generative hero (low-risk)</h4>
-        <p>Evolve the existing <code>@tsparticles/vue3</code> cobweb into the signature — cursor-reactive links that bend toward the pointer, a tasteful constellation that <em>responds</em>. You already have the dependency in the SPEC; this is incremental, degrades gracefully, and stays cheap. <strong>Recommended starting point.</strong></p>
-      </div>
-      <div class="card">
-        <h4>B · Scroll-driven hero set piece (higher ceiling)</h4>
-        <p>Lenis smooth scroll + GSAP ScrollTrigger pinning a hero that transforms as you scroll (à la Apple's scrub, scaled down). Higher craft ceiling, higher build + perf + a11y cost. Choose only if you'll invest the polish — a half-done scroll effect is worse than none.</p>
-      </div>
-    </div>
+        <h3 class="reveal">The one signature moment — pick A or B</h3>
+        <div class="grid">
+          <div class="card reveal">
+            <h4>A · Particle / generative hero (low-risk)</h4>
+            <p>Evolve the existing <code>@tsparticles/vue3</code> cobweb into the signature — cursor-reactive links that bend toward the pointer, a tasteful constellation that <em>responds</em>. You already have the dependency in the SPEC; this is incremental, degrades gracefully, and stays cheap. <strong>Recommended starting point.</strong></p>
+          </div>
+          <div class="card reveal d1">
+            <h4>B · Scroll-driven hero set piece (higher ceiling)</h4>
+            <p>Lenis smooth scroll + GSAP ScrollTrigger pinning a hero that transforms as you scroll (à la Apple's scrub, scaled down). Higher craft ceiling, higher build + perf + a11y cost. Choose only if you'll invest the polish — a half-done scroll effect is worse than none.</p>
+          </div>
+        </div>
 
-    <h3>Restraint everywhere else — the cheap, disproportionate wins</h3>
-    <ul>
-      <li><strong>Magnetic nav links/buttons</strong> (Dennis) — ~20 lines, premium feel. <a class="ref" href="workings/dennis-snellenberg.md">workings/dennis-snellenberg</a></li>
-      <li><strong>Copy-email tell</strong> (Rauno) — button flips to "Copied ✓". <a class="ref" href="workings/rauno-freiberg.md">workings/rauno-freiberg</a></li>
-      <li><strong>Scroll-spy active-section nav</strong> (Chiang) — <code>IntersectionObserver</code>, no library.</li>
-      <li><strong>View Transitions</strong> for route changes — Nuxt 4 has built-in support (see §6); eliminates navigation flash for near-zero code.</li>
-      <li><strong>Section reveal on scroll</strong> — a single fade-up with <code>@vueuse/motion</code>, one easing, short distance. No staggered confetti.</li>
-    </ul>
+        <h3 class="reveal">Restraint everywhere else — the cheap, disproportionate wins</h3>
+        <ul class="reveal">
+          <li><strong>Magnetic nav links/buttons</strong> (Dennis) — ~20 lines, premium feel. <a class="ref" href="workings/dennis-snellenberg.md">workings/dennis-snellenberg</a></li>
+          <li><strong>Copy-email tell</strong> (Rauno) — button flips to "Copied ✓". <a class="ref" href="workings/rauno-freiberg.md">workings/rauno-freiberg</a></li>
+          <li><strong>Scroll-spy active-section nav</strong> (Chiang) — <code>IntersectionObserver</code>, no library.</li>
+          <li><strong>View Transitions</strong> for route changes — Nuxt 4 has built-in support (see §6); eliminates navigation flash for near-zero code.</li>
+          <li><strong>Section reveal on scroll</strong> — a single fade-up with <code>@vueuse/motion</code>, one easing, short distance. No staggered confetti.</li>
+        </ul>
 
-    <div class="callout warn">
-      <p><strong>Perf &amp; reduced-motion guardrails (non-negotiable):</strong></p>
-      <ul>
-        <li>Wrap every non-essential animation in <code>@media (prefers-reduced-motion: reduce)</code> → reduce to opacity-only or none. Lenis must be disabled under reduced-motion.</li>
-        <li>Particles/WebGL only inside <code>&lt;ClientOnly&gt;</code>, lazy-mounted, paused when offscreen / tab hidden (<code>visibilitychange</code>).</li>
-        <li>Animate only <code>transform</code> and <code>opacity</code> (compositor-friendly). Never animate layout properties.</li>
-        <li>Budget: the signature moment must not push <strong>INP &gt; 200ms</strong> or drop the hero below 60fps on a mid-tier laptop.</li>
-      </ul>
-    </div>
+        <div class="callout warn reveal">
+          <p><strong>Perf &amp; reduced-motion guardrails (non-negotiable):</strong></p>
+          <ul>
+            <li>Wrap every non-essential animation in <code>@media (prefers-reduced-motion: reduce)</code> → reduce to opacity-only or none. Lenis must be disabled under reduced-motion.</li>
+            <li>Particles/WebGL only inside <code>&lt;ClientOnly&gt;</code>, lazy-mounted, paused when offscreen / tab hidden (<code>visibilitychange</code>).</li>
+            <li>Animate only <code>transform</code> and <code>opacity</code> (compositor-friendly). Never animate layout properties.</li>
+            <li>Budget: the signature moment must not push <strong>INP &gt; 200ms</strong> or drop the hero below 60fps on a mid-tier laptop.</li>
+          </ul>
+        </div>
+      </section>
 
-    <!-- ===================== 6. TECH ===================== -->
-    <h2 id="tech">6 · Tech architecture — Nuxt 4 specifics</h2>
+      <!-- ===================== 6. TECH ===================== -->
+      <section class="section prose" id="tech">
+        <header class="sec-head reveal">
+          <span class="sec-num">06 / Tech</span>
+          <h2>Tech architecture — Nuxt 4 specifics</h2>
+        </header>
 
-    <p>Stack is fixed by the rebuild SPEC <span class="ref">workings/SPEC</span>: Nuxt 4.4 (<code>app/</code> dir), full TypeScript, <code>@nuxt/ui</code> 4 (Tailwind v4), Pinia 3, <code>@nuxt/content</code> 3, <code>@nuxt/fonts</code>, <code>@vite-pwa/nuxt</code>, Vitest 4, pnpm, static export to GitHub Pages. The plan below maps the design decisions onto that stack. See <a class="ref" href="best-practices/NEXTJS.html">Meta-Framework</a> and <a class="ref" href="best-practices/STATE-MANAGEMENT.html">State</a>.</p>
+        <p class="reveal">Stack is fixed by the rebuild SPEC <span class="ref">workings/SPEC</span>: Nuxt 4.4 (<code>app/</code> dir), full TypeScript, <code>@nuxt/ui</code> 4 (Tailwind v4), Pinia 3, <code>@nuxt/content</code> 3, <code>@nuxt/fonts</code>, <code>@vite-pwa/nuxt</code>, Vitest 4, pnpm, static export to GitHub Pages. The plan below maps the design decisions onto that stack. See <a class="ref" href="best-practices/NEXTJS.html">Meta-Framework</a> and <a class="ref" href="best-practices/STATE-MANAGEMENT.html">State</a>.</p>
 
-    <h3>Rendering strategy</h3>
-    <p><strong>SSG / prerender.</strong> <code>ssr: true</code> + full prerender → static HTML to <code>.output/public</code>, deployed to <code>gareth0712.github.io</code>. This is correct: a portfolio is content-stable, and static-first is the universal norm across the dev-portfolio teardowns (Astro / Eleventy / Next export recur constantly). Fast first paint is treated as a <em>feature</em>.</p>
-    <pre><code>// nuxt.config.ts
+        <h3 class="reveal">Rendering strategy</h3>
+        <p class="reveal"><strong>SSG / prerender.</strong> <code>ssr: true</code> + full prerender → static HTML to <code>.output/public</code>, deployed to <code>gareth0712.github.io</code>. This is correct: a portfolio is content-stable, and static-first is the universal norm across the dev-portfolio teardowns (Astro / Eleventy / Next export recur constantly). Fast first paint is treated as a <em>feature</em>.</p>
+        <pre class="reveal"><code>// nuxt.config.ts
 export default defineNuxtConfig({
   ssr: true,
   nitro: { prerender: { crawlLinks: true, routes: ['/'] } },
@@ -366,95 +1098,109 @@ export default defineNuxtConfig({
   ],
 })</code></pre>
 
-    <h3>Content (Nuxt Content 3)</h3>
-    <p>About + each case study live in <code>content/</code> as markdown, queried via <code>queryCollection</code> and rendered with <code>&lt;ContentRenderer&gt;</code>. Define a typed collection in <code>content.config.ts</code> so frontmatter is type-safe — work items get the schema from §3.</p>
+        <h3 class="reveal">Content (Nuxt Content 3)</h3>
+        <p class="reveal">About + each case study live in <code>content/</code> as markdown, queried via <code>queryCollection</code> and rendered with <code>&lt;ContentRenderer&gt;</code>. Define a typed collection in <code>content.config.ts</code> so frontmatter is type-safe — work items get the schema from §3.</p>
 
-    <h3>Image &amp; font optimization</h3>
-    <ul>
-      <li><strong>Fonts:</strong> <code>@nuxt/fonts</code> for Quicksand (auto self-host + preload + <code>font-display: swap</code>); NeuzeitGro carried over as a local <code>@font-face</code> .ttf — subset it to Latin and preload only the hero weight to protect LCP.</li>
-      <li><strong>Images:</strong> add <code>@nuxt/image</code> for case-study covers → WebP/AVIF, responsive <code>srcset</code>, lazy below the fold, explicit width/height to kill CLS. The cosmic background should be a sized, compressed asset, not a raw JPG.</li>
-    </ul>
+        <h3 class="reveal">Image &amp; font optimization</h3>
+        <ul class="reveal">
+          <li><strong>Fonts:</strong> <code>@nuxt/fonts</code> for Quicksand (auto self-host + preload + <code>font-display: swap</code>); NeuzeitGro carried over as a local <code>@font-face</code> .ttf — subset it to Latin and preload only the hero weight to protect LCP.</li>
+          <li><strong>Images:</strong> add <code>@nuxt/image</code> for case-study covers → WebP/AVIF, responsive <code>srcset</code>, lazy below the fold, explicit width/height to kill CLS. The cosmic background should be a sized, compressed asset, not a raw JPG.</li>
+        </ul>
 
-    <h3>Motion libraries</h3>
-    <table>
-      <thead><tr><th>Need</th><th>Pick</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td>Smooth scroll</td><td>Lenis (only if signature B)</td><td>Disable under reduced-motion. Skip entirely if you choose signature A.</td></tr>
-        <tr><td>Scroll-scrub / timeline</td><td>GSAP + ScrollTrigger</td><td>Only for signature B. Heavyweight — justify it.</td></tr>
-        <tr><td>Reveal / micro-motion</td><td><code>@vueuse/motion</code></td><td>Vue-native, tiny, declarative <code>v-motion</code>. Default choice for the 90% case.</td></tr>
-        <tr><td>Page transitions</td><td>Nuxt View Transitions</td><td>Built-in; no extra dependency.</td></tr>
-      </tbody>
-    </table>
+        <h3 class="reveal">Motion libraries</h3>
+        <div class="table-scroll reveal">
+          <table>
+            <thead><tr><th>Need</th><th>Pick</th><th>Note</th></tr></thead>
+            <tbody>
+              <tr><td>Smooth scroll</td><td>Lenis (only if signature B)</td><td>Disable under reduced-motion. Skip entirely if you choose signature A.</td></tr>
+              <tr><td>Scroll-scrub / timeline</td><td>GSAP + ScrollTrigger</td><td>Only for signature B. Heavyweight — justify it.</td></tr>
+              <tr><td>Reveal / micro-motion</td><td><code>@vueuse/motion</code></td><td>Vue-native, tiny, declarative <code>v-motion</code>. Default choice for the 90% case.</td></tr>
+              <tr><td>Page transitions</td><td>Nuxt View Transitions</td><td>Built-in; no extra dependency.</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-    <h3>State (Pinia 3)</h3>
-    <p>Keep it minimal — a portfolio barely needs global state. One <code>useThemeStore</code> for the dark-mode preference (bound to <code>@nuxtjs/color-mode</code>, persisted), per the SPEC. Resist adding stores for things that are local component state. See <a class="ref" href="best-practices/STATE-MANAGEMENT.html">State</a>.</p>
+        <h3 class="reveal">State (Pinia 3)</h3>
+        <p class="reveal">Keep it minimal — a portfolio barely needs global state. One <code>useThemeStore</code> for the dark-mode preference (bound to <code>@nuxtjs/color-mode</code>, persisted), per the SPEC. Resist adding stores for things that are local component state. See <a class="ref" href="best-practices/STATE-MANAGEMENT.html">State</a>.</p>
 
-    <div class="callout tip">
-      <p><strong>Next.js equivalent</strong> (since the plan is meant to be reusable): Nuxt SSG → Next <code>output: 'export'</code> / SSG; Nuxt Content → <code>next-mdx-remote</code> or Contentlayer; <code>@nuxt/image</code> → <code>next/image</code>; <code>@nuxt/fonts</code> → <code>next/font</code>; Pinia → Zustand; View Transitions → the Next App Router View Transitions API; <code>@vueuse/motion</code> → Framer Motion. The architecture is identical; only the bindings change.</p>
-    </div>
+        <div class="callout tip reveal">
+          <p><strong>Next.js equivalent</strong> (since the plan is meant to be reusable): Nuxt SSG → Next <code>output: 'export'</code> / SSG; Nuxt Content → <code>next-mdx-remote</code> or Contentlayer; <code>@nuxt/image</code> → <code>next/image</code>; <code>@nuxt/fonts</code> → <code>next/font</code>; Pinia → Zustand; View Transitions → the Next App Router View Transitions API; <code>@vueuse/motion</code> → Framer Motion. The architecture is identical; only the bindings change.</p>
+        </div>
+      </section>
 
-    <!-- ===================== 7. BUDGET ===================== -->
-    <h2 id="budget">7 · Performance &amp; accessibility budget</h2>
+      <!-- ===================== 7. BUDGET ===================== -->
+      <section class="section prose" id="budget">
+        <header class="sec-head reveal">
+          <span class="sec-num">07 / Budget</span>
+          <h2>Performance &amp; accessibility budget</h2>
+        </header>
 
-    <h3>Core Web Vitals targets</h3>
-    <table>
-      <thead><tr><th>Metric</th><th>Target</th><th>How</th></tr></thead>
-      <tbody>
-        <tr><td>LCP</td><td>&lt; 1.5s (good: &lt; 2.5s)</td><td>Static HTML, preloaded hero font, sized hero image, no render-blocking JS.</td></tr>
-        <tr><td>INP</td><td>&lt; 200ms</td><td>Keep main thread free; lazy-mount the signature moment; debounce magnetic/scroll handlers.</td></tr>
-        <tr><td>CLS</td><td>&lt; 0.1</td><td>Explicit width/height on all media; <code>font-display: swap</code> with a matched fallback metric.</td></tr>
-        <tr><td>JS payload</td><td>&lt; 120KB gz initial</td><td>No GSAP/Lenis unless signature B; tree-shake; particles in a deferred chunk.</td></tr>
-        <tr><td>Lighthouse</td><td>95+ all four</td><td>Run in CI; treat a regression as a build failure.</td></tr>
-      </tbody>
-    </table>
+        <h3 class="reveal">Core Web Vitals targets</h3>
+        <div class="table-scroll reveal">
+          <table>
+            <thead><tr><th>Metric</th><th>Target</th><th>How</th></tr></thead>
+            <tbody>
+              <tr><td>LCP</td><td>&lt; 1.5s (good: &lt; 2.5s)</td><td>Static HTML, preloaded hero font, sized hero image, no render-blocking JS.</td></tr>
+              <tr><td>INP</td><td>&lt; 200ms</td><td>Keep main thread free; lazy-mount the signature moment; debounce magnetic/scroll handlers.</td></tr>
+              <tr><td>CLS</td><td>&lt; 0.1</td><td>Explicit width/height on all media; <code>font-display: swap</code> with a matched fallback metric.</td></tr>
+              <tr><td>JS payload</td><td>&lt; 120KB gz initial</td><td>No GSAP/Lenis unless signature B; tree-shake; particles in a deferred chunk.</td></tr>
+              <tr><td>Lighthouse</td><td>95+ all four</td><td>Run in CI; treat a regression as a build failure.</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-    <h3>Accessibility checklist</h3>
-    <ul>
-      <li>Skip-link as the first focusable DOM node (Sara/Chiang). Real landmarks: <code>header / main / nav / footer</code>.</li>
-      <li>Every interactive element keyboard-reachable with a visible <code>:focus-visible</code> ring. Magnetic effects must not trap or hide focus.</li>
-      <li>AA contrast on every text/background pair, <strong>in both themes</strong> — verify, don't assume.</li>
-      <li>Links distinguishable without color (underline or weight), not color alone.</li>
-      <li>Respect <code>prefers-reduced-motion</code> globally (§5). Canvas/particles get an <code>aria-hidden</code> + a real text DOM underneath.</li>
-      <li>Alt text on every meaningful image; decorative covers <code>alt=""</code>.</li>
-      <li>Semantic heading order (one <code>h1</code>, no skipped levels) — also your SEO backbone.</li>
-    </ul>
+        <h3 class="reveal">Accessibility checklist</h3>
+        <ul class="reveal">
+          <li>Skip-link as the first focusable DOM node (Sara/Chiang). Real landmarks: <code>header / main / nav / footer</code>.</li>
+          <li>Every interactive element keyboard-reachable with a visible <code>:focus-visible</code> ring. Magnetic effects must not trap or hide focus.</li>
+          <li>AA contrast on every text/background pair, <strong>in both themes</strong> — verify, don't assume.</li>
+          <li>Links distinguishable without color (underline or weight), not color alone.</li>
+          <li>Respect <code>prefers-reduced-motion</code> globally (§5). Canvas/particles get an <code>aria-hidden</code> + a real text DOM underneath.</li>
+          <li>Alt text on every meaningful image; decorative covers <code>alt=""</code>.</li>
+          <li>Semantic heading order (one <code>h1</code>, no skipped levels) — also your SEO backbone.</li>
+        </ul>
 
-    <div class="callout warn">
-      <p><strong>The honest trade-off we saw across the teardowns.</strong> WebGL-heavy sites (Bruno Simon, Henry Heffernan, Tim Roussilhe, Lusion) are stunning but pay a real tax: weak SEO (content lives in a canvas crawlers can't read), fragile a11y (you must hand-build a parallel DOM, as Henry does), heavy payloads, and ongoing maintenance. <span class="ref">workings/henry-heffernan</span> The calm-engineer base sidesteps all of it — your content is real HTML, indexable and accessible by default, and the one signature moment is an <em>enhancement layered on top</em>, never the load-bearing structure. That's the whole reason for the chosen direction in §1.</p>
-    </div>
+        <div class="callout warn reveal">
+          <p><strong>The honest trade-off we saw across the teardowns.</strong> WebGL-heavy sites (Bruno Simon, Henry Heffernan, Tim Roussilhe, Lusion) are stunning but pay a real tax: weak SEO (content lives in a canvas crawlers can't read), fragile a11y (you must hand-build a parallel DOM, as Henry does), heavy payloads, and ongoing maintenance. <span class="ref">workings/henry-heffernan</span> The calm-engineer base sidesteps all of it — your content is real HTML, indexable and accessible by default, and the one signature moment is an <em>enhancement layered on top</em>, never the load-bearing structure. That's the whole reason for the chosen direction in §1.</p>
+        </div>
+      </section>
 
-    <!-- ===================== 8. ROADMAP ===================== -->
-    <h2 id="roadmap">8 · Phased build roadmap</h2>
+      <!-- ===================== 8. ROADMAP ===================== -->
+      <section class="section prose" id="roadmap">
+        <header class="sec-head reveal">
+          <span class="sec-num">08 / Roadmap</span>
+          <h2>Phased build roadmap</h2>
+        </header>
 
-    <p>Three phases, shippable at the end of each. Don't build the signature moment first — get a fast, accessible, complete site live, <em>then</em> layer the wow. A half-built portfolio with a fancy hero is worse than a complete plain one.</p>
+        <p class="reveal">Three phases, shippable at the end of each. Don't build the signature moment first — get a fast, accessible, complete site live, <em>then</em> layer the wow. A half-built portfolio with a fancy hero is worse than a complete plain one.</p>
 
-    <h3>Phase 1 · MVP — complete, fast, accessible (the foundation)</h3>
-    <ul>
-      <li>Scaffold Nuxt 4 + TS + tokens (§4) per the SPEC's T1/T2. Migrate fonts, background, favicons.</li>
-      <li>Build the Chiang split-screen shell: sticky identity rail + scrolling content column.</li>
-      <li>All five sections from §3 with <em>real content</em> — About + ≥3 case studies authored in <code>content/</code>.</li>
-      <li>Dark-mode toggle (real, persisted) + the 3 contact links with copy-email tell.</li>
-      <li>Hit the §7 budget: Lighthouse 95+, AA contrast both themes, skip-link, semantic landmarks.</li>
-      <li>Deploy static to GitHub Pages via the fixed Actions workflow. <strong>Ship it.</strong></li>
-    </ul>
+        <h3 class="reveal">Phase 1 · MVP — complete, fast, accessible (the foundation)</h3>
+        <ul class="reveal">
+          <li>Scaffold Nuxt 4 + TS + tokens (§4) per the SPEC's T1/T2. Migrate fonts, background, favicons.</li>
+          <li>Build the Chiang split-screen shell: sticky identity rail + scrolling content column.</li>
+          <li>All five sections from §3 with <em>real content</em> — About + ≥3 case studies authored in <code>content/</code>.</li>
+          <li>Dark-mode toggle (real, persisted) + the 3 contact links with copy-email tell.</li>
+          <li>Hit the §7 budget: Lighthouse 95+, AA contrast both themes, skip-link, semantic landmarks.</li>
+          <li>Deploy static to GitHub Pages via the fixed Actions workflow. <strong>Ship it.</strong></li>
+        </ul>
 
-    <h3>Phase 2 · The signature moment</h3>
-    <ul>
-      <li>Pick A (cursor-reactive particle hero) or B (scroll-scrub set piece) from §5 — A recommended.</li>
-      <li>Lazy-mount inside <code>&lt;ClientOnly&gt;</code>; pause offscreen / tab-hidden; full reduced-motion fallback.</li>
-      <li>Re-verify the budget — the moment must not regress LCP/INP/CLS or 60fps.</li>
-    </ul>
+        <h3 class="reveal">Phase 2 · The signature moment</h3>
+        <ul class="reveal">
+          <li>Pick A (cursor-reactive particle hero) or B (scroll-scrub set piece) from §5 — A recommended.</li>
+          <li>Lazy-mount inside <code>&lt;ClientOnly&gt;</code>; pause offscreen / tab-hidden; full reduced-motion fallback.</li>
+          <li>Re-verify the budget — the moment must not regress LCP/INP/CLS or 60fps.</li>
+        </ul>
 
-    <h3>Phase 3 · Polish — the micro-interaction layer</h3>
-    <ul>
-      <li>Magnetic nav links/buttons (Dennis). Scroll-spy active-section highlight (Chiang).</li>
-      <li>Nuxt View Transitions on route changes. <code>@vueuse/motion</code> section reveals, one easing.</li>
-      <li>One human touch — a signature SVG, an easter egg, a live "now" line (Jhey).</li>
-      <li>Final pass: cross-browser, mobile, Lighthouse, axe a11y audit, real-device check.</li>
-    </ul>
+        <h3 class="reveal">Phase 3 · Polish — the micro-interaction layer</h3>
+        <ul class="reveal">
+          <li>Magnetic nav links/buttons (Dennis). Scroll-spy active-section highlight (Chiang).</li>
+          <li>Nuxt View Transitions on route changes. <code>@vueuse/motion</code> section reveals, one easing.</li>
+          <li>One human touch — a signature SVG, an easter egg, a live "now" line (Jhey).</li>
+          <li>Final pass: cross-browser, mobile, Lighthouse, axe a11y audit, real-device check.</li>
+        </ul>
 
-    <h3>Execution checklist</h3>
-    <pre><code>PHASE 1 — MVP (ship)
+        <h3 class="reveal">Execution checklist</h3>
+        <pre class="reveal"><code>PHASE 1 — MVP (ship)
 [ ] Nuxt 4 + TS scaffold, tokens.css, fonts/bg migrated
 [ ] Sticky split-screen shell (Chiang) responsive
 [ ] About + 3 case studies in content/ (Problem/Approach/Outcome/Artifact)
@@ -474,19 +1220,62 @@ PHASE 3 — Polish
 [ ] One human touch (SVG / easter egg / "now" line)
 [ ] Cross-browser + mobile + axe audit pass</code></pre>
 
-    <div class="callout">
-      <p><strong>The one sentence to remember.</strong> Build the calm, fast, accessible editorial site first — that alone beats 90% of dev portfolios — then spend your entire motion budget on a single moment that proves you can do the thing you say you can do. Restraint, one signature, specificity. Everything in this plan serves those three.</p>
-    </div>
+        <div class="callout reveal">
+          <p><strong>The one sentence to remember.</strong> Build the calm, fast, accessible editorial site first — that alone beats 90% of dev portfolios — then spend your entire motion budget on a single moment that proves you can do the thing you say you can do. Restraint, one signature, specificity. Everything in this plan serves those three.</p>
+        </div>
+      </section>
 
+    </div>
   </main>
 
   <footer class="ftr">
     <div class="wrap">
-      <p><span class="brand">◆ Craft Atlas</span> — Build Plan</p>
+      <a class="brand" href="PLAN.html"><span class="mark" aria-hidden="true"></span> Craft Atlas</a>
       <p>Synthesized from 80 first-hand teardowns in <a href="workings/">workings/</a>. Start with <a href="TOP-LIST.md">TOP-LIST</a> and the <a href="PORTFOLIO.md">developer-portfolio field guide</a>. Stack grounded in the Nuxt 4 rebuild <span class="ref">workings/SPEC</span>.</p>
-      <p>Guides: <a href="best-practices/UI-DESIGN.html">UI Design</a> · <a href="best-practices/UX.html">UX</a> · <a href="best-practices/TYPOGRAPHY.html">Typography</a> · <a href="best-practices/COLOR.html">Color</a> · <a href="best-practices/STYLING.html">Styling</a> · <a href="best-practices/MOTIONS.html">Motion</a> · <a href="best-practices/ANIMATIONS.html">Animation</a> · <a href="best-practices/INTERACTIONS.html">Interaction</a> · <a href="best-practices/SPATIAL.html">3D / Spatial</a> · <a href="best-practices/MINI-GAMES.html">Mini-Games</a> · <a href="best-practices/STATE-MANAGEMENT.html">State</a> · <a href="best-practices/NEXTJS.html">Meta-Framework</a></p>
+      <p class="guides">Guides: <a href="best-practices/UI-DESIGN.html">UI Design</a> · <a href="best-practices/UX.html">UX</a> · <a href="best-practices/TYPOGRAPHY.html">Typography</a> · <a href="best-practices/COLOR.html">Color</a> · <a href="best-practices/STYLING.html">Styling</a> · <a href="best-practices/MOTIONS.html">Motion</a> · <a href="best-practices/ANIMATIONS.html">Animation</a> · <a href="best-practices/INTERACTIONS.html">Interaction</a> · <a href="best-practices/SPATIAL.html">3D / Spatial</a> · <a href="best-practices/MINI-GAMES.html">Mini-Games</a> · <a href="best-practices/STATE-MANAGEMENT.html">State</a> · <a href="best-practices/NEXTJS.html">Meta-Framework</a></p>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // ---- scroll reveal via IntersectionObserver ----
+      var reveals = document.querySelectorAll('.reveal');
+      if (reduce || !('IntersectionObserver' in window)) {
+        reveals.forEach(function (el) { el.classList.add('in'); });
+      } else {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('in');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+        reveals.forEach(function (el) {
+          if (!el.classList.contains('in')) io.observe(el);
+        });
+      }
+
+      // ---- reading progress bar (rAF-throttled, no per-frame state) ----
+      if (!reduce) {
+        var bar = document.getElementById('progress');
+        var ticking = false;
+        function update() {
+          var h = document.documentElement;
+          var max = h.scrollHeight - h.clientHeight;
+          var pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+          bar.style.width = pct + '%';
+          ticking = false;
+        }
+        window.addEventListener('scroll', function () {
+          if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+        }, { passive: true });
+        update();
+      }
+    })();
+  </script>
 
 </body>
 </html>

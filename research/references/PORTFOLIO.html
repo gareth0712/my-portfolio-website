@@ -6,218 +6,1186 @@
   <title>Developer Portfolio Field Guide — Craft Atlas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,wght@0,400;0,560;1,400&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../best-practices/shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       CRAFT ATLAS — PORTFOLIO FIELD GUIDE
+       Art direction: cool archival "specimen catalogue".
+       Ink-on-bone neutral, electric cobalt accent, mono metadata,
+       ranked index plates + tiered screenshot gallery.
+       Distinct from the warm-editorial PLAN + type-specimen pages.
+       ============================================================ */
+
+    :root {
+      --paper:      #f4f2ec;   /* bone */
+      --paper-2:    #eceae2;   /* slightly deeper plate ground */
+      --card:       #fbfaf6;
+      --ink:        #16171b;   /* near-black */
+      --ink-soft:   #34363d;
+      --ink-dim:    #6c6e76;
+      --ink-faint:  #9a9ca3;
+      --line:       #d8d5cb;
+      --line-2:     #c7c4b8;
+      --accent:     #1f44ff;   /* electric cobalt */
+      --accent-ink: #0e2bb8;
+      --accent-wash:#e6e9ff;
+      --warn:       #b4541a;   /* burnt amber for caveats */
+      --warn-wash:  #f6e9dd;
+      --s-tier:     #1f44ff;
+      --a-tier:     #2f7d5b;
+      --n-tier:     #8a6d2f;
+
+      --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 18px;
+      --s-5: 28px; --s-6: 44px; --s-7: 68px; --s-8: 104px;
+
+      --max: 1240px;
+      --rad: 14px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+      --mono: "Spline Sans Mono", ui-monospace, "SF Mono", Menlo, monospace;
+      --sans: "Space Grotesk", system-ui, -apple-system, sans-serif;
+      --serif:"Fraunces", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      /* faint engineering grid, fixed so it doesn't repaint on scroll */
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 56px 56px;
+      opacity: 0.16;
+      mask-image: radial-gradient(ellipse 120% 80% at 50% 0%, #000 35%, transparent 90%);
+    }
+
+    a { color: var(--accent-ink); text-decoration: none; }
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2.5px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 3px;
+    }
+
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 0 clamp(18px, 4vw, 44px); }
+
+    /* ---------- SKIP LINK ---------- */
+    .skip {
+      position: absolute; left: -999px; top: 0;
+      background: var(--ink); color: var(--paper);
+      padding: 10px 16px; z-index: 100; border-radius: 0 0 8px 0;
+      font-family: var(--mono); font-size: 13px;
+    }
+    .skip:focus { left: 0; }
+
+    /* ============================================================
+       NAV — archival index bar: brand plate + scroll-rail of links
+       ============================================================ */
+    .topbar {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(244,242,236,0.82);
+      backdrop-filter: blur(14px) saturate(1.4);
+      -webkit-backdrop-filter: blur(14px) saturate(1.4);
+      border-bottom: 1px solid var(--line);
+    }
+    @supports not (backdrop-filter: blur(1px)) {
+      .topbar { background: var(--paper); }
+    }
+    .topbar-inner {
+      max-width: var(--max); margin: 0 auto;
+      display: flex; align-items: center; gap: var(--s-4);
+      padding: 0 clamp(18px, 4vw, 44px);
+      height: 62px;
+    }
+    .brand {
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 8px;
+      flex-shrink: 0;
+    }
+    .brand .diamond {
+      width: 9px; height: 9px; background: var(--accent);
+      transform: rotate(45deg);
+      box-shadow: 0 0 0 3px var(--accent-wash);
+    }
+    .navlinks {
+      display: flex; align-items: center; gap: 2px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line-2) transparent;
+      -webkit-overflow-scrolling: touch;
+      mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 24px), transparent 100%);
+    }
+    .navlinks::-webkit-scrollbar { height: 4px; }
+    .navlinks::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 4px; }
+    .navlinks a {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--ink-dim);
+      padding: 7px 11px;
+      border-radius: 7px;
+      white-space: nowrap;
+      transition: color 0.25s var(--ease), background 0.25s var(--ease);
+    }
+    .navlinks a:hover { color: var(--ink); background: var(--paper-2); }
+    .navlinks a[aria-current="page"] {
+      color: var(--accent-ink);
+      background: var(--accent-wash);
+    }
+    .navlinks a.cta {
+      color: var(--paper);
+      background: var(--ink);
+      font-weight: 600;
+      margin-left: 4px;
+    }
+    .navlinks a.cta:hover { background: var(--accent); color: #fff; }
+
+    /* ============================================================
+       HERO
+       ============================================================ */
+    main { position: relative; z-index: 1; }
+
+    .hero {
+      padding: clamp(48px, 9vw, var(--s-8)) 0 var(--s-7);
+      border-bottom: 1px solid var(--line);
+      position: relative;
+    }
+    .hero .wrap { display: grid; gap: var(--s-5); }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-ink);
+      display: inline-flex; align-items: center; gap: 10px;
+    }
+    .eyebrow::before {
+      content: ""; width: 26px; height: 1.5px; background: var(--accent);
+    }
+    .hero h1 {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: clamp(2.4rem, 6.4vw, 5rem);
+      line-height: 0.98;
+      letter-spacing: -0.035em;
+      margin: 0;
+      max-width: 16ch;
+    }
+    .hero h1 em {
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent-ink);
+      letter-spacing: -0.01em;
+    }
+    .lede {
+      font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+      line-height: 1.55;
+      color: var(--ink-soft);
+      max-width: 62ch;
+      margin: 0;
+    }
+    .hero-stats {
+      display: flex; flex-wrap: wrap; gap: var(--s-5) var(--s-7);
+      padding-top: var(--s-3);
+      border-top: 1px solid var(--line);
+      margin-top: var(--s-2);
+    }
+    .stat { display: grid; gap: 2px; }
+    .stat .n {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 600;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .stat .k {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ink-dim);
+    }
+
+    /* ============================================================
+       TOC — horizontal index strip
+       ============================================================ */
+    .toc { padding: var(--s-5) 0; border-bottom: 1px solid var(--line); }
+    .toc ol {
+      list-style: none; margin: 0; padding: 0;
+      display: grid; gap: var(--s-2);
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      counter-reset: toc;
+    }
+    .toc a {
+      display: flex; align-items: baseline; gap: 12px;
+      font-family: var(--mono); font-size: 13.5px;
+      color: var(--ink-soft);
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--card);
+      transition: border-color 0.25s var(--ease), transform 0.25s var(--ease), color 0.25s var(--ease);
+    }
+    .toc a:hover {
+      border-color: var(--accent);
+      color: var(--ink);
+      transform: translateY(-2px);
+    }
+    .toc a .tnum {
+      font-weight: 700; color: var(--accent-ink); font-size: 12px;
+    }
+
+    /* ============================================================
+       SECTION HEADINGS
+       ============================================================ */
+    section.block { padding: var(--s-8) 0 var(--s-7); border-bottom: 1px solid var(--line); }
+    .sec-head { display: grid; gap: var(--s-3); margin-bottom: var(--s-6); }
+    .sec-index {
+      font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    h2.sec-title {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: clamp(1.7rem, 3.6vw, 2.7rem);
+      letter-spacing: -0.03em;
+      line-height: 1.02;
+      margin: 0;
+      max-width: 20ch;
+    }
+    .sec-head p { font-size: 1.05rem; color: var(--ink-soft); max-width: 66ch; margin: 0; }
+
+    p { font-size: 1rem; color: var(--ink-soft); }
+    main p a { border-bottom: 1.5px solid var(--accent-wash); transition: border-color 0.2s var(--ease); }
+    main p a:hover { border-color: var(--accent); }
+    strong { color: var(--ink); font-weight: 600; }
+    em { font-style: italic; }
+    code {
+      font-family: var(--mono); font-size: 0.86em;
+      background: var(--paper-2); padding: 2px 6px; border-radius: 5px;
+      color: var(--accent-ink); border: 1px solid var(--line);
+    }
+
+    /* "how to read" list */
+    .read-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); }
+    .read-list > li {
+      position: relative; padding: var(--s-4) var(--s-4) var(--s-4) calc(var(--s-5) + 14px);
+      background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+      font-size: 0.98rem; color: var(--ink-soft);
+    }
+    .read-list > li::before {
+      content: ""; position: absolute; left: var(--s-4); top: calc(var(--s-4) + 9px);
+      width: 7px; height: 7px; background: var(--accent); transform: rotate(45deg);
+    }
+
+    /* ============================================================
+       RANKED INDEX — bespoke plate rows (table on desktop, cards mobile)
+       ============================================================ */
+    .ranked-meta {
+      font-family: var(--mono); font-size: 12.5px; color: var(--ink-dim);
+      margin: 0 0 var(--s-5);
+      display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center;
+    }
+    .ranked-meta .legend {
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+    .sw-s { background: var(--s-tier); }
+    .sw-a { background: var(--a-tier); }
+    .sw-n { background: var(--n-tier); }
+    .sw-w { background: var(--warn); }
+
+    .index {
+      border: 1px solid var(--line-2);
+      border-radius: var(--rad);
+      overflow: hidden;
+      background: var(--card);
+    }
+    .index-row {
+      display: grid;
+      grid-template-columns: 56px minmax(170px, 1.3fr) minmax(120px, 1fr) minmax(220px, 2fr) minmax(180px, 1.4fr) 110px;
+      align-items: stretch;
+      border-bottom: 1px solid var(--line);
+      transition: background 0.22s var(--ease);
+    }
+    .index-row:last-child { border-bottom: none; }
+    .index-row.head {
+      background: var(--ink);
+      position: sticky; top: 62px; z-index: 5;
+    }
+    .index-row.head .cell {
+      color: var(--paper);
+      font-family: var(--mono); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      padding-top: 12px; padding-bottom: 12px;
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+    .index-row.head .cell:last-child { border-right: none; }
+    .index-row.body:hover { background: var(--accent-wash); }
+    .index-row .cell {
+      padding: var(--s-3) var(--s-4);
+      font-size: 0.9rem; color: var(--ink-soft);
+      border-right: 1px solid var(--line);
+      display: flex; align-items: center;
+    }
+    .index-row .cell:last-child { border-right: none; }
+
+    .rank-no {
+      font-family: var(--serif); font-weight: 600;
+      font-size: 1.5rem; color: var(--ink);
+      justify-content: center;
+      position: relative;
+    }
+    .rank-no .tier-tag {
+      position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    }
+    .tier-S { background: var(--s-tier); }
+    .tier-A { background: var(--a-tier); }
+    .tier-N { background: var(--n-tier); }
+    .tier-W { background: var(--warn); }
+
+    .site-name {
+      font-family: var(--sans); font-weight: 600; font-size: 1rem;
+      color: var(--ink); letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .caveat-flag {
+      font-family: var(--mono); font-size: 10px; font-weight: 600;
+      color: var(--warn); background: var(--warn-wash);
+      padding: 2px 6px; border-radius: 5px; letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    .cell.url a {
+      font-family: var(--mono); font-size: 12.5px;
+      word-break: break-word;
+      border-bottom: 1px solid var(--accent-wash);
+    }
+    .cell.url a:hover { border-color: var(--accent); }
+    .cell.craft { line-height: 1.45; font-size: 0.88rem; }
+    .cell.learn { line-height: 1.45; font-size: 0.88rem; color: var(--ink-dim); font-style: italic; }
+    .teardown-link {
+      font-family: var(--mono); font-size: 12px; font-weight: 600;
+      color: var(--accent-ink);
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .teardown-link::after {
+      content: "→"; transition: transform 0.22s var(--ease);
+    }
+    .teardown-link:hover::after { transform: translateX(3px); }
+    .index-caption {
+      font-family: var(--mono); font-size: 12px; color: var(--ink-dim);
+      margin-top: var(--s-3); display: flex; align-items: center; gap: 8px;
+    }
+    .index-caption .caveat-flag { font-size: 10px; }
+
+    /* mobile card labels (hidden on desktop) */
+    .clabel { display: none; }
+
+    /* ============================================================
+       GALLERY FIGURES — screenshot tiles in machined frames
+       ============================================================ */
+    .gallery {
+      display: grid; gap: var(--s-5);
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: var(--s-6);
+    }
+    .figure {
+      margin: 0;
+      background: var(--paper-2);
+      border: 1px solid var(--line-2);
+      border-radius: var(--rad);
+      padding: var(--s-2);
+      overflow: hidden;
+      transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+    }
+    .figure:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 48px -28px rgba(31,68,255,0.4), 0 8px 18px -12px rgba(22,23,27,0.25);
+    }
+    .figure .shot {
+      position: relative; overflow: hidden;
+      border-radius: calc(var(--rad) - 6px);
+      border: 1px solid var(--line);
+      background: var(--ink);
+      aspect-ratio: 16 / 10;
+    }
+    .figure img {
+      display: block; width: 100%; height: 100%;
+      object-fit: cover; object-position: top center;
+      transition: transform 0.6s var(--ease);
+    }
+    .figure:hover img { transform: scale(1.03); }
+    .figure figcaption {
+      padding: var(--s-3) var(--s-3) var(--s-2);
+      font-size: 0.9rem; line-height: 1.5; color: var(--ink-soft);
+    }
+    .figure figcaption strong { color: var(--ink); }
+    .figure.solo { grid-column: 1 / -1; max-width: 760px; }
+    .figure.solo .shot { aspect-ratio: 21 / 9; }
+
+    /* ============================================================
+       TIERS
+       ============================================================ */
+    .tier-group { margin-bottom: var(--s-6); }
+    .tier-banner {
+      display: flex; align-items: center; gap: var(--s-3);
+      margin-bottom: var(--s-3);
+    }
+    .tier-badge {
+      font-family: var(--serif); font-weight: 600;
+      font-size: 1.05rem; color: #fff;
+      width: 38px; height: 38px; border-radius: 9px;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .badge-S { background: var(--s-tier); }
+    .badge-A { background: var(--a-tier); }
+    .badge-N { background: var(--n-tier); }
+    .badge-X { background: var(--ink); }
+    h3.tier-title {
+      font-family: var(--sans); font-weight: 600;
+      font-size: 1.25rem; letter-spacing: -0.02em; margin: 0;
+      color: var(--ink);
+    }
+    .reflist {
+      display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 var(--s-4);
+    }
+    .ref {
+      font-family: var(--mono); font-size: 12.5px; font-weight: 500;
+      color: var(--ink); background: var(--card);
+      border: 1px solid var(--line); border-radius: 999px;
+      padding: 5px 12px;
+      transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+    }
+    .reflist .ref:hover { border-color: var(--accent); background: var(--accent-wash); }
+    .tier-body ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: var(--s-2); }
+    .tier-body ul li {
+      position: relative; padding-left: 22px; font-size: 0.97rem; color: var(--ink-soft);
+    }
+    .tier-body ul li::before {
+      content: "—"; position: absolute; left: 0; color: var(--accent); font-weight: 700;
+    }
+    .tier-body p { font-size: 0.97rem; }
+
+    /* ============================================================
+       CALLOUTS
+       ============================================================ */
+    .callout {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--line-2);
+      border-radius: 12px;
+      padding: var(--s-4) var(--s-5);
+      margin: var(--s-3) 0;
+    }
+    .callout > p:first-child {
+      font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ink-dim);
+      margin: 0 0 var(--s-3); font-weight: 600;
+    }
+    .callout ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: var(--s-2); }
+    .callout ul li { position: relative; padding-left: 22px; font-size: 0.96rem; color: var(--ink-soft); }
+    .callout ul li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); }
+    .callout.steal { border-left-color: var(--accent); }
+    .callout.steal > p:first-child { color: var(--accent-ink); }
+    .callout.tip { border-left-color: var(--a-tier); }
+    .callout.tip > p:first-child { color: var(--a-tier); }
+    .callout.warn { border-left-color: var(--warn); background: var(--warn-wash); }
+    .callout.warn > p:first-child { color: var(--warn); }
+    .callout.warn ul li::before { color: var(--warn); }
+
+    .patterns-grid { display: grid; gap: var(--s-4); grid-template-columns: repeat(2, 1fr); }
+    .patterns-grid .callout { margin: 0; }
+    .patterns-grid .callout.tip { grid-column: 1 / -1; }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .ftr {
+      background: var(--ink); color: var(--paper);
+      padding: var(--s-7) 0; position: relative; z-index: 1;
+    }
+    .ftr a { color: var(--paper); }
+    .ftr .home {
+      font-family: var(--mono); font-weight: 700; font-size: 1.1rem;
+      display: inline-flex; align-items: center; gap: 10px;
+      transition: color 0.25s var(--ease);
+    }
+    .ftr .home:hover { color: #9db0ff; }
+    .ftr .home .diamond {
+      width: 9px; height: 9px; background: var(--accent); transform: rotate(45deg);
+    }
+    .ftr .credit { margin-top: var(--s-3); color: var(--ink-faint); font-size: 0.92rem; }
+    .ftr .credit strong { color: var(--paper); }
+
+    /* ---------- reveal-on-scroll ---------- */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; }
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 920px) {
+      .gallery, .patterns-grid { grid-template-columns: 1fr; }
+      .patterns-grid .callout.tip { grid-column: auto; }
+
+      /* table → stacked cards */
+      .index { border: none; background: transparent; }
+      .index-row.head { display: none; }
+      .index-row {
+        grid-template-columns: 1fr;
+        border: 1px solid var(--line-2);
+        border-radius: 12px;
+        margin-bottom: var(--s-3);
+        background: var(--card);
+        overflow: hidden;
+      }
+      .index-row .cell {
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+        padding: 10px var(--s-4);
+        align-items: flex-start;
+        gap: 4px;
+      }
+      .index-row .cell:last-child { border-bottom: none; }
+      .clabel {
+        display: block;
+        font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+        text-transform: uppercase; color: var(--ink-faint);
+        margin-bottom: 3px;
+      }
+      .cell.rank-no {
+        flex-direction: row; gap: 10px; align-items: center;
+        background: var(--paper-2); justify-content: flex-start;
+        font-size: 1.2rem; padding-left: var(--s-5);
+      }
+      .cell.rank-no .clabel { margin: 0; }
+      .cell.rank-no .tier-tag { width: 5px; }
+      .cell.craft, .cell.learn { display: block; }
+    }
+    @media (max-width: 560px) {
+      .hero-stats { gap: var(--s-4) var(--s-5); }
+      .toc ol { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <nav class="site-nav" aria-label="Best practices">
-      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
-      <a href="../best-practices/UI-DESIGN.html">UI Design</a>
-      <a href="../best-practices/UX.html">UX</a>
-      <a href="../best-practices/TYPOGRAPHY.html">Typography</a>
-      <a href="../best-practices/COLOR.html">Color</a>
-      <a href="../best-practices/STYLING.html">Styling</a>
-      <a href="../best-practices/MOTIONS.html">Motion</a>
-      <a href="../best-practices/ANIMATIONS.html">Animation</a>
-      <a href="../best-practices/INTERACTIONS.html">Interaction</a>
-      <a href="../best-practices/SPATIAL.html">3D / Spatial</a>
-      <a href="../best-practices/MINI-GAMES.html">Mini-Games</a>
-      <a href="../best-practices/STATE-MANAGEMENT.html">State</a>
-      <a href="../best-practices/NEXTJS.html">Meta-Framework</a>
-      <a href="PORTFOLIO.html" aria-current="page">Portfolio</a>
-      <a href="TOP-LIST.html">Top List</a>
-      <a href="MOTION-GALLERY.html">Motion Reel</a>
-      <a class="cta" href="../PLAN.html">Build Plan →</a>
-    </nav>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../PLAN.html"><span class="diamond" aria-hidden="true"></span>Craft Atlas</a>
+      <nav class="navlinks" aria-label="Best practices">
+        <a href="../best-practices/UI-DESIGN.html">UI Design</a>
+        <a href="../best-practices/UX.html">UX</a>
+        <a href="../best-practices/TYPOGRAPHY.html">Typography</a>
+        <a href="../best-practices/COLOR.html">Color</a>
+        <a href="../best-practices/STYLING.html">Styling</a>
+        <a href="../best-practices/MOTIONS.html">Motion</a>
+        <a href="../best-practices/ANIMATIONS.html">Animation</a>
+        <a href="../best-practices/INTERACTIONS.html">Interaction</a>
+        <a href="../best-practices/SPATIAL.html">3D / Spatial</a>
+        <a href="../best-practices/MINI-GAMES.html">Mini-Games</a>
+        <a href="../best-practices/STATE-MANAGEMENT.html">State</a>
+        <a href="../best-practices/NEXTJS.html">Meta-Framework</a>
+        <a href="PORTFOLIO.html" aria-current="page">Portfolio</a>
+        <a href="TOP-LIST.html">Top List</a>
+        <a href="MOTION-GALLERY.html">Motion Reel</a>
+        <a class="cta" href="../PLAN.html">Build Plan →</a>
+      </nav>
+    </div>
   </header>
 
-  <main class="wide">
-    <div class="hero">
-      <span class="kicker">Craft Atlas · Reference / Portfolios</span>
-      <h1>Developer Portfolio Field Guide — curated &amp; ranked.</h1>
-      <p class="lede">A quality-filtered shortlist of the best developer / design-engineer portfolio sites, derived from hands-on teardowns. Each entry was loaded live, inspected at the DOM/asset level, and screenshotted — ranked by craft you can learn from, not fame.</p>
-    </div>
+  <main id="main">
+    <!-- ===================== HERO ===================== -->
+    <section class="hero">
+      <div class="wrap">
+        <span class="eyebrow">Craft Atlas · Reference / Portfolios</span>
+        <h1>Developer Portfolio Field Guide — curated &amp; <em>ranked</em>.</h1>
+        <p class="lede">A quality-filtered shortlist of the best developer / design-engineer portfolio sites, derived from hands-on teardowns. Each entry was loaded live, inspected at the DOM/asset level, and screenshotted — ranked by craft you can learn from, not fame.</p>
+        <div class="hero-stats">
+          <div class="stat"><span class="n">30</span><span class="k">Sites ranked</span></div>
+          <div class="stat"><span class="n">80</span><span class="k">Live teardowns</span></div>
+          <div class="stat"><span class="n">4</span><span class="k">Quality tiers</span></div>
+          <div class="stat"><span class="n">5</span><span class="k">Caveat flags ⚠</span></div>
+        </div>
+      </div>
+    </section>
 
+    <!-- ===================== TOC ===================== -->
     <nav class="toc" aria-label="On this page">
-      <ol>
-        <li><a href="#how">1 · How to read this</a></li>
-        <li><a href="#ranked">2 · The ranked table (30 sites)</a></li>
-        <li><a href="#tiers">3 · Tiers — why each sits where it does</a></li>
-        <li><a href="#patterns">4 · Patterns common to great dev portfolios</a></li>
-      </ol>
+      <div class="wrap">
+        <ol>
+          <li><a href="#how"><span class="tnum">01</span> How to read this</a></li>
+          <li><a href="#ranked"><span class="tnum">02</span> The ranked index (30 sites)</a></li>
+          <li><a href="#tiers"><span class="tnum">03</span> Tiers — why each sits where it does</a></li>
+          <li><a href="#patterns"><span class="tnum">04</span> Patterns common to great portfolios</a></li>
+        </ol>
+      </div>
     </nav>
 
-    <h2 id="how">1 · How to read this</h2>
-    <p>This is <strong>curated, not a dump.</strong> The well-known list <a href="https://github.com/emmabostian/developer-portfolios">emmabostian/developer-portfolios</a> is a raw, unranked firehose — hundreds of links, most generic, no signal on which are actually worth studying. What follows is the opposite: the standouts that survived a real teardown, ranked by craft you can learn from.</p>
-    <ul>
-      <li><strong>"Standout craft"</strong> = the one thing this site does better than almost anyone.</li>
-      <li><strong>"Best for learning…"</strong> = what skill/pattern you'd open it to study.</li>
-      <li><strong>Brutal-honesty rule:</strong> a few entries are famous but not worth deep study (template-grade, or the live site no longer matches its reputation). Those are flagged explicitly and sit lower or in "Notable but niche."</li>
-      <li><strong>Reachability caveats</strong> are called out inline. Five targets were down/stubbed at teardown time (<code>aprilzero</code>, <code>gao.show</code>, <code>gianmarco.xyz</code>, <code>calebbrown.dev</code>, <code>wei-gao</code>); see their files for the forensic detail.</li>
-    </ul>
+    <!-- ===================== 01 HOW TO READ ===================== -->
+    <section class="block" id="how">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="sec-index">Section 01 — Method</span>
+          <h2 class="sec-title">How to read this index</h2>
+          <p>This is <strong>curated, not a dump.</strong> The well-known list <a href="https://github.com/emmabostian/developer-portfolios">emmabostian/developer-portfolios</a> is a raw, unranked firehose — hundreds of links, most generic, no signal on which are actually worth studying. What follows is the opposite: the standouts that survived a real teardown, ranked by craft you can learn from.</p>
+        </div>
+        <ul class="read-list reveal">
+          <li><strong>"Standout craft"</strong> = the one thing this site does better than almost anyone.</li>
+          <li><strong>"Best for learning…"</strong> = what skill/pattern you'd open it to study.</li>
+          <li><strong>Brutal-honesty rule:</strong> a few entries are famous but not worth deep study (template-grade, or the live site no longer matches its reputation). Those are flagged explicitly and sit lower or in "Notable but niche."</li>
+          <li><strong>Reachability caveats</strong> are called out inline. Five targets were down/stubbed at teardown time (<code>aprilzero</code>, <code>gao.show</code>, <code>gianmarco.xyz</code>, <code>calebbrown.dev</code>, <code>wei-gao</code>); see their files for the forensic detail.</li>
+        </ul>
+      </div>
+    </section>
 
-    <h2 id="ranked">2 · The ranked table</h2>
-    <p>Ranked by <em>craft you can learn from</em>. The <strong>Teardown</strong> column links to the full DOM/stack/motion write-up for each site.</p>
+    <!-- ===================== 02 RANKED INDEX ===================== -->
+    <section class="block" id="ranked">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="sec-index">Section 02 — The Index</span>
+          <h2 class="sec-title">The ranked index</h2>
+          <p>Ranked by <em>craft you can learn from</em>. The <strong>Teardown</strong> column links to the full DOM/stack/motion write-up for each site.</p>
+        </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Portfolio</th>
-          <th>URL</th>
-          <th>Standout craft</th>
-          <th>Best for learning…</th>
-          <th>Teardown</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>1</td><td><span class="ref">Brittany Chiang</span></td><td><a href="https://brittanychiang.com">brittanychiang.com</a></td><td>The reference dev-portfolio: sticky split-screen, scroll-spy nav, cursor spotlight, a11y as a feature</td><td>The canonical "calm engineer" single-page layout</td><td><a href="../workings/brittany-chiang.md">brittany-chiang.md</a></td></tr>
-        <tr><td>2</td><td><span class="ref">Cassie Evans</span></td><td><a href="https://www.cassie.codes">cassie.codes</a></td><td>The site <em>is</em> the demo reel — GSAP physics motion + hand-drawn SVG, zero stock</td><td>Performing skill instead of describing it</td><td><a href="../workings/cassie-evans.md">cassie-evans.md</a></td></tr>
-        <tr><td>3</td><td><span class="ref">Josh Comeau</span></td><td><a href="https://www.joshwcomeau.com">joshwcomeau.com</a></td><td>Homepage is a live demo of the whimsical craft it teaches; modern RSC stack, no template smell</td><td>"Prove, don't claim" + correct dark-mode/perf</td><td><a href="../workings/josh-comeau.md">josh-comeau.md</a></td></tr>
-        <tr><td>4</td><td><span class="ref">Dennis Snellenberg</span></td><td><a href="https://dennissnellenberg.com">dennissnellenberg.com</a></td><td>Award-tier from motion alone: buttery transitions, magnetic links, photo-matched-to-UI palette</td><td>High-end freelancer motion + microinteraction budget</td><td><a href="../workings/dennis-snellenberg.md">dennis-snellenberg.md</a></td></tr>
-        <tr><td>5</td><td><span class="ref">Sara Soueidan</span></td><td><a href="https://www.sarasoueidan.com">sarasoueidan.com</a></td><td>Flawless semantic structure + world-class type; the DOM itself is the credibility</td><td>Accessibility-first, system-font, whitespace-as-hierarchy</td><td><a href="../workings/sara-soueidan.md">sara-soueidan.md</a></td></tr>
-        <tr><td>6</td><td><span class="ref">Henry Heffernan</span></td><td><a href="https://henryheffernan.com">henryheffernan.com</a></td><td>A working 90s OS rendered onto a 3D CRT — real React UI on a screen mesh</td><td>Diegetic IA + boot-gate, with a11y DOM kept underneath</td><td><a href="../workings/henry-heffernan.md">henry-heffernan.md</a></td></tr>
-        <tr><td>7</td><td><span class="ref">Lee Robinson</span></td><td><a href="https://leerob.com">leerob.com</a></td><td>Throws out the whole playbook: 3 paragraphs of serif prose, nouns are the links</td><td>Radical reductive "bio-as-homepage" confidence</td><td><a href="../workings/lee-robinson.md">lee-robinson.md</a></td></tr>
-        <tr><td>8</td><td><span class="ref">Tim Roussilhe</span></td><td><a href="https://timroussilhe.com">timroussilhe.com</a></td><td>Navigation <em>is</em> a WebGL portal that morphs screens into letterforms</td><td>DOM-synced shaders, scroll-velocity uniforms (advanced)</td><td><a href="../workings/tim-roussilhe.md">tim-roussilhe.md</a></td></tr>
-        <tr><td>9</td><td><span class="ref">Paul Stamatiou</span></td><td><a href="https://paulstamatiou.com">paulstamatiou.com</a></td><td>Reads like an art-directed print magazine; bespoke font program, paper palette</td><td>Editorial restraint + custom type as identity</td><td><a href="../workings/paul-stamatiou.md">paul-stamatiou.md</a></td></tr>
-        <tr><td>10</td><td><span class="ref">Jhey Tompkins</span></td><td><a href="https://jhey.dev">jhey.dev</a></td><td>One-screen bio with a live "now" status island; three typefaces encode tone</td><td>Astro islands + typeface-driven hierarchy</td><td><a href="../workings/jhey-tompkins.md">jhey-tompkins.md</a></td></tr>
-        <tr><td>11</td><td><span class="ref">Adham Dannaway</span></td><td><a href="https://www.adhamdannaway.com">adhamdannaway.com</a></td><td>One split-portrait hero states "designer + developer" with near-zero copy</td><td>Concept-over-tech hero (it's just WordPress)</td><td><a href="../workings/adham-dannaway.md">adham-dannaway.md</a></td></tr>
-        <tr><td>12</td><td><span class="ref">Robb Owen</span></td><td><a href="https://robbowen.digital">robbowen.digital</a></td><td>Bespoke per-project line-art + SVG textures; motion praise without GSAP/WebGL</td><td>Illustration-led storytelling on a light theme</td><td><a href="../workings/robb-owen.md">robb-owen.md</a></td></tr>
-        <tr><td>13</td><td><span class="ref">Tania Rascia</span></td><td><a href="https://www.taniarascia.com">taniarascia.com</a></td><td>Content-dense "digital garden" that stays calm; sidebar IA + editorial type</td><td>Fixed-sidebar shell for content-heavy sites</td><td><a href="../workings/tania-rascia.md">tania-rascia.md</a></td></tr>
-        <tr><td>14</td><td><span class="ref">Hakim El Hattab</span></td><td><a href="https://hakim.se">hakim.se</a></td><td>Magazine-essay bio + live animating project tiles; reveal.js author</td><td>Editorial serif prose + inline progressive disclosure</td><td><a href="../workings/hakim-el-hattab.md">hakim-el-hattab.md</a></td></tr>
-        <tr><td>15</td><td><span class="ref">Mike Hall</span></td><td><a href="https://mikemai.net">mikemai.net</a></td><td>World-class craft from semantic HTML + CSS only; CSS-only 5-mode theme switcher</td><td>Typography-as-brand, near-zero-JS discipline</td><td><a href="../workings/mike-hall-mikemai-net.md">mike-hall-mikemai-net.md</a></td></tr>
-        <tr><td>16</td><td><span class="ref">Jack McDade</span></td><td><a href="https://jackmcdade.com">jackmcdade.com</a></td><td>Defiantly anti-minimalist kitsch executed so well the chaos reads as intentional</td><td>A loud, opinionated brand point-of-view</td><td><a href="../workings/jack-mcdade.md">jack-mcdade.md</a></td></tr>
-        <tr><td>17</td><td><span class="ref">Lynn Fisher</span></td><td><a href="https://lynnandtonic.com">lynnandtonic.com</a></td><td>Rebuilds her whole site from a blank CSS file every year; each is CSS art</td><td>CSS-art restraint + version/archive as a flex</td><td><a href="../workings/lynn-fisher.md">lynn-fisher.md</a></td></tr>
-        <tr><td>18</td><td><span class="ref">Jesper Landberg</span></td><td><a href="https://jesper-landberg.dev">jesper-landberg.dev</a></td><td>30+ Awwwards SOTD; current site is a stripped-back Swiss type index</td><td>Confidence-through-subtraction, editorial index</td><td><a href="../workings/jesper-landberg.md">jesper-landberg.md</a></td></tr>
-        <tr><td>19</td><td><span class="ref">Cassidy Williams</span></td><td><a href="https://cassidoo.co">cassidoo.co</a></td><td>Hand-crafted monospace single-column with rainbow links + "random post"</td><td>Voice/personality over framework</td><td><a href="../workings/cassidy-williams.md">cassidy-williams.md</a></td></tr>
-        <tr><td>20</td><td><span class="ref">Lou Hoebregts (LHC)</span></td><td><a href="https://lhc.fr">lhc.fr</a></td><td>IBM Plex Mono grid + per-letter color type + lazy-mounted phyllotaxis field</td><td>Vanilla-JS generative centerpiece, mono identity</td><td><a href="../workings/lhc-louis-hoebregts.md">lhc-louis-hoebregts.md</a></td></tr>
-        <tr><td>21</td><td><span class="ref">Andrei Terteci</span></td><td><a href="https://www.andreiterteci.com">andreiterteci.com</a></td><td>"Boring" Next.js + Tailwind made premium by one gradient + sharp copy</td><td>Conversion-funnel IA + founder-framed copywriting</td><td><a href="../workings/andrei-terteci.md">andrei-terteci.md</a></td></tr>
-        <tr><td>22</td><td><span class="ref">Manu Arora</span></td><td><a href="https://manuarora.in">manuarora.in</a></td><td>Aceternity UI's founder chose a text-first "personal letter" — taste over spectacle</td><td>Anti-portfolio restraint, list-as-résumé pattern</td><td><a href="../workings/manu-arora.md">manu-arora.md</a></td></tr>
-        <tr><td>23</td><td><span class="ref">Pol Piella</span></td><td><a href="https://www.polpiella.dev">polpiella.dev</a></td><td>"World-class" on pure Astro + Tailwind + system fonts; proof-led IA</td><td>Zero-animation polish, dated-achievement lists</td><td><a href="../workings/pol-piella.md">pol-piella.md</a></td></tr>
-        <tr><td>24</td><td><span class="ref">Olaolu Olawuyi</span></td><td><a href="https://olaolu.dev">olaolu.dev</a></td><td>One screen of plain prose + a shock-contrast footer that does all the nav</td><td>Copy-as-design, footer-as-navigation</td><td><a href="../workings/olaolu-olawuyi.md">olaolu-olawuyi.md</a></td></tr>
-        <tr><td>25</td><td><span class="ref">Sam Dape</span></td><td><a href="https://github.com/emmabostian/developer-portfolios">developer-portfolios</a></td><td>One grey screen, three low-poly objects that <em>are</em> the navigation</td><td>Image-as-navigation + radical subtraction</td><td><a href="../workings/sam-dape.md">sam-dape.md</a></td></tr>
-        <tr><td>26</td><td><span class="ref">Gianmarco Cavallo</span> ⚠</td><td><a href="https://gianmarcocavallo.com">gianmarcocavallo.com</a></td><td>Bento-grid "playable toy": theme+style switchers, world clock, easter egg</td><td>Bento IA + signature interactive flourish</td><td><a href="../workings/gianmarco-cavallo.md">gianmarco-cavallo.md</a></td></tr>
-        <tr><td>27</td><td><span class="ref">Anand Sharma (aprilzero)</span> ⚠</td><td><a href="https://aprilzero.com">aprilzero.com</a></td><td>Legendary quantified-self 3D dashboard — but the live URL is now a black stub</td><td>Motion-as-craft <em>philosophy</em> (study the write-ups)</td><td><a href="../workings/anand-sharma-aprilzero.md">anand-sharma-aprilzero.md</a></td></tr>
-        <tr><td>28</td><td><span class="ref">Wei Gao</span> ⚠</td><td><a href="https://github.com/emmabostian/developer-portfolios">developer-portfolios</a></td><td>Illustrated "Fluffy Philharmonic" mascot universe — domain is dead</td><td>Mascot-as-identity (and the keep-your-domain-alive lesson)</td><td><a href="../workings/wei-gao.md">wei-gao.md</a></td></tr>
-        <tr><td>29</td><td><span class="ref">Caleb Brown</span> ⚠</td><td><a href="https://caleb-brown.dev">caleb-brown.dev</a></td><td>Unmodified Hugo "Coder" template — the <em>floor</em>, not the ceiling</td><td>What minimal-but-generic looks like (a baseline)</td><td><a href="../workings/caleb-brown.md">caleb-brown.md</a></td></tr>
-        <tr><td>30</td><td><span class="ref">Gao Hongyu</span> ⚠</td><td><a href="https://gao.show">gao.show</a></td><td>Unverifiable — domain NXDOMAIN, no archive, nothing to study</td><td>— (re-confirm URL; likely confused with romanjeanelie.com)</td><td><a href="../workings/gao-hongyu.md">gao-hongyu.md</a></td></tr>
-      </tbody>
-      <caption>⚠ = reachability caveat (down, stubbed, mirror, or template). See the teardown file.</caption>
-    </table>
+        <p class="ranked-meta reveal">
+          <span>Tier rail:</span>
+          <span class="legend"><span class="swatch sw-s"></span>S — study deeply</span>
+          <span class="legend"><span class="swatch sw-a"></span>A — strong reference</span>
+          <span class="legend"><span class="swatch sw-n"></span>N — notable / niche</span>
+          <span class="legend"><span class="swatch sw-w"></span>⚠ caveat / demoted</span>
+        </p>
 
-    <figure class="figure">
-      <img src="../workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang portfolio: sticky split-screen with a left bio column and scroll-spy navigation">
-      <figcaption><strong>Brittany Chiang ↗</strong> — the most-cloned dev portfolio on GitHub. Sticky split-screen, scroll-spy nav, cursor spotlight, accessibility treated as a feature. Clone the discipline, not the pixels.</figcaption>
-    </figure>
+        <div class="index reveal" role="table" aria-label="Ranked developer portfolios">
+          <div class="index-row head" role="row">
+            <span class="cell" role="columnheader">#</span>
+            <span class="cell" role="columnheader">Portfolio</span>
+            <span class="cell" role="columnheader">URL</span>
+            <span class="cell" role="columnheader">Standout craft</span>
+            <span class="cell" role="columnheader">Best for learning…</span>
+            <span class="cell" role="columnheader">Teardown</span>
+          </div>
 
-    <figure class="figure">
-      <img src="../workings/shots/cassie-evans/01-hero.png" alt="Cassie Evans portfolio hero: hand-drawn SVG illustration with GSAP physics motion">
-      <figcaption><strong>Cassie Evans ↗</strong> — the site <em>is</em> the demo reel. GSAP physics motion and hand-drawn SVG with zero stock imagery: she performs the skill instead of describing it.</figcaption>
-    </figure>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-S"></span><span class="clabel">Rank</span>1</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Brittany Chiang</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://brittanychiang.com">brittanychiang.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>The reference dev-portfolio: sticky split-screen, scroll-spy nav, cursor spotlight, a11y as a feature</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>The canonical "calm engineer" single-page layout</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/brittany-chiang.md">brittany-chiang.md</a></span>
+          </div>
 
-    <h2 id="tiers">3 · Tiers — why each sits where it does</h2>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-S"></span><span class="clabel">Rank</span>2</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Cassie Evans</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://www.cassie.codes">cassie.codes</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>The site <em>is</em> the demo reel — GSAP physics motion + hand-drawn SVG, zero stock</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Performing skill instead of describing it</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/cassie-evans.md">cassie-evans.md</a></span>
+          </div>
 
-    <h3>S-tier — study deeply</h3>
-    <p><span class="ref">Brittany Chiang ↗</span> · <span class="ref">Cassie Evans ↗</span> · <span class="ref">Josh Comeau ↗</span> · <span class="ref">Dennis Snellenberg ↗</span> · <span class="ref">Sara Soueidan ↗</span></p>
-    <p>These are the ones to open in DevTools and dissect. Each defines a different <em>correct answer</em> to "what is a great dev portfolio":</p>
-    <ul>
-      <li><strong>Chiang</strong> = the calm-engineer layout archetype (so good it's the most-cloned on GitHub — clone the discipline, not the pixels).</li>
-      <li><strong>Cassie / Josh</strong> = "the site is the proof" — the homepage itself performs the craft, with no separate gallery needed.</li>
-      <li><strong>Dennis</strong> = how far pure motion + microinteraction polish gets you with a near-monochrome palette.</li>
-      <li><strong>Sara</strong> = the engineering-credibility route: semantic structure, a11y, and typography <em>are</em> the demo. Lowest spectacle, highest signal for a pure-engineer audience.</li>
-    </ul>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-S"></span><span class="clabel">Rank</span>3</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Josh Comeau</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://www.joshwcomeau.com">joshwcomeau.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Homepage is a live demo of the whimsical craft it teaches; modern RSC stack, no template smell</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>"Prove, don't claim" + correct dark-mode/perf</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/josh-comeau.md">josh-comeau.md</a></span>
+          </div>
 
-    <figure class="figure">
-      <img src="../workings/shots/josh-comeau/01-hero.png" alt="Josh Comeau homepage hero with whimsical interactive demos and a polished dark-mode aesthetic">
-      <figcaption><strong>Josh Comeau ↗</strong> — the homepage is a live demo of the whimsical craft it teaches, on a modern RSC stack with correct dark-mode and perf. "Prove, don't claim."</figcaption>
-    </figure>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-S"></span><span class="clabel">Rank</span>4</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Dennis Snellenberg</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://dennissnellenberg.com">dennissnellenberg.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Award-tier from motion alone: buttery transitions, magnetic links, photo-matched-to-UI palette</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>High-end freelancer motion + microinteraction budget</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/dennis-snellenberg.md">dennis-snellenberg.md</a></span>
+          </div>
 
-    <h3>A-tier — strong references</h3>
-    <p><span class="ref">Henry Heffernan ↗</span> · <span class="ref">Lee Robinson ↗</span> · <span class="ref">Tim Roussilhe ↗</span> · <span class="ref">Paul Stamatiou ↗</span> · <span class="ref">Jhey Tompkins ↗</span> · <span class="ref">Adham Dannaway ↗</span> · <span class="ref">Robb Owen ↗</span> · <span class="ref">Tania Rascia ↗</span> · <span class="ref">Hakim El Hattab ↗</span></p>
-    <p>Excellent and worth borrowing from, but each is a <em>specific bet</em> rather than a universal template — copy the idea, not the whole site:</p>
-    <ul>
-      <li><strong>Henry / Tim</strong> = high-ambition WebGL/3D set pieces. Stunning, but expensive to build and maintain; steal the <em>pattern</em> (boot-gate, DOM-synced portal) before the spectacle.</li>
-      <li><strong>Lee / Hakim</strong> = the prose-first, anti-grid bet — magnificent if your writing carries it, weak if it doesn't.</li>
-      <li><strong>Paul / Robb / Tania</strong> = editorial/illustration-led craft; the differentiator is taste (custom type, bespoke line-art), not tech.</li>
-      <li><strong>Jhey / Adham</strong> = one strong idea (live status island; split-portrait concept) executed cleanly on a light stack.</li>
-    </ul>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-S"></span><span class="clabel">Rank</span>5</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Sara Soueidan</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://www.sarasoueidan.com">sarasoueidan.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Flawless semantic structure + world-class type; the DOM itself is the credibility</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Accessibility-first, system-font, whitespace-as-hierarchy</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/sara-soueidan.md">sara-soueidan.md</a></span>
+          </div>
 
-    <h3>Notable but niche</h3>
-    <p><span class="ref">Mike Hall ↗</span> · <span class="ref">Jack McDade ↗</span> · <span class="ref">Lynn Fisher ↗</span> · <span class="ref">Jesper Landberg ↗</span> · <span class="ref">Cassidy Williams ↗</span> · <span class="ref">Lou Hoebregts ↗</span> · <span class="ref">Andrei Terteci ↗</span> · <span class="ref">Manu Arora ↗</span> · <span class="ref">Pol Piella ↗</span> · <span class="ref">Olaolu Olawuyi ↗</span> · <span class="ref">Sam Dape ↗</span></p>
-    <p>Real craft, but each leans on a strong personal premise (a loud brand, a yearly CSS-art rebuild, a Swiss-type index, "look how little I can ship"). Brilliant <em>for that person</em>; risky to copy wholesale because the magic is the conviction, not a reusable mechanic. Mine them for individual moves — Mike's CSS-only theme switcher, Lynn's archive-as-flex, Olaolu's footer-as-nav, Andrei's single-gradient cohesion.</p>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-A"></span><span class="clabel">Rank</span>6</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Henry Heffernan</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://henryheffernan.com">henryheffernan.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>A working 90s OS rendered onto a 3D CRT — real React UI on a screen mesh</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Diegetic IA + boot-gate, with a11y DOM kept underneath</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/henry-heffernan.md">henry-heffernan.md</a></span>
+          </div>
 
-    <h3>Honest demotions / do-not-bother</h3>
-    <div class="callout warn">
-      <ul>
-        <li><strong>Caleb Brown</strong> — an unmodified Hugo template. Useful only as a "this is the generic floor" reference; nothing proprietary to steal. (The exact target <code>calebbrown.dev</code> was also down — 504; findings are from the live <code>caleb-brown.dev</code> twin.)</li>
-        <li><strong>Anand Sharma (aprilzero)</strong> — historically a landmark, but the <em>live</em> URL is now a black placeholder. Study the legend via his "Making of April Zero" articles and gyrosco.pe, not the dead domain.</li>
-        <li><strong>Wei Gao</strong> — genuinely charming concept, but the domain has lapsed and the site is unreachable. Its loudest lesson is operational: a portfolio is only an asset while the domain is alive.</li>
-        <li><strong>Gao Hongyu</strong> — unverifiable (NXDOMAIN, no archive). Likely a mis-filed/incorrect URL; possibly confused with <strong>romanjeanelie.com</strong>. Skip until the URL is reconfirmed.</li>
-      </ul>
-    </div>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-A"></span><span class="clabel">Rank</span>7</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Lee Robinson</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://leerob.com">leerob.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Throws out the whole playbook: 3 paragraphs of serif prose, nouns are the links</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Radical reductive "bio-as-homepage" confidence</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/lee-robinson.md">lee-robinson.md</a></span>
+          </div>
 
-    <h2 id="patterns">4 · Patterns common to great dev portfolios</h2>
-    <p>Synthesized across all 30 teardowns. The recurring moves the best sites share:</p>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-A"></span><span class="clabel">Rank</span>8</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Tim Roussilhe</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://timroussilhe.com">timroussilhe.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Navigation <em>is</em> a WebGL portal that morphs screens into letterforms</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>DOM-synced shaders, scroll-velocity uniforms (advanced)</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/tim-roussilhe.md">tim-roussilhe.md</a></span>
+          </div>
 
-    <div class="callout steal">
-      <p><strong>Hero</strong></p>
-      <ul>
-        <li>Lead with <strong>one idea, not a paragraph.</strong> A split portrait (Adham), a generative toy (Josh), a value-prop sentence (Andrei), or three paragraphs of prose (Lee) — but <em>one</em> clear thesis above the fold.</li>
-        <li><strong>The hero often <em>is</em> the proof.</strong> For motion/CSS specialists, the homepage performs the skill (Cassie, Josh, LHC). Don't describe capability you can demonstrate.</li>
-        <li><strong>Restraint reads as senior.</strong> Suppressed type scale, off-black-on-off-white, one accent — confidence signals (Lee, Sara, Manu, Jesper) recur far more than spectacle.</li>
-      </ul>
-    </div>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-A"></span><span class="clabel">Rank</span>9</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Paul Stamatiou</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://paulstamatiou.com">paulstamatiou.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Reads like an art-directed print magazine; bespoke font program, paper palette</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Editorial restraint + custom type as identity</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/paul-stamatiou.md">paul-stamatiou.md</a></span>
+          </div>
 
-    <div class="callout steal">
-      <p><strong>Project storytelling</strong></p>
-      <ul>
-        <li><strong>Specificity over adjectives.</strong> Dated lists of talks/shipped apps with named companies and quantified impact (Pol, Olaolu, Andrei) beat "passionate developer."</li>
-        <li><strong>Editorial wayfinding is cheap and high-signal:</strong> numbered grids (01–08), <code>NN / total</code> counters, year-tagged indexes, monospace metadata (Andrei, Tim, Jesper).</li>
-        <li><strong>Make tiles move or be real:</strong> live animating thumbnails (Hakim), actual product screenshots (Adham), or bespoke per-project illustrations (Robb) instead of abstract placeholders.</li>
-      </ul>
-    </div>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-A"></span><span class="clabel">Rank</span>10</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Jhey Tompkins</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://jhey.dev">jhey.dev</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>One-screen bio with a live "now" status island; three typefaces encode tone</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Astro islands + typeface-driven hierarchy</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/jhey-tompkins.md">jhey-tompkins.md</a></span>
+          </div>
 
-    <div class="callout steal">
-      <p><strong>About / voice</strong></p>
-      <ul>
-        <li><strong>Bio as the hero, nouns as nav</strong> (Lee, Hakim, Manu, Olaolu). For content-heavy people the homepage doubles as an index/sitemap (Tania).</li>
-        <li><strong>One human touch</strong> — a hand-drawn mascot, a signature SVG, a nickname, an easter egg (Sara's owl, Jhey's avatar, Chiang's Tardis). Cheapest way to read as a person, not a template.</li>
-      </ul>
-    </div>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-A"></span><span class="clabel">Rank</span>11</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Adham Dannaway</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://www.adhamdannaway.com">adhamdannaway.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>One split-portrait hero states "designer + developer" with near-zero copy</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Concept-over-tech hero (it's just WordPress)</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/adham-dannaway.md">adham-dannaway.md</a></span>
+          </div>
 
-    <div class="callout tip">
-      <p><strong>Contact</strong></p>
-      <p><strong>Low-friction, personality-laden CTAs:</strong> prefilled <code>mailto:</code> with an emoji subject (Robb), Cal.com "book a call" tile (Gianmarco), inline contextual "contact me" at the end of the bio (Olaolu). Avoid a cold form where a one-liner works.</p>
-    </div>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>12</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Robb Owen</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://robbowen.digital">robbowen.digital</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Bespoke per-project line-art + SVG textures; motion praise without GSAP/WebGL</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Illustration-led storytelling on a light theme</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/robb-owen.md">robb-owen.md</a></span>
+          </div>
 
-    <div class="callout steal">
-      <p><strong>Motion budget</strong></p>
-      <ul>
-        <li><strong>Spend motion where it earns its maintenance cost.</strong> The S-tier sites either go all-in deliberately (Dennis, Cassie, Tim) or skip it entirely with taste (Sara, Lee, Manu) — almost none scatter half-baked effects.</li>
-        <li><strong>Cheap, disproportionate wins:</strong> cursor spotlight (~20 lines, Chiang), magnetic links (Dennis), View Transitions API page morphs (Lee, Gianmarco), scroll-velocity transforms (Tim). High perceived polish, low code.</li>
-        <li><strong>Concentrate the "wow":</strong> one lazy-mounted generative centerpiece (LHC) or one scripted hero transition (Henry) beats a dozen small animations.</li>
-      </ul>
-    </div>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>13</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Tania Rascia</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://www.taniarascia.com">taniarascia.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Content-dense "digital garden" that stays calm; sidebar IA + editorial type</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Fixed-sidebar shell for content-heavy sites</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/tania-rascia.md">tania-rascia.md</a></span>
+          </div>
 
-    <div class="callout steal">
-      <p><strong>Performance &amp; stack</strong></p>
-      <ul>
-        <li><strong>Static-first is the norm:</strong> Astro / Eleventy / Next static export recur constantly (Cassidy, Sara, Pol, Jhey, Gianmarco). Fast load is treated as a <em>feature</em>, often stated out loud.</li>
-        <li><strong>System fonts or one self-hosted face</strong> — zero/near-zero font payload, hierarchy from weight + scale, not many sizes (Sara, Pol, Olaolu, Mike). When custom type is used, it's <em>one</em> characterful face doing the brand work.</li>
-        <li><strong>A11y is table stakes and a selling point</strong> for engineer-audience sites: skip-link as first DOM node, real landmarks, underline-not-color links, AA contrast (Sara, Chiang, Robb, Mike).</li>
-        <li><strong>Privacy-friendly analytics</strong> (Fathom / Umami / GoatCounter / Plausible) over Google Tag Manager — on-brand for a dev audience and keeps the page light.</li>
-        <li><strong>Open-sourcing the site</strong> doubles as a code sample and credibility signal (Cassidy, Manu, Pol, Tania).</li>
-        <li><strong>Operational lesson (Wei Gao):</strong> auto-renew the domain and keep a backup deploy on a platform subdomain — a portfolio is worthless the moment the domain lapses.</li>
-      </ul>
-    </div>
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>14</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Hakim El Hattab</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://hakim.se">hakim.se</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Magazine-essay bio + live animating project tiles; reveal.js author</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Editorial serif prose + inline progressive disclosure</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/hakim-el-hattab.md">hakim-el-hattab.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>15</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Mike Hall</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://mikemai.net">mikemai.net</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>World-class craft from semantic HTML + CSS only; CSS-only 5-mode theme switcher</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Typography-as-brand, near-zero-JS discipline</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/mike-hall-mikemai-net.md">mike-hall-mikemai-net.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>16</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Jack McDade</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://jackmcdade.com">jackmcdade.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Defiantly anti-minimalist kitsch executed so well the chaos reads as intentional</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>A loud, opinionated brand point-of-view</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/jack-mcdade.md">jack-mcdade.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>17</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Lynn Fisher</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://lynnandtonic.com">lynnandtonic.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Rebuilds her whole site from a blank CSS file every year; each is CSS art</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>CSS-art restraint + version/archive as a flex</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/lynn-fisher.md">lynn-fisher.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>18</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Jesper Landberg</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://jesper-landberg.dev">jesper-landberg.dev</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>30+ Awwwards SOTD; current site is a stripped-back Swiss type index</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Confidence-through-subtraction, editorial index</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/jesper-landberg.md">jesper-landberg.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>19</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Cassidy Williams</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://cassidoo.co">cassidoo.co</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Hand-crafted monospace single-column with rainbow links + "random post"</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Voice/personality over framework</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/cassidy-williams.md">cassidy-williams.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>20</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Lou Hoebregts (LHC)</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://lhc.fr">lhc.fr</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>IBM Plex Mono grid + per-letter color type + lazy-mounted phyllotaxis field</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Vanilla-JS generative centerpiece, mono identity</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/lhc-louis-hoebregts.md">lhc-louis-hoebregts.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>21</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Andrei Terteci</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://www.andreiterteci.com">andreiterteci.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>"Boring" Next.js + Tailwind made premium by one gradient + sharp copy</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Conversion-funnel IA + founder-framed copywriting</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/andrei-terteci.md">andrei-terteci.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>22</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Manu Arora</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://manuarora.in">manuarora.in</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Aceternity UI's founder chose a text-first "personal letter" — taste over spectacle</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Anti-portfolio restraint, list-as-résumé pattern</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/manu-arora.md">manu-arora.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>23</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Pol Piella</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://www.polpiella.dev">polpiella.dev</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>"World-class" on pure Astro + Tailwind + system fonts; proof-led IA</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Zero-animation polish, dated-achievement lists</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/pol-piella.md">pol-piella.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>24</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Olaolu Olawuyi</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://olaolu.dev">olaolu.dev</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>One screen of plain prose + a shock-contrast footer that does all the nav</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Copy-as-design, footer-as-navigation</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/olaolu-olawuyi.md">olaolu-olawuyi.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-N"></span><span class="clabel">Rank</span>25</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Sam Dape</span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://github.com/emmabostian/developer-portfolios">developer-portfolios</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>One grey screen, three low-poly objects that <em>are</em> the navigation</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Image-as-navigation + radical subtraction</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/sam-dape.md">sam-dape.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-W"></span><span class="clabel">Rank</span>26</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Gianmarco Cavallo <span class="caveat-flag">⚠ caveat</span></span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://gianmarcocavallo.com">gianmarcocavallo.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Bento-grid "playable toy": theme+style switchers, world clock, easter egg</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Bento IA + signature interactive flourish</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/gianmarco-cavallo.md">gianmarco-cavallo.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-W"></span><span class="clabel">Rank</span>27</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Anand Sharma (aprilzero) <span class="caveat-flag">⚠ stub</span></span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://aprilzero.com">aprilzero.com</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Legendary quantified-self 3D dashboard — but the live URL is now a black stub</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Motion-as-craft <em>philosophy</em> (study the write-ups)</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/anand-sharma-aprilzero.md">anand-sharma-aprilzero.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-W"></span><span class="clabel">Rank</span>28</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Wei Gao <span class="caveat-flag">⚠ dead</span></span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://github.com/emmabostian/developer-portfolios">developer-portfolios</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Illustrated "Fluffy Philharmonic" mascot universe — domain is dead</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>Mascot-as-identity (and the keep-your-domain-alive lesson)</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/wei-gao.md">wei-gao.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-W"></span><span class="clabel">Rank</span>29</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Caleb Brown <span class="caveat-flag">⚠ template</span></span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://caleb-brown.dev">caleb-brown.dev</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Unmodified Hugo "Coder" template — the <em>floor</em>, not the ceiling</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>What minimal-but-generic looks like (a baseline)</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/caleb-brown.md">caleb-brown.md</a></span>
+          </div>
+
+          <div class="index-row body" role="row">
+            <span class="cell rank-no" role="cell"><span class="tier-tag tier-W"></span><span class="clabel">Rank</span>30</span>
+            <span class="cell" role="cell"><span class="clabel">Portfolio</span><span class="site-name">Gao Hongyu <span class="caveat-flag">⚠ unverifiable</span></span></span>
+            <span class="cell url" role="cell"><span class="clabel">URL</span><a href="https://gao.show">gao.show</a></span>
+            <span class="cell craft" role="cell"><span class="clabel">Standout craft</span>Unverifiable — domain NXDOMAIN, no archive, nothing to study</span>
+            <span class="cell learn" role="cell"><span class="clabel">Best for learning</span>— (re-confirm URL; likely confused with romanjeanelie.com)</span>
+            <span class="cell" role="cell"><span class="clabel">Teardown</span><a class="teardown-link" href="../workings/gao-hongyu.md">gao-hongyu.md</a></span>
+          </div>
+        </div>
+        <p class="index-caption"><span class="caveat-flag">⚠</span> reachability caveat (down, stubbed, mirror, or template). See the teardown file.</p>
+
+        <!-- screenshot gallery -->
+        <div class="gallery">
+          <figure class="figure reveal">
+            <div class="shot">
+              <img src="../workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang portfolio: sticky split-screen with a left bio column and scroll-spy navigation" loading="lazy">
+            </div>
+            <figcaption><strong>Brittany Chiang ↗</strong> — the most-cloned dev portfolio on GitHub. Sticky split-screen, scroll-spy nav, cursor spotlight, accessibility treated as a feature. Clone the discipline, not the pixels.</figcaption>
+          </figure>
+          <figure class="figure reveal">
+            <div class="shot">
+              <img src="../workings/shots/cassie-evans/01-hero.png" alt="Cassie Evans portfolio hero: hand-drawn SVG illustration with GSAP physics motion" loading="lazy">
+            </div>
+            <figcaption><strong>Cassie Evans ↗</strong> — the site <em>is</em> the demo reel. GSAP physics motion and hand-drawn SVG with zero stock imagery: she performs the skill instead of describing it.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 03 TIERS ===================== -->
+    <section class="block" id="tiers">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="sec-index">Section 03 — Tiering</span>
+          <h2 class="sec-title">Tiers — why each sits where it does</h2>
+        </div>
+
+        <div class="tier-group reveal">
+          <div class="tier-banner">
+            <span class="tier-badge badge-S" aria-hidden="true">S</span>
+            <h3 class="tier-title">S-tier — study deeply</h3>
+          </div>
+          <div class="reflist">
+            <span class="ref">Brittany Chiang ↗</span>
+            <span class="ref">Cassie Evans ↗</span>
+            <span class="ref">Josh Comeau ↗</span>
+            <span class="ref">Dennis Snellenberg ↗</span>
+            <span class="ref">Sara Soueidan ↗</span>
+          </div>
+          <div class="tier-body">
+            <p>These are the ones to open in DevTools and dissect. Each defines a different <em>correct answer</em> to "what is a great dev portfolio":</p>
+            <ul>
+              <li><strong>Chiang</strong> = the calm-engineer layout archetype (so good it's the most-cloned on GitHub — clone the discipline, not the pixels).</li>
+              <li><strong>Cassie / Josh</strong> = "the site is the proof" — the homepage itself performs the craft, with no separate gallery needed.</li>
+              <li><strong>Dennis</strong> = how far pure motion + microinteraction polish gets you with a near-monochrome palette.</li>
+              <li><strong>Sara</strong> = the engineering-credibility route: semantic structure, a11y, and typography <em>are</em> the demo. Lowest spectacle, highest signal for a pure-engineer audience.</li>
+            </ul>
+          </div>
+        </div>
+
+        <figure class="figure solo reveal">
+          <div class="shot">
+            <img src="../workings/shots/josh-comeau/01-hero.png" alt="Josh Comeau homepage hero with whimsical interactive demos and a polished dark-mode aesthetic" loading="lazy">
+          </div>
+          <figcaption><strong>Josh Comeau ↗</strong> — the homepage is a live demo of the whimsical craft it teaches, on a modern RSC stack with correct dark-mode and perf. "Prove, don't claim."</figcaption>
+        </figure>
+
+        <div class="tier-group reveal">
+          <div class="tier-banner">
+            <span class="tier-badge badge-A" aria-hidden="true">A</span>
+            <h3 class="tier-title">A-tier — strong references</h3>
+          </div>
+          <div class="reflist">
+            <span class="ref">Henry Heffernan ↗</span>
+            <span class="ref">Lee Robinson ↗</span>
+            <span class="ref">Tim Roussilhe ↗</span>
+            <span class="ref">Paul Stamatiou ↗</span>
+            <span class="ref">Jhey Tompkins ↗</span>
+            <span class="ref">Adham Dannaway ↗</span>
+            <span class="ref">Robb Owen ↗</span>
+            <span class="ref">Tania Rascia ↗</span>
+            <span class="ref">Hakim El Hattab ↗</span>
+          </div>
+          <div class="tier-body">
+            <p>Excellent and worth borrowing from, but each is a <em>specific bet</em> rather than a universal template — copy the idea, not the whole site:</p>
+            <ul>
+              <li><strong>Henry / Tim</strong> = high-ambition WebGL/3D set pieces. Stunning, but expensive to build and maintain; steal the <em>pattern</em> (boot-gate, DOM-synced portal) before the spectacle.</li>
+              <li><strong>Lee / Hakim</strong> = the prose-first, anti-grid bet — magnificent if your writing carries it, weak if it doesn't.</li>
+              <li><strong>Paul / Robb / Tania</strong> = editorial/illustration-led craft; the differentiator is taste (custom type, bespoke line-art), not tech.</li>
+              <li><strong>Jhey / Adham</strong> = one strong idea (live status island; split-portrait concept) executed cleanly on a light stack.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="tier-group reveal">
+          <div class="tier-banner">
+            <span class="tier-badge badge-N" aria-hidden="true">N</span>
+            <h3 class="tier-title">Notable but niche</h3>
+          </div>
+          <div class="reflist">
+            <span class="ref">Mike Hall ↗</span>
+            <span class="ref">Jack McDade ↗</span>
+            <span class="ref">Lynn Fisher ↗</span>
+            <span class="ref">Jesper Landberg ↗</span>
+            <span class="ref">Cassidy Williams ↗</span>
+            <span class="ref">Lou Hoebregts ↗</span>
+            <span class="ref">Andrei Terteci ↗</span>
+            <span class="ref">Manu Arora ↗</span>
+            <span class="ref">Pol Piella ↗</span>
+            <span class="ref">Olaolu Olawuyi ↗</span>
+            <span class="ref">Sam Dape ↗</span>
+          </div>
+          <div class="tier-body">
+            <p>Real craft, but each leans on a strong personal premise (a loud brand, a yearly CSS-art rebuild, a Swiss-type index, "look how little I can ship"). Brilliant <em>for that person</em>; risky to copy wholesale because the magic is the conviction, not a reusable mechanic. Mine them for individual moves — Mike's CSS-only theme switcher, Lynn's archive-as-flex, Olaolu's footer-as-nav, Andrei's single-gradient cohesion.</p>
+          </div>
+        </div>
+
+        <div class="tier-group reveal">
+          <div class="tier-banner">
+            <span class="tier-badge badge-X" aria-hidden="true">✕</span>
+            <h3 class="tier-title">Honest demotions / do-not-bother</h3>
+          </div>
+          <div class="callout warn">
+            <p>Flagged — skip or treat as baseline</p>
+            <ul>
+              <li><strong>Caleb Brown</strong> — an unmodified Hugo template. Useful only as a "this is the generic floor" reference; nothing proprietary to steal. (The exact target <code>calebbrown.dev</code> was also down — 504; findings are from the live <code>caleb-brown.dev</code> twin.)</li>
+              <li><strong>Anand Sharma (aprilzero)</strong> — historically a landmark, but the <em>live</em> URL is now a black placeholder. Study the legend via his "Making of April Zero" articles and gyrosco.pe, not the dead domain.</li>
+              <li><strong>Wei Gao</strong> — genuinely charming concept, but the domain has lapsed and the site is unreachable. Its loudest lesson is operational: a portfolio is only an asset while the domain is alive.</li>
+              <li><strong>Gao Hongyu</strong> — unverifiable (NXDOMAIN, no archive). Likely a mis-filed/incorrect URL; possibly confused with <strong>romanjeanelie.com</strong>. Skip until the URL is reconfirmed.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 04 PATTERNS ===================== -->
+    <section class="block" id="patterns" style="border-bottom:none;">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="sec-index">Section 04 — Synthesis</span>
+          <h2 class="sec-title">Patterns common to great portfolios</h2>
+          <p>Synthesized across all 30 teardowns. The recurring moves the best sites share:</p>
+        </div>
+
+        <div class="patterns-grid reveal">
+          <div class="callout steal">
+            <p>Hero</p>
+            <ul>
+              <li>Lead with <strong>one idea, not a paragraph.</strong> A split portrait (Adham), a generative toy (Josh), a value-prop sentence (Andrei), or three paragraphs of prose (Lee) — but <em>one</em> clear thesis above the fold.</li>
+              <li><strong>The hero often <em>is</em> the proof.</strong> For motion/CSS specialists, the homepage performs the skill (Cassie, Josh, LHC). Don't describe capability you can demonstrate.</li>
+              <li><strong>Restraint reads as senior.</strong> Suppressed type scale, off-black-on-off-white, one accent — confidence signals (Lee, Sara, Manu, Jesper) recur far more than spectacle.</li>
+            </ul>
+          </div>
+
+          <div class="callout steal">
+            <p>Project storytelling</p>
+            <ul>
+              <li><strong>Specificity over adjectives.</strong> Dated lists of talks/shipped apps with named companies and quantified impact (Pol, Olaolu, Andrei) beat "passionate developer."</li>
+              <li><strong>Editorial wayfinding is cheap and high-signal:</strong> numbered grids (01–08), <code>NN / total</code> counters, year-tagged indexes, monospace metadata (Andrei, Tim, Jesper).</li>
+              <li><strong>Make tiles move or be real:</strong> live animating thumbnails (Hakim), actual product screenshots (Adham), or bespoke per-project illustrations (Robb) instead of abstract placeholders.</li>
+            </ul>
+          </div>
+
+          <div class="callout steal">
+            <p>About / voice</p>
+            <ul>
+              <li><strong>Bio as the hero, nouns as nav</strong> (Lee, Hakim, Manu, Olaolu). For content-heavy people the homepage doubles as an index/sitemap (Tania).</li>
+              <li><strong>One human touch</strong> — a hand-drawn mascot, a signature SVG, a nickname, an easter egg (Sara's owl, Jhey's avatar, Chiang's Tardis). Cheapest way to read as a person, not a template.</li>
+            </ul>
+          </div>
+
+          <div class="callout steal">
+            <p>Motion budget</p>
+            <ul>
+              <li><strong>Spend motion where it earns its maintenance cost.</strong> The S-tier sites either go all-in deliberately (Dennis, Cassie, Tim) or skip it entirely with taste (Sara, Lee, Manu) — almost none scatter half-baked effects.</li>
+              <li><strong>Cheap, disproportionate wins:</strong> cursor spotlight (~20 lines, Chiang), magnetic links (Dennis), View Transitions API page morphs (Lee, Gianmarco), scroll-velocity transforms (Tim). High perceived polish, low code.</li>
+              <li><strong>Concentrate the "wow":</strong> one lazy-mounted generative centerpiece (LHC) or one scripted hero transition (Henry) beats a dozen small animations.</li>
+            </ul>
+          </div>
+
+          <div class="callout steal">
+            <p>Performance &amp; stack</p>
+            <ul>
+              <li><strong>Static-first is the norm:</strong> Astro / Eleventy / Next static export recur constantly (Cassidy, Sara, Pol, Jhey, Gianmarco). Fast load is treated as a <em>feature</em>, often stated out loud.</li>
+              <li><strong>System fonts or one self-hosted face</strong> — zero/near-zero font payload, hierarchy from weight + scale, not many sizes (Sara, Pol, Olaolu, Mike). When custom type is used, it's <em>one</em> characterful face doing the brand work.</li>
+              <li><strong>A11y is table stakes and a selling point</strong> for engineer-audience sites: skip-link as first DOM node, real landmarks, underline-not-color links, AA contrast (Sara, Chiang, Robb, Mike).</li>
+              <li><strong>Privacy-friendly analytics</strong> (Fathom / Umami / GoatCounter / Plausible) over Google Tag Manager — on-brand for a dev audience and keeps the page light.</li>
+              <li><strong>Open-sourcing the site</strong> doubles as a code sample and credibility signal (Cassidy, Manu, Pol, Tania).</li>
+              <li><strong>Operational lesson (Wei Gao):</strong> auto-renew the domain and keep a backup deploy on a platform subdomain — a portfolio is worthless the moment the domain lapses.</li>
+            </ul>
+          </div>
+
+          <div class="callout tip">
+            <p>Contact</p>
+            <p style="font-size:0.96rem;color:var(--ink-soft);margin:0;"><strong>Low-friction, personality-laden CTAs:</strong> prefilled <code>mailto:</code> with an emoji subject (Robb), Cal.com "book a call" tile (Gianmarco), inline contextual "contact me" at the end of the bio (Olaolu). Avoid a cold form where a one-liner works.</p>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="ftr">
-    <div class="wide">
-      <p><a href="../PLAN.html">◆ Craft Atlas — Build Plan →</a></p>
-      <p style="margin-top:var(--s-3);color:var(--ink-dim);">Reference · <strong>Developer Portfolio Field Guide</strong>. Craft Atlas — synthesized from 80 live site teardowns.</p>
+    <div class="wrap">
+      <p><a class="home" href="../PLAN.html"><span class="diamond" aria-hidden="true"></span>Craft Atlas — Build Plan →</a></p>
+      <p class="credit">Reference · <strong>Developer Portfolio Field Guide</strong>. Craft Atlas — synthesized from 80 live site teardowns.</p>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var els = document.querySelectorAll('.reveal');
+      if (reduce || !('IntersectionObserver' in window)) {
+        els.forEach(function (el) { el.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+      els.forEach(function (el) { io.observe(el); });
+    })();
+  </script>
 </body>
 </html>

@@ -4,106 +4,606 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Motion Design — Craft Atlas</title>
+  <meta name="description" content="A guide to motion design from 80 live site teardowns: scroll-as-timeline, smooth scroll, pinned scrubbing, reveals, parallax, route transitions, easing, and the motion budget.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,560;1,6..72,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* ---- page-local live-demo styles only ---- */
-    .ease-demo { display:grid; gap:.75rem; }
-    .ease-row { display:grid; grid-template-columns: 13ch 1fr; align-items:center; gap:1rem; }
-    .ease-row .label { font-family:var(--font-mono); font-size:.78rem; color:var(--ink-dim); }
-    .ease-track { position:relative; height:34px; background:var(--bg-2); border:1px solid var(--line); border-radius:var(--r-pill); }
-    .ease-ball { position:absolute; top:50%; left:4px; width:26px; height:26px; margin-top:-13px; border-radius:50%; background:var(--accent); box-shadow:0 0 14px var(--accent-glow); }
-    .ease-demo.run .ease-ball { animation: slideX 1.5s infinite alternate; }
-    .ease-demo.run .e-linear { animation-timing-function: linear; }
-    .ease-demo.run .e-ease   { animation-timing-function: cubic-bezier(.22,.61,.36,1); }
-    .ease-demo.run .e-spring { animation-timing-function: cubic-bezier(.34,1.56,.64,1); }
-    @keyframes slideX { to { left: calc(100% - 30px); } }
+    /* ============================================================
+       MOTIONS — Kinetic / cinematic dark. Native CSS + vanilla JS.
+       Art direction: OLED near-black stage, single electric-lime
+       accent, scroll-reactive reveals, a scrub-bar that tracks the
+       page, magnetic CTAs, marquee, and live motion demos.
+       ============================================================ */
 
-    /* scroll-reveal demo */
-    .reveal-grid { display:grid; gap:.75rem; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); }
-    .reveal-cell {
-      padding:1.1rem .75rem; text-align:center; border:1px solid var(--line); border-radius:var(--r-2);
-      background:var(--bg-2); font-family:var(--font-mono); font-size:.78rem; color:var(--ink-soft);
-      opacity:0; transform:translateY(18px);
-      transition: opacity .6s var(--ease), transform .6s var(--ease);
-    }
-    .reveal-cell.in { opacity:1; transform:none; }
-    @media (prefers-reduced-motion: reduce) {
-      .ease-demo.run .ease-ball { animation:none; }
-      .reveal-cell { opacity:1; transform:none; transition:none; }
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      /* --- palette: cinematic dark + one bright accent --- */
+      --bg:        #07080a;   /* OLED stage            */
+      --bg-1:      #0c0e12;   /* raised panel          */
+      --bg-2:      #12151b;   /* card surface          */
+      --bg-3:      #181c24;   /* hover / track         */
+      --line:      #21262f;   /* hairline              */
+      --line-soft: #1a1e26;
+      --ink:       #f3f5f7;   /* primary text          */
+      --ink-soft:  #c2c8d2;   /* secondary             */
+      --ink-dim:   #7f8794;   /* muted / captions      */
+      --ink-faint: #4a515c;   /* watermark             */
+
+      --accent:        #c6f24e;            /* electric lime         */
+      --accent-2:      #6ee7ff;            /* cyan companion        */
+      --accent-ink:    #0a0b0d;            /* text on accent        */
+      --accent-glow:   rgba(198,242,78,.45);
+      --accent-faint:  rgba(198,242,78,.10);
+
+      --font-sans:  'Space Grotesk', system-ui, sans-serif;
+      --font-disp:  'Sora', 'Space Grotesk', system-ui, sans-serif;
+      --font-mono:  'JetBrains Mono', ui-monospace, monospace;
+
+      /* fluid type scale */
+      --step--1: clamp(.78rem, .74rem + .2vw, .86rem);
+      --step-0:  clamp(1rem, .96rem + .25vw, 1.12rem);
+      --step-1:  clamp(1.3rem, 1.15rem + .7vw, 1.7rem);
+      --step-2:  clamp(1.7rem, 1.4rem + 1.4vw, 2.6rem);
+      --step-3:  clamp(2.4rem, 1.8rem + 3vw, 4rem);
+      --step-hero: clamp(3rem, 1.6rem + 7vw, 8.5rem);
+
+      --r-1: 10px;
+      --r-2: 16px;
+      --r-3: 24px;
+      --r-pill: 999px;
+
+      --ease: cubic-bezier(.22,.61,.36,1);     /* confident ease-out */
+      --ease-spring: cubic-bezier(.34,1.4,.5,1);
+      --maxw: 1180px;
     }
 
-    /* blur-to-focus (refokus) demo */
-    .blur-line { font-family:var(--font-serif); font-size:var(--step-2); line-height:1.2; color:var(--ink); }
-    .blur-line .soft { filter:blur(6px); opacity:.55; transition:filter .5s var(--ease), opacity .5s var(--ease); }
-    .blur-line.sharp .soft { filter:blur(0); opacity:1; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: var(--step-0);
+      line-height: 1.7;
+      letter-spacing: -0.005em;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ambient cinematic wash + grain, fixed so it never repaints on scroll */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(680px 480px at 78% -8%, rgba(110,231,255,.10), transparent 60%),
+        radial-gradient(820px 560px at 12% 8%, rgba(198,242,78,.09), transparent 62%),
+        radial-gradient(900px 700px at 50% 118%, rgba(198,242,78,.05), transparent 60%);
+    }
+    body::after {
+      content: "";
+      position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    a { color: inherit; }
+    img { max-width: 100%; display: block; }
+    code, pre { font-family: var(--font-mono); }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    .skip {
+      position: absolute; left: 12px; top: -60px; z-index: 100;
+      background: var(--accent); color: var(--accent-ink);
+      padding: .6rem 1rem; border-radius: var(--r-pill);
+      font-family: var(--font-mono); font-size: .78rem; font-weight: 600;
+      transition: top .25s var(--ease);
+    }
+    .skip:focus { top: 12px; }
+
+    /* ---------- scroll progress bar (page-as-timeline cue) ---------- */
+    .scrub {
+      position: fixed; top: 0; left: 0; right: 0; height: 3px;
+      z-index: 60; background: transparent; pointer-events: none;
+    }
+    .scrub__fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 12px var(--accent-glow);
+      transform-origin: left;
+    }
+
+    /* =================== NAV =================== */
+    .site-header {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(7,8,10,.72);
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .site-nav {
+      max-width: var(--maxw); margin: 0 auto;
+      display: flex; align-items: center; gap: .25rem;
+      padding: .7rem clamp(1rem, 3vw, 2rem);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .site-nav::-webkit-scrollbar { display: none; }
+    .site-nav a {
+      flex: none; text-decoration: none;
+      font-size: .82rem; font-weight: 500; color: var(--ink-dim);
+      padding: .4rem .7rem; border-radius: var(--r-pill);
+      white-space: nowrap; letter-spacing: -0.01em;
+      transition: color .2s var(--ease), background .2s var(--ease);
+    }
+    .site-nav a:hover { color: var(--ink); background: var(--bg-2); }
+    .site-nav a.brand {
+      font-family: var(--font-disp); font-weight: 800; font-size: .95rem;
+      color: var(--ink); margin-right: .5rem; padding-left: 0;
+    }
+    .site-nav a.brand:hover { background: transparent; color: var(--accent); }
+    .site-nav a[href$="MOTIONS.html"] {
+      color: var(--accent-ink); background: var(--accent);
+    }
+    .site-nav a[href$="MOTIONS.html"]:hover { background: var(--accent); }
+    .site-nav a.cta {
+      margin-left: auto; color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    .site-nav a.cta:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
+
+    /* =================== LAYOUT =================== */
+    .wrap {
+      position: relative; z-index: 2;
+      max-width: var(--maxw); margin: 0 auto;
+      padding: 0 clamp(1.1rem, 4vw, 2.5rem);
+    }
+    main { position: relative; z-index: 2; }
+
+    /* =================== HERO =================== */
+    .hero {
+      position: relative;
+      min-height: 92vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: clamp(4rem, 9vw, 7rem) 0 clamp(3rem, 6vw, 5rem);
+      overflow: hidden;
+    }
+    .hero__kicker {
+      display: inline-flex; align-items: center; gap: .55rem;
+      font-family: var(--font-mono); font-size: .76rem;
+      letter-spacing: .16em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1.5rem; width: max-content;
+    }
+    .hero__kicker::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);
+      animation: pulse 2.4s var(--ease) infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity:1; transform:scale(1);} 50% { opacity:.4; transform:scale(.7);} }
+
+    .hero h1 {
+      font-family: var(--font-disp);
+      font-size: var(--step-hero);
+      font-weight: 800;
+      line-height: .92;
+      letter-spacing: -0.04em;
+      margin: 0;
+      max-width: 14ch;
+    }
+    .hero h1 .word {
+      display: inline-block;
+      transform: translateY(110%);
+      opacity: 0;
+    }
+    .hero.lit h1 .word { animation: riseIn .9s var(--ease) forwards; }
+    .hero h1 .accent {
+      color: var(--accent);
+      font-style: italic;
+      position: relative;
+    }
+    @keyframes riseIn { to { transform: translateY(0); opacity: 1; } }
+
+    .hero__lede {
+      margin-top: 2rem; max-width: 60ch;
+      font-size: var(--step-1);
+      line-height: 1.45; color: var(--ink-soft);
+      font-weight: 400; letter-spacing: -0.015em;
+    }
+    .hero__meta {
+      margin-top: 2.6rem; display: flex; flex-wrap: wrap; gap: 1.2rem 2.4rem;
+      align-items: center;
+    }
+    .hero__stat { display: flex; flex-direction: column; gap: .1rem; }
+    .hero__stat b {
+      font-family: var(--font-disp); font-size: var(--step-1);
+      color: var(--ink); font-weight: 700; line-height: 1;
+    }
+    .hero__stat span {
+      font-family: var(--font-mono); font-size: .72rem;
+      color: var(--ink-dim); text-transform: uppercase; letter-spacing: .1em;
+    }
+    .hero__scroll {
+      margin-top: auto; padding-top: 3rem;
+      font-family: var(--font-mono); font-size: .74rem;
+      color: var(--ink-dim); letter-spacing: .14em; text-transform: uppercase;
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .hero__scroll .line {
+      width: 56px; height: 1px; background: var(--line); position: relative; overflow: hidden;
+    }
+    .hero__scroll .line::after {
+      content: ""; position: absolute; inset: 0; width: 40%;
+      background: var(--accent); animation: track 2.2s var(--ease) infinite;
+    }
+    @keyframes track { 0% { transform: translateX(-100%);} 100% { transform: translateX(250%);} }
+
+    /* =================== MARQUEE =================== */
+    .marquee {
+      position: relative; z-index: 2;
+      border-top: 1px solid var(--line-soft);
+      border-bottom: 1px solid var(--line-soft);
+      padding: 1.1rem 0; overflow: hidden;
+      background: var(--bg-1);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+              mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+    .marquee__track {
+      display: flex; gap: 3rem; width: max-content;
+      animation: drift 32s linear infinite;
+    }
+    .marquee:hover .marquee__track { animation-play-state: paused; }
+    .marquee__track span {
+      font-family: var(--font-disp); font-weight: 700;
+      font-size: clamp(1.1rem, 2.4vw, 1.8rem);
+      color: var(--ink-faint); letter-spacing: -0.02em;
+      display: inline-flex; align-items: center; gap: 3rem;
+    }
+    .marquee__track span::after {
+      content: "◆"; color: var(--accent); font-size: .7em;
+    }
+    @keyframes drift { to { transform: translateX(-50%); } }
+
+    /* =================== SECTIONS =================== */
+    .section { padding: clamp(4.5rem, 10vw, 8rem) 0; position: relative; }
+    .section + .section { border-top: 1px solid var(--line-soft); }
+
+    .sec-head { display: flex; align-items: flex-start; gap: 1.5rem; margin-bottom: 2.6rem; }
+    .sec-num {
+      font-family: var(--font-mono); font-size: var(--step-1);
+      color: var(--accent); font-weight: 600; line-height: 1;
+      flex: none; min-width: 2.4ch;
+    }
+    h2 {
+      font-family: var(--font-disp);
+      font-size: var(--step-3);
+      font-weight: 700; line-height: 1.02;
+      letter-spacing: -0.03em; margin: 0;
+      max-width: 18ch;
+    }
+    h3 {
+      font-family: var(--font-disp);
+      font-size: var(--step-1);
+      font-weight: 600; line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin: 2.8rem 0 .9rem;
+      color: var(--ink);
+    }
+
+    p { color: var(--ink-soft); max-width: 72ch; margin: 1.1rem 0; }
+    .lede-block p { font-size: var(--step-1); color: var(--ink-soft); line-height: 1.5; }
+    strong { color: var(--ink); font-weight: 600; }
+    em { color: var(--ink); }
+
+    p code, li code, figcaption code {
+      font-size: .85em; background: var(--bg-2); color: var(--accent-2);
+      padding: .12em .42em; border-radius: 6px; border: 1px solid var(--line-soft);
+    }
+
+    /* reference citation chips */
+    .ref {
+      color: var(--ink); font-weight: 500;
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: 1px; white-space: nowrap;
+      transition: color .2s var(--ease), background .2s var(--ease);
+      cursor: default;
+    }
+    .ref:hover { color: var(--accent); background: var(--accent-faint); }
+
+    /* =================== CODE BLOCKS =================== */
+    pre {
+      background: var(--bg-1);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--r-2);
+      padding: 1.25rem 1.4rem; margin: 1.6rem 0;
+      overflow-x: auto;
+      font-size: .82rem; line-height: 1.7;
+      box-shadow: 0 18px 50px -30px rgba(0,0,0,.9);
+    }
+    pre code { color: var(--ink-soft); }
+
+    /* =================== CALLOUTS =================== */
+    .callout {
+      margin: 1.8rem 0; padding: 1.3rem 1.5rem;
+      border-radius: var(--r-2);
+      background: var(--bg-1);
+      border: 1px solid var(--line);
+      position: relative;
+    }
+    .callout p { margin: 0; max-width: none; color: var(--ink-soft); }
+    .callout::before {
+      font-family: var(--font-mono); font-size: .66rem; font-weight: 600;
+      letter-spacing: .18em; text-transform: uppercase;
+      display: inline-block; margin-bottom: .6rem;
+    }
+    .callout.steal { border-color: rgba(198,242,78,.35); background: linear-gradient(180deg, rgba(198,242,78,.06), transparent); }
+    .callout.steal::before { content: "Steal this"; color: var(--accent); }
+    .callout.warn { border-color: rgba(255,140,90,.3); }
+    .callout.warn::before { content: "Watch out"; color: #ff9a66; }
+    .callout.tip { border-color: rgba(110,231,255,.3); }
+    .callout.tip::before { content: "Field note"; color: var(--accent-2); }
+
+    /* =================== FIGURES =================== */
+    .figure {
+      margin: 2.4rem 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-3);
+      overflow: hidden; background: var(--bg-1);
+      padding: .55rem;
+    }
+    .figure img {
+      width: 100%; border-radius: calc(var(--r-3) - .5rem);
+      filter: saturate(1.05) contrast(1.04);
+    }
+    figcaption {
+      color: var(--ink-dim); font-size: var(--step--1);
+      line-height: 1.55; padding: 1rem .8rem .5rem;
+    }
+    .figure figcaption strong { color: var(--ink); }
+
+    /* =================== LIVE DEMO PANELS =================== */
+    .example {
+      margin: 2.2rem 0; padding: 1.6rem;
+      border-radius: var(--r-3);
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .example figcaption { padding: 1rem 0 0; }
+    .demo-label {
+      font-family: var(--font-mono); font-size: .74rem; color: var(--ink-dim);
+      text-transform: uppercase; letter-spacing: .12em; margin: 0 0 1rem;
+    }
 
     .demo-btn {
-      font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em; text-transform:uppercase;
-      color:var(--accent-ink); background:var(--accent); border:0; border-radius:var(--r-pill);
-      padding:.45rem 1rem; cursor:pointer;
+      font-family: var(--font-mono); font-size: .72rem; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      color: var(--accent-ink); background: var(--accent);
+      border: 0; border-radius: var(--r-pill);
+      padding: .55rem 1.2rem; cursor: pointer; margin-top: 1rem;
+      transition: transform .2s var(--ease-spring), box-shadow .2s var(--ease);
     }
-    .demo-btn:hover { background:var(--accent-soft); }
+    .demo-btn:hover { box-shadow: 0 0 22px var(--accent-glow); transform: translateY(-1px); }
+    .demo-btn:active { transform: scale(.96); }
+
+    /* easing demo */
+    .ease-demo { display: grid; gap: .85rem; }
+    .ease-row { display: grid; grid-template-columns: 11ch 1fr; align-items: center; gap: 1rem; }
+    .ease-row .label { font-family: var(--font-mono); font-size: .76rem; color: var(--ink-dim); }
+    .ease-track { position: relative; height: 36px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-pill); }
+    .ease-ball { position: absolute; top: 50%; left: 5px; width: 26px; height: 26px; margin-top: -13px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 16px var(--accent-glow); }
+    .ease-demo.run .ease-ball { animation: slideX 1.6s infinite alternate; }
+    .ease-demo.run .e-linear { animation-timing-function: linear; }
+    .ease-demo.run .e-ease   { animation-timing-function: cubic-bezier(.22,.61,.36,1); }
+    .ease-demo.run .e-spring { animation-timing-function: cubic-bezier(.34,1.56,.64,1); background: var(--accent-2); box-shadow: 0 0 16px rgba(110,231,255,.5); }
+    @keyframes slideX { to { left: calc(100% - 31px); } }
+
+    /* scroll-reveal demo */
+    .reveal-grid { display: grid; gap: .7rem; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+    .reveal-cell {
+      padding: 1.3rem .75rem; text-align: center; border: 1px solid var(--line);
+      border-radius: var(--r-1); background: var(--bg); color: var(--accent);
+      font-family: var(--font-mono); font-size: 1rem; font-weight: 600;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity .6s var(--ease), transform .6s var(--ease);
+    }
+    .reveal-cell.in { opacity: 1; transform: none; }
+
+    /* blur-to-focus demo */
+    .blur-line { font-family: var(--font-disp); font-weight: 700; font-size: var(--step-2); line-height: 1.2; color: var(--ink); letter-spacing: -0.02em; }
+    .blur-line .soft { filter: blur(7px); opacity: .5; transition: filter .55s var(--ease), opacity .55s var(--ease); color: var(--accent); }
+    .blur-line.sharp .soft { filter: blur(0); opacity: 1; }
+
+    /* =================== SCROLL-REVEAL (page-wide) =================== */
+    [data-reveal] {
+      opacity: 0; transform: translateY(26px);
+      transition: opacity .8s var(--ease), transform .8s var(--ease);
+      will-change: opacity, transform;
+    }
+    [data-reveal].in { opacity: 1; transform: none; }
+
+    /* =================== TOC =================== */
+    .toc {
+      margin: 0 0 1rem; padding: 0;
+    }
+    .toc ol {
+      list-style: none; margin: 0; padding: 0;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: .5rem;
+      counter-reset: toc;
+    }
+    .toc a {
+      display: flex; gap: .9rem; align-items: baseline;
+      text-decoration: none; color: var(--ink-soft);
+      padding: .9rem 1rem; border: 1px solid var(--line-soft);
+      border-radius: var(--r-1); background: var(--bg-1);
+      font-size: .92rem; line-height: 1.3;
+      transition: border-color .2s var(--ease), color .2s var(--ease), transform .2s var(--ease);
+    }
+    .toc a::before {
+      counter-increment: toc; content: counter(toc, decimal-leading-zero);
+      font-family: var(--font-mono); font-size: .76rem; color: var(--accent);
+      flex: none;
+    }
+    .toc a:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-2px); }
+
+    /* =================== CTA STRIP =================== */
+    .closer {
+      text-align: center;
+      padding: clamp(5rem, 10vw, 8rem) 0;
+    }
+    .closer h2 { margin: 0 auto 1.6rem; max-width: 18ch; }
+    .magnetic {
+      display: inline-flex; align-items: center; gap: .8rem;
+      font-family: var(--font-disp); font-weight: 700; font-size: 1.05rem;
+      text-decoration: none; color: var(--accent-ink);
+      background: var(--accent); padding: 1rem 1.3rem 1rem 1.8rem;
+      border-radius: var(--r-pill);
+      transition: box-shadow .3s var(--ease);
+    }
+    .magnetic:hover { box-shadow: 0 0 40px var(--accent-glow); }
+    .magnetic .ico {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--accent-ink); color: var(--accent);
+      display: grid; place-items: center; font-size: 1.1rem;
+      transition: transform .3s var(--ease-spring);
+    }
+    .magnetic:hover .ico { transform: translate(3px, -3px) scale(1.08); }
+
+    /* =================== FOOTER =================== */
+    .ftr {
+      position: relative; z-index: 2;
+      border-top: 1px solid var(--line);
+      background: var(--bg-1);
+      padding: clamp(3rem, 6vw, 4.5rem) 0;
+    }
+    .ftr a { color: var(--accent); text-decoration: none; }
+    .ftr a:hover { text-decoration: underline; }
+    .ftr p { color: var(--ink-dim); margin: .4rem 0; }
+    .ftr .brand { font-family: var(--font-disp); font-weight: 800; color: var(--ink); }
+
+    /* =================== RESPONSIVE =================== */
+    @media (max-width: 680px) {
+      .sec-head { flex-direction: column; gap: .4rem; }
+      .ease-row { grid-template-columns: 8ch 1fr; }
+      .hero { min-height: 88vh; }
+    }
+
+    /* =================== REDUCED MOTION =================== */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+      }
+      .hero h1 .word { transform: none; opacity: 1; }
+      [data-reveal] { opacity: 1; transform: none; }
+      .reveal-cell { opacity: 1; transform: none; }
+      .marquee__track { animation: none; }
+      .ease-demo.run .ease-ball { animation: none; }
+    }
   </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="scrub" aria-hidden="true"><div class="scrub__fill" id="scrubFill"></div></div>
+
 <header class="site-header">
-    <nav class="site-nav" aria-label="Best practices">
-      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
-      <a href="UI-DESIGN.html">UI Design</a>
-      <a href="UX.html">UX</a>
-      <a href="TYPOGRAPHY.html">Typography</a>
-      <a href="COLOR.html">Color</a>
-      <a href="STYLING.html">Styling</a>
-      <a href="MOTIONS.html">Motion</a>
-      <a href="ANIMATIONS.html">Animation</a>
-      <a href="INTERACTIONS.html">Interaction</a>
-      <a href="SPATIAL.html">3D / Spatial</a>
-      <a href="MINI-GAMES.html">Mini-Games</a>
-      <a href="STATE-MANAGEMENT.html">State</a>
-      <a href="NEXTJS.html">Meta-Framework</a>
-      <a href="../references/PORTFOLIO.html">Portfolio</a>
-      <a href="../references/TOP-LIST.html">Top List</a>
-      <a href="../references/MOTION-GALLERY.html">Motion Reel</a>
-      <a class="cta" href="../PLAN.html">Build Plan →</a>
-    </nav>
-  </header>
-
-<main class="wrap">
-  <span class="kicker">Craft Atlas · 06</span>
-  <h1>Motion Design</h1>
-  <p class="lede">Motion is the one craft that never survives a screenshot. It is choreography: how the page enters, how scroll becomes a timeline, how a route hands off to the next. Done right it paces the reader and earns the award; done wrong it taxes the main thread and nauseates the visitor. Here is how the best 80 sites move — and the budget they pay to do it.</p>
-
-  <nav class="toc" aria-label="On this page">
-    <ul>
-      <li><a href="#scroll-is-timeline">1 · Scroll is the timeline</a></li>
-      <li><a href="#smooth-scroll">2 · Smooth scroll (Lenis &amp; the inertia layer)</a></li>
-      <li><a href="#scrub-pin">3 · Scroll-scrubbing &amp; pinned timelines</a></li>
-      <li><a href="#reveals">4 · Scroll-triggered reveals</a></li>
-      <li><a href="#parallax">5 · Parallax done with restraint</a></li>
-      <li><a href="#route-transitions">6 · Page &amp; route transitions</a></li>
-      <li><a href="#view-transitions">7 · The View Transitions API</a></li>
-      <li><a href="#easing">8 · Easing &amp; the feel of weight</a></li>
-      <li><a href="#budget">9 · The motion budget</a></li>
-    </ul>
+  <nav class="site-nav" aria-label="Best practices">
+    <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+    <a href="UI-DESIGN.html">UI Design</a>
+    <a href="UX.html">UX</a>
+    <a href="TYPOGRAPHY.html">Typography</a>
+    <a href="COLOR.html">Color</a>
+    <a href="STYLING.html">Styling</a>
+    <a href="MOTIONS.html">Motion</a>
+    <a href="ANIMATIONS.html">Animation</a>
+    <a href="INTERACTIONS.html">Interaction</a>
+    <a href="SPATIAL.html">3D / Spatial</a>
+    <a href="MINI-GAMES.html">Mini-Games</a>
+    <a href="STATE-MANAGEMENT.html">State</a>
+    <a href="NEXTJS.html">Meta-Framework</a>
+    <a href="../references/PORTFOLIO.html">Portfolio</a>
+    <a href="../references/TOP-LIST.html">Top List</a>
+    <a href="../references/MOTION-GALLERY.html">Motion Reel</a>
+    <a class="cta" href="../PLAN.html">Build Plan →</a>
   </nav>
+</header>
 
-  <h2 id="scroll-is-timeline">1 · Scroll is the timeline</h2>
-  <p>The single biggest mental shift in elite motion work: <strong>stop treating scroll as "moving a document down" and start treating it as a scrubbable playhead.</strong> The scrollbar becomes a 0→1 progress value you bind anything to — camera position, an assembly animation, a video's <code>currentTime</code>, a blur radius.</p>
-  <p><span class="ref">Lusion ↗</span> takes this to the extreme: scroll acts as a <strong>camera/timeline driver</strong> for a WebGL scene — "each scroll feels like a continuation of a bigger story." The hero is effectively pinned while the 3D scene evolves; you are scrubbing a narrative, not a page. <span class="ref">Unseen Studio ↗</span> does the same — scrolling pans the camera through a fixed-stage 3D world (DOM scroll barely moves the visible scene because the scene <em>is</em> the scroll). <span class="ref">Obys Agency ↗</span> runs a <strong>synchronized scroll engine</strong> where a left name-list, a center media column, and right metadata all advance as one timeline through a fixed "viewfinder" bracket.</p>
+<main id="main">
 
-  <figure class="figure">
-    <img src="../workings/shots/igloo-inc/02-mid.png" alt="Igloo Inc igloo half-assembled from glowing blocks, mid-scroll">
-    <figcaption><strong>Igloo Inc</strong> — scroll position is bound to an assembly animation: the igloo grows from a pile of blocks into a glowing dome. Scrolling <em>is</em> the build sequence, not just navigation past it.</figcaption>
-  </figure>
+  <!-- ============ HERO ============ -->
+  <section class="hero wrap" id="hero">
+    <span class="hero__kicker">Craft Atlas · 06 · Motion</span>
+    <h1>
+      <span class="word">A</span>
+      <span class="word">page</span>
+      <span class="word">that</span>
+      <span class="word accent">moves.</span>
+    </h1>
+    <p class="hero__lede">Motion is the one craft that never survives a screenshot. It is choreography — how the page enters, how scroll becomes a timeline, how a route hands off to the next. Done right it paces the reader and earns the award; done wrong it taxes the main thread and nauseates the visitor.</p>
 
-  <p><span class="ref">Igloo Inc ↗</span> binds scroll to a <strong>scroll-scrubbed assembly</strong> — blocks grow and brighten into a domed structure as you scroll, GSAP-timeline-driven rather than CSS. <span class="ref">Apple ↗</span> pioneered the mainstream version: <strong>scroll-driven canvas frame-sequences</strong> (pre-rendered frames drawn to <code>&lt;canvas&gt;</code> via <code>drawImage()</code>, indexed to scroll), and has since shifted some to <strong>scroll-scrubbed compressed video</strong> (tie scroll to <code>video.currentTime</code>) — cheaper and smoother.</p>
+    <div class="hero__meta">
+      <div class="hero__stat"><b>80</b><span>sites torn down</span></div>
+      <div class="hero__stat"><b>9</b><span>motion systems</span></div>
+      <div class="hero__stat"><b>1</b><span>scroll clock</span></div>
+    </div>
 
-  <div class="callout steal">
-    <p>The universal primitive is a clamped, normalized scroll progress. Everything else is just what you bind it to.</p>
-    <pre><code>// 0 → 1 progress for any element as it crosses the viewport
+    <div class="hero__scroll"><span class="line"></span> Scroll is the playhead</div>
+  </section>
+
+  <!-- ============ MARQUEE ============ -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>Lenis</span><span>GSAP ScrollTrigger</span><span>View Transitions</span><span>Pinned timelines</span><span>Scroll-scrub</span><span>Parallax</span><span>Tokenized easing</span><span>One rAF clock</span>
+      <span>Lenis</span><span>GSAP ScrollTrigger</span><span>View Transitions</span><span>Pinned timelines</span><span>Scroll-scrub</span><span>Parallax</span><span>Tokenized easing</span><span>One rAF clock</span>
+    </div>
+  </div>
+
+  <!-- ============ TOC ============ -->
+  <section class="section wrap" aria-label="On this page">
+    <nav class="toc" data-reveal>
+      <ol>
+        <li><a href="#scroll-is-timeline">Scroll is the timeline</a></li>
+        <li><a href="#smooth-scroll">Smooth scroll &amp; the inertia layer</a></li>
+        <li><a href="#scrub-pin">Scroll-scrubbing &amp; pinned timelines</a></li>
+        <li><a href="#reveals">Scroll-triggered reveals</a></li>
+        <li><a href="#parallax">Parallax done with restraint</a></li>
+        <li><a href="#route-transitions">Page &amp; route transitions</a></li>
+        <li><a href="#view-transitions">The View Transitions API</a></li>
+        <li><a href="#easing">Easing &amp; the feel of weight</a></li>
+        <li><a href="#budget">The motion budget</a></li>
+      </ol>
+    </nav>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="section wrap" id="scroll-is-timeline">
+    <div class="sec-head" data-reveal>
+      <span class="sec-num">01</span>
+      <h2>Scroll is the timeline</h2>
+    </div>
+    <div class="lede-block" data-reveal>
+      <p>The single biggest mental shift in elite motion work: <strong>stop treating scroll as "moving a document down" and start treating it as a scrubbable playhead.</strong> The scrollbar becomes a 0→1 progress value you bind anything to — camera position, an assembly animation, a video's <code>currentTime</code>, a blur radius.</p>
+    </div>
+    <p data-reveal><span class="ref">Lusion ↗</span> takes this to the extreme: scroll acts as a <strong>camera/timeline driver</strong> for a WebGL scene — "each scroll feels like a continuation of a bigger story." The hero is effectively pinned while the 3D scene evolves; you are scrubbing a narrative, not a page. <span class="ref">Unseen Studio ↗</span> does the same — scrolling pans the camera through a fixed-stage 3D world (DOM scroll barely moves the visible scene because the scene <em>is</em> the scroll). <span class="ref">Obys Agency ↗</span> runs a <strong>synchronized scroll engine</strong> where a left name-list, a center media column, and right metadata all advance as one timeline through a fixed "viewfinder" bracket.</p>
+
+    <figure class="figure" data-reveal>
+      <img src="../workings/shots/igloo-inc/02-mid.png" alt="Igloo Inc igloo half-assembled from glowing blocks, mid-scroll">
+      <figcaption><strong>Igloo Inc</strong> — scroll position is bound to an assembly animation: the igloo grows from a pile of blocks into a glowing dome. Scrolling <em>is</em> the build sequence, not just navigation past it.</figcaption>
+    </figure>
+
+    <p data-reveal><span class="ref">Igloo Inc ↗</span> binds scroll to a <strong>scroll-scrubbed assembly</strong> — blocks grow and brighten into a domed structure as you scroll, GSAP-timeline-driven rather than CSS. <span class="ref">Apple ↗</span> pioneered the mainstream version: <strong>scroll-driven canvas frame-sequences</strong> (pre-rendered frames drawn to <code>&lt;canvas&gt;</code> via <code>drawImage()</code>, indexed to scroll), and has since shifted some to <strong>scroll-scrubbed compressed video</strong> (tie scroll to <code>video.currentTime</code>) — cheaper and smoother.</p>
+
+    <div class="callout steal" data-reveal>
+      <p>The universal primitive is a clamped, normalized scroll progress. Everything else is just what you bind it to.</p>
+      <pre><code>// 0 → 1 progress for any element as it crosses the viewport
 function progress(el) {
   const r = el.getBoundingClientRect();
   const total = window.innerHeight + r.height;
@@ -113,13 +613,19 @@ function progress(el) {
 
 // Bind it to anything: video scrub, blur, transform, camera.z…
 video.currentTime = progress(section) * video.duration;</code></pre>
-  </div>
+    </div>
+  </section>
 
-  <h2 id="smooth-scroll">2 · Smooth scroll — the inertia layer</h2>
-  <p>Native scroll is instantaneous and snappy; agency-grade scroll has <em>inertia</em> — a slight weight and ease-out that makes the whole page feel premium. The de-facto tool is now <strong>Lenis</strong> (from darkroom.engineering), which has displaced the older Locomotive Scroll on most new builds.</p>
-  <p><span class="ref">Studio Freight / Darkroom ↗</span> author Lenis themselves — "inertial, eased scrolling is the baseline feel of the whole page." <span class="ref">Locomotive ↗</span>'s own current build runs on Lenis (<code>html.lenis</code>, an <code>is-scrolling-up</code> state class). <span class="ref">Cuberto ↗</span> ships Lenis 1.3.23 + GSAP ScrollTrigger — the smooth scroll <em>drives</em> all scroll-triggered animation downstream. <span class="ref">14islands ↗</span> confirms <code>lenis</code> on <code>&lt;html&gt;</code> and pairs it with their <code>r3f-scroll-rig</code> so one WebGL canvas syncs 1:1 with DOM scroll.</p>
+  <!-- ============ 2 ============ -->
+  <section class="section wrap" id="smooth-scroll">
+    <div class="sec-head" data-reveal>
+      <span class="sec-num">02</span>
+      <h2>Smooth scroll — the inertia layer</h2>
+    </div>
+    <p data-reveal>Native scroll is instantaneous and snappy; agency-grade scroll has <em>inertia</em> — a slight weight and ease-out that makes the whole page feel premium. The de-facto tool is now <strong>Lenis</strong> (from darkroom.engineering), which has displaced the older Locomotive Scroll on most new builds.</p>
+    <p data-reveal><span class="ref">Studio Freight / Darkroom ↗</span> author Lenis themselves — "inertial, eased scrolling is the baseline feel of the whole page." <span class="ref">Locomotive ↗</span>'s own current build runs on Lenis (<code>html.lenis</code>, an <code>is-scrolling-up</code> state class). <span class="ref">Cuberto ↗</span> ships Lenis 1.3.23 + GSAP ScrollTrigger — the smooth scroll <em>drives</em> all scroll-triggered animation downstream. <span class="ref">14islands ↗</span> confirms <code>lenis</code> on <code>&lt;html&gt;</code> and pairs it with their <code>r3f-scroll-rig</code> so one WebGL canvas syncs 1:1 with DOM scroll.</p>
 
-  <pre><code>// Lenis: the modern smooth-scroll baseline. Drive GSAP off its frame.
+    <pre data-reveal><code>// Lenis: the modern smooth-scroll baseline. Drive GSAP off its frame.
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -131,20 +637,26 @@ lenis.on('scroll', ScrollTrigger.update);
 gsap.ticker.add((t) => lenis.raf(t * 1000));
 gsap.ticker.lagSmoothing(0);</code></pre>
 
-  <div class="callout warn">
-    <p><strong>Smooth scroll is a commitment, not a sprinkle.</strong> It hijacks the scroll thread, can break <code>position: sticky</code>, anchor jumps, and assistive-tech scrolling, and adds input latency. Always honor <code>prefers-reduced-motion</code> by disabling it, keep keyboard <code>Page Down</code> / <code>Home</code>/<code>End</code> working, and never run it on a content/docs site where readers just want to <em>read</em> — see <span class="ref">Lee Robinson ↗</span>, who deliberately ships <em>no</em> Lenis.</p>
-  </div>
+    <div class="callout warn" data-reveal>
+      <p><strong>Smooth scroll is a commitment, not a sprinkle.</strong> It hijacks the scroll thread, can break <code>position: sticky</code>, anchor jumps, and assistive-tech scrolling, and adds input latency. Always honor <code>prefers-reduced-motion</code> by disabling it, keep keyboard <code>Page Down</code> / <code>Home</code>/<code>End</code> working, and never run it on a content/docs site where readers just want to <em>read</em> — see <span class="ref">Lee Robinson ↗</span>, who deliberately ships <em>no</em> Lenis.</p>
+    </div>
+  </section>
 
-  <h2 id="scrub-pin">3 · Scroll-scrubbing &amp; pinned timelines</h2>
-  <p>A <strong>pinned timeline</strong> fixes an element in place while scroll advances an internal animation — the section "holds" while content morphs through it, then releases. This is the backbone of scrollytelling.</p>
-  <p><span class="ref">Igloo Inc ↗</span> pins the hero stage and scrubs the igloo assembly. <span class="ref">Refokus ↗</span> pins statement lines and scrubs a <strong>blur-to-focus</strong> reveal — trailing words start Gaussian-blurred and sharpen as you scroll ("we make people feel them"), perfectly on-brand. <span class="ref">Basement Studio ↗</span> wraps GSAP ScrollTrigger in their open-source <strong>BSMNT Scrollytelling</strong> lib. <span class="ref">Cassie Evans ↗</span> uses ScrollTrigger so each color section animates as it enters the viewport.</p>
+  <!-- ============ 3 ============ -->
+  <section class="section wrap" id="scrub-pin">
+    <div class="sec-head" data-reveal>
+      <span class="sec-num">03</span>
+      <h2>Scroll-scrubbing &amp; pinned timelines</h2>
+    </div>
+    <p data-reveal>A <strong>pinned timeline</strong> fixes an element in place while scroll advances an internal animation — the section "holds" while content morphs through it, then releases. This is the backbone of scrollytelling.</p>
+    <p data-reveal><span class="ref">Igloo Inc ↗</span> pins the hero stage and scrubs the igloo assembly. <span class="ref">Refokus ↗</span> pins statement lines and scrubs a <strong>blur-to-focus</strong> reveal — trailing words start Gaussian-blurred and sharpen as you scroll ("we make people feel them"), perfectly on-brand. <span class="ref">Basement Studio ↗</span> wraps GSAP ScrollTrigger in their open-source <strong>BSMNT Scrollytelling</strong> lib. <span class="ref">Cassie Evans ↗</span> uses ScrollTrigger so each color section animates as it enters the viewport.</p>
 
-  <figure class="figure">
-    <img src="../workings/shots/refokus/03-lower.png" alt="Refokus statement type with trailing words blurred, sharpening on scroll">
-    <figcaption><strong>Refokus</strong> — a signature scroll-scrubbed effect: words render heavily Gaussian-blurred and snap into focus as scroll progress crosses them. The blur radius is just another value bound to the 0→1 playhead.</figcaption>
-  </figure>
+    <figure class="figure" data-reveal>
+      <img src="../workings/shots/refokus/03-lower.png" alt="Refokus statement type with trailing words blurred, sharpening on scroll">
+      <figcaption><strong>Refokus</strong> — a signature scroll-scrubbed effect: words render heavily Gaussian-blurred and snap into focus as scroll progress crosses them. The blur radius is just another value bound to the 0→1 playhead.</figcaption>
+    </figure>
 
-  <pre><code>// GSAP ScrollTrigger: pin a section and scrub a timeline across it.
+    <pre data-reveal><code>// GSAP ScrollTrigger: pin a section and scrub a timeline across it.
 const tl = gsap.timeline({
   scrollTrigger: {
     trigger: '.act',
@@ -157,8 +669,8 @@ const tl = gsap.timeline({
 tl.from('.act .word', { filter: 'blur(8px)', opacity: 0.4, stagger: 0.05 })
   .to('.act .media', { scale: 1.1 }, 0);</code></pre>
 
-  <p>For pure CSS, the modern path is <strong>scroll-driven animations</strong> via <code>animation-timeline: view()</code> — no JS, runs off the compositor:</p>
-  <pre><code>/* Native CSS scroll-scrubbing — zero JS, compositor-driven. */
+    <p data-reveal>For pure CSS, the modern path is <strong>scroll-driven animations</strong> via <code>animation-timeline: view()</code> — no JS, runs off the compositor:</p>
+    <pre data-reveal><code>/* Native CSS scroll-scrubbing — zero JS, compositor-driven. */
 @keyframes sharpen { from { filter: blur(8px); opacity:.4 } to { filter:none; opacity:1 } }
 .headline {
   animation: sharpen linear both;
@@ -166,22 +678,28 @@ tl.from('.act .word', { filter: 'blur(8px)', opacity: 0.4, stagger: 0.05 })
   animation-range: entry 10% cover 40%;  /* map start/end to scroll band   */
 }</code></pre>
 
-  <div class="example">
-    <p style="font-family:var(--font-mono);font-size:.8rem;color:var(--ink-dim);margin-bottom:.75rem;">Blur-to-focus, the Refokus way — tap to scrub:</p>
-    <p class="blur-line" id="blurLine">We make people <span class="soft">feel</span> them.</p>
-    <button class="demo-btn" id="blurBtn" type="button" style="margin-top:1rem;">Toggle focus</button>
-    <figcaption>The blur radius is bound to a single boolean here; on a real page it's bound to scroll progress so it sharpens continuously as the line crosses the viewport.</figcaption>
-  </div>
+    <div class="example" data-reveal>
+      <p class="demo-label">Blur-to-focus, the Refokus way — tap to scrub</p>
+      <p class="blur-line" id="blurLine">We make people <span class="soft">feel</span> them.</p>
+      <button class="demo-btn" id="blurBtn" type="button">Toggle focus</button>
+      <figcaption>The blur radius is bound to a single boolean here; on a real page it's bound to scroll progress so it sharpens continuously as the line crosses the viewport.</figcaption>
+    </div>
+  </section>
 
-  <h2 id="reveals">4 · Scroll-triggered reveals</h2>
-  <p>The most common, highest-ROI motion: content fades and rises into view as it enters the viewport. Almost every site in the corpus does it — the craft is in the <em>stagger</em> and the <em>discipline</em>.</p>
-  <p><span class="ref">Hello Monday ↗</span> staggers column offsets so cards fade/translate in with amplified rhythm. <span class="ref">Dennis Snellenberg ↗</span> uses GSAP ScrollTrigger for staggered text/line reveals on work rows. <span class="ref">Refokus ↗</span> splits the hero h1 into individual letters (spaced in the DOM) for a per-character staggered entrance. <span class="ref">14islands ↗</span> splits headlines into per-character/word spans, and crucially keeps reveals <strong>CSS-first wherever possible for performance</strong> — WebGL only where it earns its weight.</p>
+  <!-- ============ 4 ============ -->
+  <section class="section wrap" id="reveals">
+    <div class="sec-head" data-reveal>
+      <span class="sec-num">04</span>
+      <h2>Scroll-triggered reveals</h2>
+    </div>
+    <p data-reveal>The most common, highest-ROI motion: content fades and rises into view as it enters the viewport. Almost every site in the corpus does it — the craft is in the <em>stagger</em> and the <em>discipline</em>.</p>
+    <p data-reveal><span class="ref">Hello Monday ↗</span> staggers column offsets so cards fade/translate in with amplified rhythm. <span class="ref">Dennis Snellenberg ↗</span> uses GSAP ScrollTrigger for staggered text/line reveals on work rows. <span class="ref">Refokus ↗</span> splits the hero h1 into individual letters (spaced in the DOM) for a per-character staggered entrance. <span class="ref">14islands ↗</span> splits headlines into per-character/word spans, and crucially keeps reveals <strong>CSS-first wherever possible for performance</strong> — WebGL only where it earns its weight.</p>
 
-  <div class="callout tip">
-    <p><strong>Use <code>IntersectionObserver</code>, not scroll listeners.</strong> A scroll handler fires hundreds of times a second on the main thread; an observer fires only at the threshold you care about. Add a <code>once</code> guard so elements don't re-animate on scroll-back, and always set the <em>resting</em> state as the default so a no-JS / reduced-motion visitor sees finished content.</p>
-  </div>
+    <div class="callout tip" data-reveal>
+      <p><strong>Use <code>IntersectionObserver</code>, not scroll listeners.</strong> A scroll handler fires hundreds of times a second on the main thread; an observer fires only at the threshold you care about. Add a <code>once</code> guard so elements don't re-animate on scroll-back, and always set the <em>resting</em> state as the default so a no-JS / reduced-motion visitor sees finished content.</p>
+    </div>
 
-  <pre><code>// Robust, cheap reveal — observer + reduced-motion respect.
+    <pre data-reveal><code>// Robust, cheap reveal — observer + reduced-motion respect.
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const io = new IntersectionObserver((entries) => {
   for (const e of entries) {
@@ -194,36 +712,48 @@ const io = new IntersectionObserver((entries) => {
 if (!reduce) document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el));
 // CSS provides the resting state by default; `.in` adds the entrance.</code></pre>
 
-  <div class="example">
-    <p style="font-family:var(--font-mono);font-size:.8rem;color:var(--ink-dim);margin-bottom:.75rem;">Staggered reveal (IntersectionObserver) — scroll this into view to replay:</p>
-    <div class="reveal-grid" id="revealGrid">
-      <div class="reveal-cell">01</div><div class="reveal-cell">02</div>
-      <div class="reveal-cell">03</div><div class="reveal-cell">04</div>
-      <div class="reveal-cell">05</div><div class="reveal-cell">06</div>
+    <div class="example" data-reveal>
+      <p class="demo-label">Staggered reveal (IntersectionObserver) — scroll into view to replay</p>
+      <div class="reveal-grid" id="revealGrid">
+        <div class="reveal-cell">01</div><div class="reveal-cell">02</div>
+        <div class="reveal-cell">03</div><div class="reveal-cell">04</div>
+        <div class="reveal-cell">05</div><div class="reveal-cell">06</div>
+      </div>
+      <figcaption>Each cell gets a transition-delay so they cascade. Resting state is the default — disable JS and you still see all six.</figcaption>
     </div>
-    <figcaption>Each cell gets a transition-delay so they cascade. Resting state is the default — disable JS and you still see all six.</figcaption>
-  </div>
+  </section>
 
-  <h2 id="parallax">5 · Parallax — restraint over spectacle</h2>
-  <p>Parallax (foreground/background moving at different rates) reads as depth and life. The corpus uses it sparingly and structurally, not as confetti.</p>
-  <p><span class="ref">Dennis Snellenberg ↗</span> virtualizes the page with Locomotive Scroll (transform-based) and drives parallax via <code>data-scroll</code> attributes — hero text and portrait move at different rates. <span class="ref">Jesper Landberg ↗</span> pins a sticky left-column name to create a scroll-pinned parallax effect as the index scrolls past, plus horizontal-scrolling project images locked against vertically-scrolling titles. <span class="ref">Family ↗</span> floats illustration elements with gentle physics/parallax and idle-bob so the hero feels alive rather than static. <span class="ref">14islands ↗</span> achieves image distortion + parallax through a single synced WebGL canvas instead of per-image canvases.</p>
+  <!-- ============ 5 ============ -->
+  <section class="section wrap" id="parallax">
+    <div class="sec-head" data-reveal>
+      <span class="sec-num">05</span>
+      <h2>Parallax — restraint over spectacle</h2>
+    </div>
+    <p data-reveal>Parallax (foreground/background moving at different rates) reads as depth and life. The corpus uses it sparingly and structurally, not as confetti.</p>
+    <p data-reveal><span class="ref">Dennis Snellenberg ↗</span> virtualizes the page with Locomotive Scroll (transform-based) and drives parallax via <code>data-scroll</code> attributes — hero text and portrait move at different rates. <span class="ref">Jesper Landberg ↗</span> pins a sticky left-column name to create a scroll-pinned parallax effect as the index scrolls past, plus horizontal-scrolling project images locked against vertically-scrolling titles. <span class="ref">Family ↗</span> floats illustration elements with gentle physics/parallax and idle-bob so the hero feels alive rather than static. <span class="ref">14islands ↗</span> achieves image distortion + parallax through a single synced WebGL canvas instead of per-image canvases.</p>
 
-  <pre><code>/* Pure-CSS parallax — no JS, no scroll handler. Uses 3D transform trick. */
+    <pre data-reveal><code>/* Pure-CSS parallax — no JS, no scroll handler. Uses 3D transform trick. */
 .scene { height:100vh; overflow-y:auto; overflow-x:hidden; perspective:1px; }
 .layer        { transform: translateZ(0)    scale(1);   }  /* foreground */
 .layer.back   { transform: translateZ(-1px) scale(2);   }  /* moves slower */
 /* Or, modern: bind translateY to a scroll-driven timeline (see §3). */</code></pre>
 
-  <div class="callout warn">
-    <p><strong>Parallax is a motion-sickness vector.</strong> Large background shifts, multiple competing rates, and fast parallax on mobile are common nausea triggers. Cap displacement (a few dozen px), never parallax body text, and collapse all of it under <code>prefers-reduced-motion</code>.</p>
-  </div>
+    <div class="callout warn" data-reveal>
+      <p><strong>Parallax is a motion-sickness vector.</strong> Large background shifts, multiple competing rates, and fast parallax on mobile are common nausea triggers. Cap displacement (a few dozen px), never parallax body text, and collapse all of it under <code>prefers-reduced-motion</code>.</p>
+    </div>
+  </section>
 
-  <h2 id="route-transitions">6 · Page &amp; route transitions</h2>
-  <p>A hard page reload — white flash, layout shift, scroll reset — shatters the spell. Award sites choreograph the handoff between routes so navigation feels like one continuous space.</p>
-  <p><span class="ref">Dennis Snellenberg ↗</span> drives full-page transitions with <strong>Barba.js</strong> — a charcoal background sweeps in to cover, then reveals the next route. <span class="ref">Unseen Studio ↗</span> uses <strong>Taxi.js</strong> for seamless route changes (no hard reloads between Index / Projects / World). <span class="ref">Refokus ↗</span> documents a BarbaJS-style app-navigation layer over Webflow + GSAP. <span class="ref">Robin Noguier ↗</span> uses React's <code>useTransition</code> for app-like route changes with React-Spring physics, so projects interpolate in. <span class="ref">Lusion ↗</span> keeps a persistent "Back" control implying an SPA transition layer painted over the canvas.</p>
+  <!-- ============ 6 ============ -->
+  <section class="section wrap" id="route-transitions">
+    <div class="sec-head" data-reveal>
+      <span class="sec-num">06</span>
+      <h2>Page &amp; route transitions</h2>
+    </div>
+    <p data-reveal>A hard page reload — white flash, layout shift, scroll reset — shatters the spell. Award sites choreograph the handoff between routes so navigation feels like one continuous space.</p>
+    <p data-reveal><span class="ref">Dennis Snellenberg ↗</span> drives full-page transitions with <strong>Barba.js</strong> — a charcoal background sweeps in to cover, then reveals the next route. <span class="ref">Unseen Studio ↗</span> uses <strong>Taxi.js</strong> for seamless route changes (no hard reloads between Index / Projects / World). <span class="ref">Refokus ↗</span> documents a BarbaJS-style app-navigation layer over Webflow + GSAP. <span class="ref">Robin Noguier ↗</span> uses React's <code>useTransition</code> for app-like route changes with React-Spring physics, so projects interpolate in. <span class="ref">Lusion ↗</span> keeps a persistent "Back" control implying an SPA transition layer painted over the canvas.</p>
 
-  <p>The classic pattern is a two-phase <strong>cover / reveal</strong> overlay that masks the swap:</p>
-  <pre><code>// Cover → swap content → reveal. The overlay hides the layout flash.
+    <p data-reveal>The classic pattern is a two-phase <strong>cover / reveal</strong> overlay that masks the swap:</p>
+    <pre data-reveal><code>// Cover → swap content → reveal. The overlay hides the layout flash.
 async function navigate(url) {
   await cover.animate(
     [{ transform:'translateY(100%)' }, { transform:'translateY(0)' }],
@@ -239,20 +769,26 @@ async function navigate(url) {
     { duration: 500, easing: 'cubic-bezier(.7,0,.3,1)', fill:'forwards' }
   ).finished;
 }</code></pre>
+  </section>
 
-  <h2 id="view-transitions">7 · The View Transitions API</h2>
-  <p>The browser-native answer to all the above — no Barba, no GSAP, near-zero JS. <code>document.startViewTransition()</code> snapshots the old DOM, runs your mutation, and cross-fades (or morphs matched elements) automatically.</p>
-  <p><span class="ref">Lee Robinson ↗</span> is the reference: his near-static essay site's <em>only</em> signature motion is the View Transitions API cross-fade between routes, wired to the Next.js App Router — "calm tech," motion reserved for continuity, zero animation libs. <span class="ref">Gianmarco Cavallo ↗</span> uses <strong>Astro's ClientRouter / View Transitions</strong> with a custom <code>GridTransition</code> so his bento cards morph and reflow between routes on a fully static site.</p>
+  <!-- ============ 7 ============ -->
+  <section class="section wrap" id="view-transitions">
+    <div class="sec-head" data-reveal>
+      <span class="sec-num">07</span>
+      <h2>The View Transitions API</h2>
+    </div>
+    <p data-reveal>The browser-native answer to all the above — no Barba, no GSAP, near-zero JS. <code>document.startViewTransition()</code> snapshots the old DOM, runs your mutation, and cross-fades (or morphs matched elements) automatically.</p>
+    <p data-reveal><span class="ref">Lee Robinson ↗</span> is the reference: his near-static essay site's <em>only</em> signature motion is the View Transitions API cross-fade between routes, wired to the Next.js App Router — "calm tech," motion reserved for continuity, zero animation libs. <span class="ref">Gianmarco Cavallo ↗</span> uses <strong>Astro's ClientRouter / View Transitions</strong> with a custom <code>GridTransition</code> so his bento cards morph and reflow between routes on a fully static site.</p>
 
-  <pre><code>// Native cross-document View Transitions — opt in with ONE CSS rule.
+    <pre data-reveal><code>// Native cross-document View Transitions — opt in with ONE CSS rule.
 // Cross-fades between full page loads, no framework required.
 @view-transition { navigation: auto; }
 
 /* Morph a specific element (e.g. a hero image) across routes */
 .hero-img { view-transition-name: hero; }   /* same name on both pages */</code></pre>
 
-  <p>Same-document (SPA) version, framework-agnostic and what Lee's Next.js setup compiles down to:</p>
-  <pre><code>// React / Next.js App Router (Lee Robinson's pattern)
+    <p data-reveal>Same-document (SPA) version, framework-agnostic and what Lee's Next.js setup compiles down to:</p>
+    <pre data-reveal><code>// React / Next.js App Router (Lee Robinson's pattern)
 if (document.startViewTransition) {
   document.startViewTransition(() => router.push(href));
 } else {
@@ -266,39 +802,51 @@ export default defineNuxtConfig({
 });
 // …then add  ::view-transition-old(root) / -new(root)  CSS to taste.</code></pre>
 
-  <div class="callout steal">
-    <p>For a portfolio that is mostly content, the View Transitions API buys an "app-like" polish at essentially zero JS cost and zero main-thread tax. It is the highest value-to-effort motion on this entire page. Add <code>@view-transition { navigation: auto; }</code> and a couple of <code>view-transition-name</code>s and you are done.</p>
-  </div>
-
-  <h2 id="easing">8 · Easing &amp; the feel of weight</h2>
-  <p>Two animations with identical duration and distance feel completely different based on their easing curve. <strong>Nothing in nature moves linearly</strong> — linear motion reads as robotic and cheap. The corpus obsesses over this.</p>
-  <p><span class="ref">Cassie Evans ↗</span> loads GSAP's <strong>CustomBounce / CustomWiggle / CustomEase</strong> for bespoke springy, overshooting curves — "motion has weight and personality, not linear tweens." <span class="ref">Robin Noguier ↗</span> mixes React-Spring physics with Bezier-Easing curves where precise easing is wanted. <span class="ref">Stripe ↗</span> codifies easing into <strong>design tokens</strong> (standardized durations, easings, choreography) so sequences are predictable and reusable — and famously, the CEO requested <em>randomized per-character delays</em> on a typing animation because uniform timing felt non-human.</p>
-
-  <div class="example">
-    <p style="font-family:var(--font-mono);font-size:.8rem;color:var(--ink-dim);margin-bottom:1rem;">Same distance, same duration — three easing curves. Press play:</p>
-    <div class="ease-demo" id="easeDemo">
-      <div class="ease-row"><span class="label">linear</span><div class="ease-track"><div class="ease-ball e-linear"></div></div></div>
-      <div class="ease-row"><span class="label">ease (out)</span><div class="ease-track"><div class="ease-ball e-ease"></div></div></div>
-      <div class="ease-row"><span class="label">spring</span><div class="ease-track"><div class="ease-ball e-spring"></div></div></div>
+    <div class="callout steal" data-reveal>
+      <p>For a portfolio that is mostly content, the View Transitions API buys an "app-like" polish at essentially zero JS cost and zero main-thread tax. It is the highest value-to-effort motion on this entire page. Add <code>@view-transition { navigation: auto; }</code> and a couple of <code>view-transition-name</code>s and you are done.</p>
     </div>
-    <button class="demo-btn" id="easeBtn" type="button" style="margin-top:1rem;">Play / pause</button>
-    <figcaption>Linear feels mechanical. <code>cubic-bezier(.22,.61,.36,1)</code> (an ease-out) feels confident and natural. The spring curve (control point &gt;1) overshoots and settles — that overshoot is what reads as "tactile."</figcaption>
-  </div>
+  </section>
 
-  <div class="callout tip">
-    <p><strong>Default to ease-out for entrances</strong> (fast start, gentle settle — the object arrives and relaxes) and <strong>ease-in for exits</strong>. Reserve overshoot/spring for small, playful, low-stakes elements (buttons, toggles, toy-like UI à la Cassie Evans), not for primary content reveals. Keep durations short: 150–400ms for UI, up to ~600ms for large hero motion.</p>
-  </div>
+  <!-- ============ 8 ============ -->
+  <section class="section wrap" id="easing">
+    <div class="sec-head" data-reveal>
+      <span class="sec-num">08</span>
+      <h2>Easing &amp; the feel of weight</h2>
+    </div>
+    <p data-reveal>Two animations with identical duration and distance feel completely different based on their easing curve. <strong>Nothing in nature moves linearly</strong> — linear motion reads as robotic and cheap. The corpus obsesses over this.</p>
+    <p data-reveal><span class="ref">Cassie Evans ↗</span> loads GSAP's <strong>CustomBounce / CustomWiggle / CustomEase</strong> for bespoke springy, overshooting curves — "motion has weight and personality, not linear tweens." <span class="ref">Robin Noguier ↗</span> mixes React-Spring physics with Bezier-Easing curves where precise easing is wanted. <span class="ref">Stripe ↗</span> codifies easing into <strong>design tokens</strong> (standardized durations, easings, choreography) so sequences are predictable and reusable — and famously, the CEO requested <em>randomized per-character delays</em> on a typing animation because uniform timing felt non-human.</p>
 
-  <h2 id="budget">9 · The motion budget</h2>
-  <p>Every animation costs frames, battery, and — for some users — comfort. The best sites treat motion as a <strong>budget</strong> they spend deliberately.</p>
+    <div class="example" data-reveal>
+      <p class="demo-label">Same distance, same duration — three easing curves. Press play</p>
+      <div class="ease-demo" id="easeDemo">
+        <div class="ease-row"><span class="label">linear</span><div class="ease-track"><div class="ease-ball e-linear"></div></div></div>
+        <div class="ease-row"><span class="label">ease (out)</span><div class="ease-track"><div class="ease-ball e-ease"></div></div></div>
+        <div class="ease-row"><span class="label">spring</span><div class="ease-track"><div class="ease-ball e-spring"></div></div></div>
+      </div>
+      <button class="demo-btn" id="easeBtn" type="button">Play / pause</button>
+      <figcaption>Linear feels mechanical. <code>cubic-bezier(.22,.61,.36,1)</code> (an ease-out) feels confident and natural. The spring curve (control point &gt;1) overshoots and settles — that overshoot is what reads as "tactile."</figcaption>
+    </div>
 
-  <h3>Animate only cheap properties</h3>
-  <p><span class="ref">Stripe ↗</span> states the rule plainly: animate only <code>transform</code> and <code>opacity</code>, <strong>never layout properties</strong> (<code>width</code>/<code>height</code>/<code>top</code>/<code>left</code>) — those trigger layout + paint on every frame; transform/opacity run on the compositor. <span class="ref">Apple ↗</span>'s discipline: "most effects are simple GPU-friendly transforms + timed easing," and content motion is kept separate from graphical motion. <span class="ref">Obys Agency ↗</span> pauses tweens in background tabs and loads a font subset first, full axes after idle — keeping LCP ≈1.3s desktop.</p>
+    <div class="callout tip" data-reveal>
+      <p><strong>Default to ease-out for entrances</strong> (fast start, gentle settle — the object arrives and relaxes) and <strong>ease-in for exits</strong>. Reserve overshoot/spring for small, playful, low-stakes elements (buttons, toggles, toy-like UI à la Cassie Evans), not for primary content reveals. Keep durations short: 150–400ms for UI, up to ~600ms for large hero motion.</p>
+    </div>
+  </section>
 
-  <h3>Respect the user — <code>prefers-reduced-motion</code> is non-negotiable</h3>
-  <p><span class="ref">Obys Agency ↗</span> freezes glyph morphs and swaps slide-ins for fades under reduced-motion. <span class="ref">Stripe ↗</span> evaluates it at runtime. <span class="ref">Apple ↗</span> ships an explicit <em>pause</em> affordance on hero motion — treating "motion is content" and "the user controls content" as the same principle. Note that <code>shared.css</code> already collapses transitions/animations under reduced-motion; your JS must do the same for scroll-jacking and observers.</p>
+  <!-- ============ 9 ============ -->
+  <section class="section wrap" id="budget">
+    <div class="sec-head" data-reveal>
+      <span class="sec-num">09</span>
+      <h2>The motion budget</h2>
+    </div>
+    <p data-reveal>Every animation costs frames, battery, and — for some users — comfort. The best sites treat motion as a <strong>budget</strong> they spend deliberately.</p>
 
-  <pre><code>/* The floor every motion site must have. */
+    <h3 data-reveal>Animate only cheap properties</h3>
+    <p data-reveal><span class="ref">Stripe ↗</span> states the rule plainly: animate only <code>transform</code> and <code>opacity</code>, <strong>never layout properties</strong> (<code>width</code>/<code>height</code>/<code>top</code>/<code>left</code>) — those trigger layout + paint on every frame; transform/opacity run on the compositor. <span class="ref">Apple ↗</span>'s discipline: "most effects are simple GPU-friendly transforms + timed easing," and content motion is kept separate from graphical motion. <span class="ref">Obys Agency ↗</span> pauses tweens in background tabs and loads a font subset first, full axes after idle — keeping LCP ≈1.3s desktop.</p>
+
+    <h3 data-reveal>Respect the user — <code>prefers-reduced-motion</code> is non-negotiable</h3>
+    <p data-reveal><span class="ref">Obys Agency ↗</span> freezes glyph morphs and swaps slide-ins for fades under reduced-motion. <span class="ref">Stripe ↗</span> evaluates it at runtime. <span class="ref">Apple ↗</span> ships an explicit <em>pause</em> affordance on hero motion — treating "motion is content" and "the user controls content" as the same principle. This page is built the same way: every transition and observer is gated behind the same query, so a reduced-motion visitor gets the finished page with zero animation.</p>
+
+    <pre data-reveal><code>/* The floor every motion site must have. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
@@ -307,7 +855,7 @@ export default defineNuxtConfig({
     scroll-behavior: auto !important;
   }
 }</code></pre>
-  <pre><code>// And the JS side: gate every effect behind the same query.
+    <pre data-reveal><code>// And the JS side: gate every effect behind the same query.
 const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 function init() {
   if (reduce.matches) return;        // no Lenis, no ScrollTrigger, no parallax
@@ -316,19 +864,27 @@ function init() {
 reduce.addEventListener('change', () => location.reload()); // re-evaluate on toggle
 init();</code></pre>
 
-  <h3>The budget checklist</h3>
-  <ul>
-    <li><strong>One scroll clock.</strong> Lenis → GSAP ticker → ScrollTrigger on a single rAF loop. Competing loops = jitter (the 14islands / Cuberto / Studio Freight pattern).</li>
-    <li><strong>Compositor-only props.</strong> transform + opacity + filter. Audit with DevTools' paint-flashing.</li>
-    <li><strong>Observe, don't poll.</strong> IntersectionObserver over scroll listeners; pause off-screen and in background tabs (Obys).</li>
-    <li><strong>Resting state is the default.</strong> No-JS and reduced-motion users see finished content, never a blank stage.</li>
-    <li><strong>Motion must mean something.</strong> Apple's test: does it pace the reader / reveal content, or just show off? If the latter, cut it.</li>
-    <li><strong>Match motion to brand.</strong> Family's bouncy/rounded vs. Lee Robinson's calm cross-fade — both correct, because both match the product.</li>
-  </ul>
+    <h3 data-reveal>The budget checklist</h3>
+    <ul data-reveal>
+      <li><strong>One scroll clock.</strong> Lenis → GSAP ticker → ScrollTrigger on a single rAF loop. Competing loops = jitter (the 14islands / Cuberto / Studio Freight pattern).</li>
+      <li><strong>Compositor-only props.</strong> transform + opacity + filter. Audit with DevTools' paint-flashing.</li>
+      <li><strong>Observe, don't poll.</strong> IntersectionObserver over scroll listeners; pause off-screen and in background tabs (Obys).</li>
+      <li><strong>Resting state is the default.</strong> No-JS and reduced-motion users see finished content, never a blank stage.</li>
+      <li><strong>Motion must mean something.</strong> Apple's test: does it pace the reader / reveal content, or just show off? If the latter, cut it.</li>
+      <li><strong>Match motion to brand.</strong> Family's bouncy/rounded vs. Lee Robinson's calm cross-fade — both correct, because both match the product.</li>
+    </ul>
 
-  <div class="callout steal">
-    <p>The full elite stack, distilled: <strong>Lenis</strong> for the inertia layer → <strong>GSAP ScrollTrigger</strong> (or native <code>animation-timeline</code>) for scrub/pin/reveal → <strong>View Transitions API</strong> for route handoffs → <strong>tokenized easing</strong> for consistent feel → <strong>one rAF clock</strong> and a hard <code>prefers-reduced-motion</code> gate so none of it costs you a frame you can't afford.</p>
-  </div>
+    <div class="callout steal" data-reveal>
+      <p>The full elite stack, distilled: <strong>Lenis</strong> for the inertia layer → <strong>GSAP ScrollTrigger</strong> (or native <code>animation-timeline</code>) for scrub/pin/reveal → <strong>View Transitions API</strong> for route handoffs → <strong>tokenized easing</strong> for consistent feel → <strong>one rAF clock</strong> and a hard <code>prefers-reduced-motion</code> gate so none of it costs you a frame you can't afford.</p>
+    </div>
+  </section>
+
+  <!-- ============ CLOSER ============ -->
+  <section class="closer wrap" data-reveal>
+    <h2>Spend the motion budget where it pays.</h2>
+    <a class="magnetic" href="../PLAN.html">Build Plan <span class="ico" aria-hidden="true">↗</span></a>
+  </section>
+
 </main>
 
 <footer class="ftr">
@@ -339,29 +895,71 @@ init();</code></pre>
 </footer>
 
 <script>
+  // ---- scroll progress scrub bar (page-as-timeline cue) ----
+  const fill = document.getElementById('scrubFill');
+  let ticking = false;
+  function updateScrub() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const p = max > 0 ? (h.scrollTop || document.body.scrollTop) / max : 0;
+    fill.style.width = (p * 100) + '%';
+    ticking = false;
+  }
+  window.addEventListener('scroll', () => {
+    if (!ticking) { requestAnimationFrame(updateScrub); ticking = true; }
+  }, { passive: true });
+  updateScrub();
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- hero word rise-in ----
+  if (!reduce) {
+    requestAnimationFrame(() => {
+      const hero = document.getElementById('hero');
+      hero.querySelectorAll('.word').forEach((w, i) => {
+        w.style.animationDelay = (0.12 + i * 0.08) + 's';
+      });
+      hero.classList.add('lit');
+    });
+  }
+
+  // ---- page-wide scroll reveals (IntersectionObserver) ----
+  const reveals = document.querySelectorAll('[data-reveal]');
+  if (reduce) {
+    reveals.forEach((el) => el.classList.add('in'));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    reveals.forEach((el) => io.observe(el));
+  }
+
   // ---- easing demo ----
   const easeDemo = document.getElementById('easeDemo');
   document.getElementById('easeBtn').addEventListener('click', () => easeDemo.classList.toggle('run'));
-  easeDemo.classList.add('run');
+  if (!reduce) easeDemo.classList.add('run');
 
   // ---- blur-to-focus demo ----
   const blurLine = document.getElementById('blurLine');
   document.getElementById('blurBtn').addEventListener('click', () => blurLine.classList.toggle('sharp'));
 
-  // ---- IntersectionObserver reveal demo ----
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // ---- staggered reveal demo (replays on scroll-back) ----
   const cells = document.querySelectorAll('#revealGrid .reveal-cell');
   cells.forEach((c, i) => { c.style.transitionDelay = (i * 80) + 'ms'; });
   if (reduce) {
     cells.forEach((c) => c.classList.add('in'));
   } else {
-    const io = new IntersectionObserver((entries) => {
+    const io2 = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (e.isIntersecting) e.target.classList.add('in');
-        else e.target.classList.remove('in'); // replay on scroll-back for the demo
+        else e.target.classList.remove('in');
       });
     }, { threshold: 0.3 });
-    cells.forEach((c) => io.observe(c));
+    cells.forEach((c) => io2.observe(c));
   }
 </script>
 </body>

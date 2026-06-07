@@ -6,55 +6,700 @@
   <title>Meta-Framework — Craft Atlas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,560;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="shared.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* --- page-local live-demo styles only --- */
-    /* side-by-side Next ↔ Nuxt code columns */
-    .twoup { display: grid; gap: var(--s-3); grid-template-columns: 1fr; }
-    @media (min-width: 880px) { .twoup { grid-template-columns: 1fr 1fr; } }
-    .twoup figure { margin: 0; }
+    /* =================================================================
+       NEXTJS.html — "Build Spec" art direction
+       Dark IDE/terminal canvas · monospace-led · dual-rail framework
+       color-coding (Next graphite ↔ Nuxt green) · blueprint grid.
+       Self-contained: no shared.css dependency.
+       ================================================================= */
+
+    :root {
+      /* --- canvas: deep slate, not pure black --- */
+      --bg-0: #0a0c10;          /* page */
+      --bg-1: #0e1116;          /* raised surface */
+      --bg-2: #12161d;          /* panels */
+      --bg-3: #171c24;          /* code wells */
+      --line: rgba(160, 180, 210, 0.10);
+      --line-2: rgba(160, 180, 210, 0.18);
+
+      /* --- ink --- */
+      --ink: #e8edf4;
+      --ink-soft: #aeb9c7;
+      --ink-dim: #6b7686;
+
+      /* --- dual rail: Next graphite-white ↔ Nuxt green --- */
+      --next: #d6dde7;
+      --next-bg: rgba(214, 221, 231, 0.07);
+      --nuxt: #00dc82;
+      --nuxt-soft: #5ff0b6;
+      --nuxt-bg: rgba(0, 220, 130, 0.08);
+
+      /* --- single locked accent: electric cyan --- */
+      --accent: #46e0e0;
+      --accent-soft: #8af0f0;
+      --accent-bg: rgba(70, 224, 224, 0.10);
+
+      /* semantic tints */
+      --warn: #ffb454;
+      --warn-bg: rgba(255, 180, 84, 0.08);
+      --tip: #6cb6ff;
+      --tip-bg: rgba(108, 182, 255, 0.08);
+
+      --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+      --font-disp: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+
+      --r-1: 6px;
+      --r-2: 12px;
+      --r-3: 18px;
+
+      --maxw: 1180px;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+    body {
+      margin: 0;
+      background: var(--bg-0);
+      color: var(--ink);
+      font-family: var(--font-disp);
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    /* blueprint grid + faint corner glow, fixed, behind everything */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 120% 80% at 50% -10%, #000 35%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse 120% 80% at 50% -10%, #000 35%, transparent 75%);
+      opacity: 0.6;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      top: -25vh; left: 50%;
+      width: 90vw; height: 70vh;
+      transform: translateX(-50%);
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 30% 40%, var(--accent-bg), transparent 60%),
+        radial-gradient(circle at 70% 30%, var(--nuxt-bg), transparent 55%);
+      filter: blur(20px);
+      opacity: 0.9;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 3px;
+    }
+
+    code, pre, kbd { font-family: var(--font-mono); }
+
+    /* =================== TOP NAV ==================== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: color-mix(in srgb, var(--bg-0) 82%, transparent);
+      backdrop-filter: blur(14px) saturate(140%);
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      border-bottom: 1px solid var(--line);
+    }
+    .site-nav {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 20px;
+      height: 60px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .site-nav::-webkit-scrollbar { display: none; }
+    .site-nav a {
+      flex: 0 0 auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--ink-dim);
+      padding: 7px 11px;
+      border-radius: var(--r-1);
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      transition: color .18s var(--ease), background .18s var(--ease);
+    }
+    .site-nav a:hover { color: var(--ink); background: var(--bg-2); }
+    .site-nav a.brand {
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 0.86rem;
+      margin-right: 10px;
+      padding-left: 4px;
+    }
+    .site-nav a.brand::before { content: "◆ "; color: var(--accent); }
+    .site-nav a[href="NEXTJS.html"] {
+      color: var(--accent);
+      background: var(--accent-bg);
+    }
+    .site-nav a.cta {
+      margin-left: auto;
+      color: var(--bg-0);
+      background: var(--accent);
+      font-weight: 600;
+      padding: 7px 14px;
+    }
+    .site-nav a.cta:hover { background: var(--accent-soft); color: var(--bg-0); }
+
+    /* =================== LAYOUT WRAP ==================== */
+    .shell {
+      position: relative;
+      z-index: 1;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* hero */
+    .hero {
+      position: relative;
+      z-index: 1;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 86px 20px 56px;
+    }
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-soft);
+      background: var(--accent-bg);
+      border: 1px solid var(--line-2);
+      padding: 6px 13px;
+      border-radius: 100px;
+      margin: 0 0 26px;
+    }
+    .kicker .pulse {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 0 var(--accent);
+      animation: pulse 2.4s var(--ease) infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(70,224,224,0.5); }
+      70% { box-shadow: 0 0 0 9px rgba(70,224,224,0); }
+      100% { box-shadow: 0 0 0 0 rgba(70,224,224,0); }
+    }
+    @media (prefers-reduced-motion: reduce) { .kicker .pulse { animation: none; } }
+
+    h1 {
+      font-family: var(--font-disp);
+      font-weight: 700;
+      font-size: clamp(2.6rem, 7vw, 5rem);
+      line-height: 0.98;
+      letter-spacing: -0.035em;
+      margin: 0 0 26px;
+      max-width: 16ch;
+    }
+    h1 .rail {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 0.42em;
+      letter-spacing: -0.01em;
+      display: block;
+      margin-top: 18px;
+      color: var(--ink-dim);
+    }
+    h1 .rail b { font-weight: 600; }
+    h1 .rail .n { color: var(--next); }
+    h1 .rail .v { color: var(--nuxt-soft); }
+
+    .lede {
+      font-size: 1.12rem;
+      line-height: 1.62;
+      color: var(--ink-soft);
+      max-width: 66ch;
+      margin: 0;
+    }
+    .lede code { color: var(--accent-soft); }
+
+    /* legend chips under hero */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 34px;
+    }
+    .legend .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--ink-soft);
+      border: 1px solid var(--line);
+      background: var(--bg-1);
+      padding: 8px 13px;
+      border-radius: var(--r-1);
+    }
+    .legend .swatch { width: 11px; height: 11px; border-radius: 3px; }
+    .legend .next-sw { background: var(--next); }
+    .legend .nuxt-sw { background: var(--nuxt); }
+    .legend .acc-sw { background: var(--accent); }
+
+    /* =================== MAIN GRID (toc rail + content) =============== */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 30px 20px 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    @media (min-width: 1000px) {
+      main { grid-template-columns: 218px minmax(0, 1fr); gap: 56px; }
+    }
+
+    /* sticky section index */
+    .toc {
+      align-self: start;
+    }
+    @media (min-width: 1000px) {
+      .toc { position: sticky; top: 84px; }
+    }
+    .toc h2 {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      margin: 0 0 16px;
+      border: none;
+      padding: 0;
+    }
+    .toc ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-left: 1px solid var(--line);
+    }
+    .toc li { margin: 0; }
+    .toc a {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.35;
+      color: var(--ink-dim);
+      padding: 9px 0 9px 16px;
+      margin-left: -1px;
+      border-left: 1px solid transparent;
+      transition: color .18s var(--ease), border-color .18s var(--ease);
+    }
+    .toc a:hover { color: var(--ink); }
+    .toc a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+    .toc a .num { color: var(--ink-dim); margin-right: 8px; }
+    .toc a.active .num { color: var(--accent); }
+
+    .content { min-width: 0; }
+
+    /* =================== SECTIONS / TYPOGRAPHY ==================== */
+    section {
+      padding: 18px 0 56px;
+      border-top: 1px solid var(--line);
+      margin-top: 40px;
+    }
+    section:first-child { border-top: none; margin-top: 0; }
+
+    h2 {
+      font-family: var(--font-disp);
+      font-weight: 700;
+      font-size: clamp(1.5rem, 3.4vw, 2.2rem);
+      letter-spacing: -0.02em;
+      line-height: 1.12;
+      margin: 18px 0 22px;
+      scroll-margin-top: 80px;
+    }
+    h2 .idx {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      vertical-align: middle;
+      background: var(--accent-bg);
+      border: 1px solid var(--line-2);
+      padding: 3px 9px;
+      border-radius: var(--r-1);
+      margin-right: 14px;
+      position: relative;
+      top: -3px;
+    }
+    h3 {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+      margin: 38px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+    h3::before { content: "// "; color: var(--accent); }
+
+    p { margin: 0 0 18px; color: var(--ink-soft); }
+    .content > p:first-of-type, section > p { max-width: 72ch; }
+    strong { color: var(--ink); font-weight: 600; }
+    em { color: var(--ink); font-style: italic; }
+
+    /* inline code */
+    p code, li code, figcaption code, .callout code {
+      font-family: var(--font-mono);
+      font-size: 0.86em;
+      color: var(--accent-soft);
+      background: var(--accent-bg);
+      border: 1px solid var(--line);
+      padding: 1px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* lists */
+    ul { margin: 0 0 22px; padding: 0; list-style: none; }
+    ul li {
+      position: relative;
+      padding: 12px 0 12px 26px;
+      color: var(--ink-soft);
+      max-width: 74ch;
+      border-bottom: 1px solid var(--line);
+    }
+    ul li:last-child { border-bottom: none; }
+    ul li::before {
+      content: "›";
+      position: absolute;
+      left: 4px; top: 11px;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    /* citation tags */
+    .ref {
+      font-family: var(--font-mono);
+      font-size: 0.8em;
+      color: var(--ink);
+      background: var(--bg-2);
+      border: 1px solid var(--line-2);
+      padding: 1px 7px;
+      border-radius: 4px;
+      white-space: nowrap;
+      transition: border-color .18s var(--ease), color .18s var(--ease);
+    }
+    .ref:hover { border-color: var(--accent); color: var(--accent-soft); }
+
+    /* =================== CODE PANELS ==================== */
+    pre {
+      margin: 0;
+      background: var(--bg-3);
+      border: 1px solid var(--line);
+      border-radius: var(--r-2);
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      line-height: 1.66;
+      color: #cdd6e4;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    pre code { background: none; border: none; padding: 0; color: inherit; white-space: pre; font-size: inherit; }
+
+    /* standalone full-width pre (outside .twoup) */
+    .content > pre, section > pre { margin: 24px 0; }
+
+    /* =================== TWO-UP FRAMEWORK COMPARISON ==================== */
+    .twoup {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr;
+      margin: 26px 0;
+    }
+    @media (min-width: 820px) { .twoup { grid-template-columns: 1fr 1fr; } }
+    .twoup figure {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--line);
+      border-radius: var(--r-2);
+      overflow: hidden;
+      background: var(--bg-2);
+    }
+    .twoup .next { border-top: 2px solid var(--next); }
+    .twoup .nuxt { border-top: 2px solid var(--nuxt); }
     .twoup .stack-label {
-      font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--ink-dim); margin: 0 0 var(--s-2);
-      display: flex; align-items: center; gap: var(--s-2);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin: 0;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg-1);
     }
-    .twoup .stack-label .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-    .twoup .next .dot { background: #e6e6e6; }
-    .twoup .nuxt .dot { background: #00dc82; }
-    .twoup .nuxt .stack-label { color: #69e6ad; }
-    .twoup pre { margin: 0; height: 100%; }
-
-    /* render-strategy decision demo */
-    .render-demo .modes { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-bottom: var(--s-3); }
-    .render-demo button {
-      font-family: var(--font-mono); font-size: var(--step--1);
-      background: var(--bg-2); border: 1px solid var(--line); color: var(--ink-soft);
-      padding: var(--s-2) var(--s-3); border-radius: var(--r-1); cursor: pointer;
-      transition: border-color .15s, color .15s, background .15s;
+    .twoup .next .stack-label { color: var(--next); }
+    .twoup .nuxt .stack-label { color: var(--nuxt-soft); }
+    .twoup .stack-label .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
+    .twoup .next .dot { background: var(--next); }
+    .twoup .nuxt .dot { background: var(--nuxt); box-shadow: 0 0 8px rgba(0,220,130,0.5); }
+    /* faux window dots on the right of the label */
+    .twoup .stack-label::after {
+      content: "";
+      margin-left: auto;
+      width: 36px; height: 8px;
+      background-image: radial-gradient(circle, var(--ink-dim) 3px, transparent 3.5px);
+      background-size: 12px 8px;
+      opacity: 0.5;
     }
-    .render-demo button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-soft); background: color-mix(in srgb, var(--accent) 12%, var(--bg-2)); }
-    .render-demo .panel { border: 1px solid var(--line); border-radius: var(--r-2); padding: var(--s-4); background: var(--bg-2); }
-    .render-demo .panel h4 { margin: 0 0 var(--s-2); font-family: var(--font-mono); color: var(--accent-soft); font-size: var(--step-0); }
-    .render-demo .panel p { margin: 0 0 var(--s-2); color: var(--ink-soft); }
-    .render-demo .panel .meta { font-family: var(--font-mono); font-size: var(--step--1); color: var(--ink-dim); margin: 0; }
-    .render-demo .panel .meta b { color: var(--ink-soft); }
+    .twoup pre {
+      margin: 0;
+      border: none;
+      border-radius: 0;
+      flex: 1;
+      box-shadow: none;
+      background: var(--bg-3);
+    }
 
-    /* RSC boundary diagram */
-    .boundary { display: grid; gap: 0; border: 1px solid var(--line); border-radius: var(--r-2); overflow: hidden; font-family: var(--font-mono); font-size: var(--step--1); }
-    .boundary .row { display: grid; grid-template-columns: 92px 1fr; }
+    /* =================== EXAMPLE / FIGCAPTION ==================== */
+    .example { margin: 26px 0; }
+    figcaption {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: var(--ink-dim);
+      margin-top: 12px;
+      padding-left: 14px;
+      border-left: 2px solid var(--line-2);
+      max-width: 74ch;
+    }
+    figcaption strong { color: var(--ink); }
+    figcaption code { font-size: 0.92em; }
+
+    /* =================== BOUNDARY DIAGRAM ==================== */
+    .boundary {
+      display: grid;
+      gap: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-2);
+      overflow: hidden;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: var(--bg-2);
+    }
+    .boundary .row { display: grid; grid-template-columns: 96px 1fr; }
     .boundary .row + .row { border-top: 1px solid var(--line); }
-    .boundary .tag { padding: var(--s-3); display: flex; align-items: center; justify-content: center; text-align: center; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.62rem; }
-    .boundary .server .tag { background: color-mix(in srgb, var(--accent) 16%, var(--bg-2)); color: var(--accent-soft); }
-    .boundary .client .tag { background: var(--bg-3, #1a1a1a); color: var(--ink-soft); }
-    .boundary .body { padding: var(--s-3); color: var(--ink-soft); display: flex; align-items: center; }
-    .boundary .body code { background: none; padding: 0; }
+    .boundary .tag {
+      padding: 16px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.62rem;
+      font-weight: 600;
+    }
+    .boundary .server .tag { background: var(--nuxt-bg); color: var(--nuxt-soft); border-right: 1px solid var(--line); }
+    .boundary .client .tag { background: var(--accent-bg); color: var(--accent-soft); border-right: 1px solid var(--line); }
+    .boundary .body {
+      padding: 16px 18px;
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+    }
+    .boundary .body code { background: none; border: none; padding: 0; white-space: normal; color: var(--ink-soft); }
+
+    /* =================== RENDER DEMO ==================== */
+    .render-demo .modes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .render-demo button {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 500;
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+      padding: 9px 16px;
+      border-radius: var(--r-1);
+      cursor: pointer;
+      transition: border-color .15s var(--ease), color .15s var(--ease), background .15s var(--ease), transform .1s var(--ease);
+    }
+    .render-demo button:hover { border-color: var(--line-2); color: var(--ink); }
+    .render-demo button:active { transform: scale(0.97); }
+    .render-demo button[aria-pressed="true"] {
+      border-color: var(--accent);
+      color: var(--accent-soft);
+      background: var(--accent-bg);
+    }
+    .render-demo .panel {
+      border: 1px solid var(--line);
+      border-left: 2px solid var(--accent);
+      border-radius: var(--r-2);
+      padding: 24px 26px;
+      background: var(--bg-2);
+    }
+    .render-demo .panel h4 {
+      margin: 0 0 12px;
+      font-family: var(--font-disp);
+      font-weight: 600;
+      color: var(--ink);
+      font-size: 1.12rem;
+      letter-spacing: -0.01em;
+    }
+    .render-demo .panel p { margin: 0 0 12px; color: var(--ink-soft); max-width: none; }
+    .render-demo .panel .meta {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--ink-dim);
+      margin: 6px 0 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: baseline;
+    }
+    .render-demo .panel .meta b { color: var(--ink-soft); font-weight: 500; }
+    .render-demo .panel .meta code {
+      background: var(--bg-3);
+      border: 1px solid var(--line);
+      color: var(--accent-soft);
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: normal;
+    }
+    .render-demo .panel .meta .lbl-next { color: var(--next); }
+    .render-demo .panel .meta .lbl-nuxt { color: var(--nuxt-soft); }
+
+    /* =================== CALLOUTS ==================== */
+    .callout {
+      margin: 26px 0;
+      padding: 20px 22px 20px 52px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-2);
+      position: relative;
+      background: var(--bg-1);
+    }
+    .callout p { margin: 0; max-width: 72ch; color: var(--ink-soft); }
+    .callout p strong { color: var(--ink); }
+    .callout::before {
+      position: absolute;
+      left: 18px; top: 19px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .callout.steal { border-left: 3px solid var(--accent); }
+    .callout.steal::before { content: "★"; color: var(--accent); }
+    .callout.steal p strong { color: var(--accent-soft); }
+    .callout.warn { border-left: 3px solid var(--warn); background: var(--warn-bg); }
+    .callout.warn::before { content: "!"; color: var(--warn); }
+    .callout.warn p strong { color: var(--warn); }
+    .callout.tip { border-left: 3px solid var(--tip); background: var(--tip-bg); }
+    .callout.tip::before { content: "i"; color: var(--tip); }
+    .callout.tip p strong { color: var(--tip); }
+
+    /* =================== FIGURES (screenshots) ==================== */
+    .figure {
+      margin: 30px 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-2);
+      overflow: hidden;
+      background: var(--bg-2);
+    }
+    .figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-bottom: 1px solid var(--line);
+    }
+    .figure figcaption {
+      margin: 0;
+      padding: 16px 20px;
+      border-left: none;
+      border-top: none;
+    }
+
+    /* =================== REVEAL ANIMATION ==================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .7s var(--ease), transform .7s var(--ease);
+    }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* =================== FOOTER ==================== */
+    .ftr {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--line);
+      margin-top: 70px;
+      padding: 48px 20px;
+      background: var(--bg-1);
+    }
+    .ftr .inner { max-width: var(--maxw); margin: 0 auto; }
+    .ftr p { margin: 0 0 8px; color: var(--ink-dim); font-family: var(--font-mono); font-size: 0.82rem; }
+    .ftr .brand { color: var(--ink); font-weight: 600; font-family: var(--font-disp); font-size: 1rem; }
+    .ftr .brand::before { content: "◆ "; color: var(--accent); }
+    .ftr a:hover { color: var(--accent-soft); }
+
+    /* =================== RESPONSIVE ==================== */
+    @media (max-width: 600px) {
+      body { font-size: 16px; }
+      .hero { padding-top: 56px; }
+      h2 .idx { display: inline-block; margin-bottom: 8px; }
+      .callout { padding-left: 48px; }
+      pre { font-size: 0.76rem; }
+    }
   </style>
 </head>
 <body>
   <header class="site-header">
     <nav class="site-nav" aria-label="Best practices">
-      <a class="brand" href="../PLAN.html">◆ Craft Atlas</a>
+      <a class="brand" href="../PLAN.html">Craft Atlas</a>
       <a href="UI-DESIGN.html">UI Design</a>
       <a href="UX.html">UX</a>
       <a href="TYPOGRAPHY.html">Typography</a>
@@ -74,64 +719,78 @@
     </nav>
   </header>
 
-  <main class="wrap">
-    <p class="kicker">Craft Atlas · 13</p>
-    <h1>Meta-Frameworks</h1>
+  <div class="hero reveal">
+    <p class="kicker"><span class="pulse"></span> Craft Atlas · Spec 13 / 13</p>
+    <h1>
+      Meta-Frameworks
+      <span class="rail">
+        <b class="n">next.js app router</b> ↔ <b class="v">nuxt 4</b> · same principle, two syntaxes
+      </span>
+    </h1>
     <p class="lede">Next.js App Router and Nuxt 4 solve the same problem from opposite syntax: ship HTML fast, hydrate the minimum, optimise images and fonts at the framework layer, and pick a render strategy per route. Of our 80 teardowns the production-grade ones cluster hard on this stack — Next.js App Router on Vercel, with <code>next/font</code>, RSC output, and ISR. Our own site is Nuxt 4 / Vue, so every pattern here is shown side-by-side: learn the principle from the React leaders, apply it in Nuxt.</p>
+    <div class="legend" aria-hidden="true">
+      <span class="chip"><span class="swatch next-sw"></span> Next.js</span>
+      <span class="chip"><span class="swatch nuxt-sw"></span> Nuxt 4</span>
+      <span class="chip"><span class="swatch acc-sw"></span> shared principle</span>
+    </div>
+  </div>
 
+  <main>
     <nav class="toc" aria-label="On this page">
+      <h2>Spec Index</h2>
       <ol>
-        <li><a href="#stack">1 · The stack the leaders actually ship</a></li>
-        <li><a href="#rsc">2 · Server-first: RSC &amp; Nuxt islands</a></li>
-        <li><a href="#render">3 · Render strategy per route (SSG / SSR / ISR)</a></li>
-        <li><a href="#data">4 · Data fetching &amp; caching</a></li>
-        <li><a href="#image">5 · Image &amp; font optimisation</a></li>
-        <li><a href="#metadata">6 · Metadata, streaming &amp; transitions</a></li>
-        <li><a href="#vitals">7 · Core Web Vitals &amp; bundle discipline</a></li>
-        <li><a href="#checklist">8 · The portfolio-site checklist</a></li>
+        <li><a href="#stack"><span class="num">01</span>The stack leaders ship</a></li>
+        <li><a href="#rsc"><span class="num">02</span>Server-first &amp; islands</a></li>
+        <li><a href="#render"><span class="num">03</span>Render strategy per route</a></li>
+        <li><a href="#data"><span class="num">04</span>Data fetching &amp; caching</a></li>
+        <li><a href="#image"><span class="num">05</span>Image &amp; font optimisation</a></li>
+        <li><a href="#metadata"><span class="num">06</span>Metadata &amp; streaming</a></li>
+        <li><a href="#vitals"><span class="num">07</span>Core Web Vitals</a></li>
+        <li><a href="#checklist"><span class="num">08</span>Portfolio checklist</a></li>
       </ol>
     </nav>
 
-    <!-- ============================================================= -->
-    <section id="stack">
-      <h2>1 · The stack the leaders actually ship</h2>
-      <p>Before any opinion, the evidence. We fingerprinted the stack of every teardown (script paths, <code>_next</code> chunks, <code>meta generator</code>, font class hashes). The signal is overwhelming: <strong>elite developer/SaaS sites are Next.js App Router on Vercel</strong>, with a clear convergence on <code>next/font</code> and RSC output.</p>
-      <ul>
-        <li><span class="ref">Vercel ↗</span> — Next.js with 170+ <code>_next</code> static chunks; <strong>Geist</strong> Sans/Mono self-hosted woff2. The product itself (deploy logs, streaming code editor, live leaderboards) is the hero — "live, interactive surfaces instead of static screenshots."</li>
-        <li><span class="ref">Linear ↗</span> — App Router confirmed (chunks under <code>static.linear.app/web/_next/static/chunks/</code>, <code>main-app-*.js</code>). <em>No</em> legacy <code>__NEXT_DATA__</code> and no generator meta — the RSC-output signature. Inter Variable + Framer Motion.</li>
-        <li><span class="ref">Ramp ↗</span> — App Router on Vercel (<code>?dpl=dpl_…</code> deployment-ID params on chunks), <code>next/font local</code> for the paid Lausanne face with a metric-matched fallback. Migrated <em>off</em> Webflow as it scaled.</li>
-        <li><span class="ref">Brittany Chiang ↗</span> — the current v5 portfolio is a Next.js App Router rebuild (the famous v4 was Gatsby); Inter via <code>next/font</code> with the hashed <code>__inter_*</code> class.</li>
-        <li><span class="ref">Josh Comeau ↗</span> — App Router + React Server Components, with zero-runtime CSS (Linaria) and compile-time syntax highlighting (Shiki) chosen <em>specifically</em> to drop client runtime — "modern stack choices double as portfolio evidence."</li>
-        <li><span class="ref">Paul Stamatiou ↗</span> — 20-year site rebuilt from scratch in Next.js (2024), bundled with <strong>Turbopack</strong>, modern App-router build (no legacy data blob).</li>
-        <li><span class="ref">Off-Menu ↗</span> &amp; <span class="ref">Manu Arora ↗</span> — both App Router + Turbopack on Vercel, RSC signature, fonts via <code>next/font</code>.</li>
-      </ul>
+    <div class="content">
+      <!-- ============================================================= -->
+      <section id="stack" class="reveal">
+        <h2><span class="idx">01</span>The stack the leaders actually ship</h2>
+        <p>Before any opinion, the evidence. We fingerprinted the stack of every teardown (script paths, <code>_next</code> chunks, <code>meta generator</code>, font class hashes). The signal is overwhelming: <strong>elite developer/SaaS sites are Next.js App Router on Vercel</strong>, with a clear convergence on <code>next/font</code> and RSC output.</p>
+        <ul>
+          <li><span class="ref">Vercel ↗</span> — Next.js with 170+ <code>_next</code> static chunks; <strong>Geist</strong> Sans/Mono self-hosted woff2. The product itself (deploy logs, streaming code editor, live leaderboards) is the hero — "live, interactive surfaces instead of static screenshots."</li>
+          <li><span class="ref">Linear ↗</span> — App Router confirmed (chunks under <code>static.linear.app/web/_next/static/chunks/</code>, <code>main-app-*.js</code>). <em>No</em> legacy <code>__NEXT_DATA__</code> and no generator meta — the RSC-output signature. Inter Variable + Framer Motion.</li>
+          <li><span class="ref">Ramp ↗</span> — App Router on Vercel (<code>?dpl=dpl_…</code> deployment-ID params on chunks), <code>next/font local</code> for the paid Lausanne face with a metric-matched fallback. Migrated <em>off</em> Webflow as it scaled.</li>
+          <li><span class="ref">Brittany Chiang ↗</span> — the current v5 portfolio is a Next.js App Router rebuild (the famous v4 was Gatsby); Inter via <code>next/font</code> with the hashed <code>__inter_*</code> class.</li>
+          <li><span class="ref">Josh Comeau ↗</span> — App Router + React Server Components, with zero-runtime CSS (Linaria) and compile-time syntax highlighting (Shiki) chosen <em>specifically</em> to drop client runtime — "modern stack choices double as portfolio evidence."</li>
+          <li><span class="ref">Paul Stamatiou ↗</span> — 20-year site rebuilt from scratch in Next.js (2024), bundled with <strong>Turbopack</strong>, modern App-router build (no legacy data blob).</li>
+          <li><span class="ref">Off-Menu ↗</span> &amp; <span class="ref">Manu Arora ↗</span> — both App Router + Turbopack on Vercel, RSC signature, fonts via <code>next/font</code>.</li>
+        </ul>
 
-      <p>Counter-evidence keeps it honest: <span class="ref">Cassidy Williams ↗</span> and <span class="ref">Tania Rascia ↗</span> go fully static (Astro / Gatsby) for a "near-zero JS, blazing Lighthouse" story; <span class="ref">14islands ↗</span> and <span class="ref">Family ↗</span> are on the older Next.js <em>Pages</em> Router (SSG via <code>_buildManifest</code>/<code>_ssgManifest</code>); <span class="ref">Mercury ↗</span> shows no Next markers at all (custom React). A meta-framework is a default, not a law — if the site is purely static content, a static generator wins.</p>
+        <p>Counter-evidence keeps it honest: <span class="ref">Cassidy Williams ↗</span> and <span class="ref">Tania Rascia ↗</span> go fully static (Astro / Gatsby) for a "near-zero JS, blazing Lighthouse" story; <span class="ref">14islands ↗</span> and <span class="ref">Family ↗</span> are on the older Next.js <em>Pages</em> Router (SSG via <code>_buildManifest</code>/<code>_ssgManifest</code>); <span class="ref">Mercury ↗</span> shows no Next markers at all (custom React). A meta-framework is a default, not a law — if the site is purely static content, a static generator wins.</p>
 
-      <div class="callout steal">
-        <p><strong>Default to App Router (Next) or Nuxt 4, deploy to a platform that does ISR for free.</strong> The pattern under all the leaders: server-render by default, hydrate islands, optimise fonts/images at the framework layer, and let the host (Vercel / Netlify / Cloudflare) handle the CDN cache. For a Vue/Nuxt site you get the identical capabilities — they just have different names.</p>
-      </div>
-    </section>
-
-    <!-- ============================================================= -->
-    <section id="rsc">
-      <h2>2 · Server-first: RSC &amp; Nuxt islands</h2>
-      <p>The defining move of the modern App Router is the <strong>Server Component default</strong>: components render on the server, ship HTML, and send <em>zero</em> JS to the client unless you opt a leaf into interactivity. <span class="ref">Josh Comeau ↗</span>'s blog is the clean example — an RSC stack where the whole page is server-rendered and only the toys (generative art re-roller, sound widgets) are client islands. Nuxt 4's equivalent is <strong>server components</strong> (<code>.server.vue</code>) and the <code>&lt;NuxtIsland&gt;</code> primitive: render a component to HTML on the server and ship no component JS.</p>
-
-      <p>Mental model — the boundary is a one-way door. Server code (DB, secrets, heavy deps) stays on the server; mark a leaf as a client component only where you need state, effects, or event handlers.</p>
-
-      <div class="example">
-        <div class="boundary" aria-label="Server vs client component boundary">
-          <div class="row server"><div class="tag">Server</div><div class="body"><code>page.tsx — fetch, DB, secrets · 0 KB JS shipped</code></div></div>
-          <div class="row server"><div class="tag">Server</div><div class="body"><code>&lt;ArticleBody/&gt; — async, renders to HTML</code></div></div>
-          <div class="row client"><div class="tag">Client</div><div class="body"><code>'use client' &lt;LikeButton/&gt; — state + onClick, hydrated</code></div></div>
+        <div class="callout steal">
+          <p><strong>Default to App Router (Next) or Nuxt 4, deploy to a platform that does ISR for free.</strong> The pattern under all the leaders: server-render by default, hydrate islands, optimise fonts/images at the framework layer, and let the host (Vercel / Netlify / Cloudflare) handle the CDN cache. For a Vue/Nuxt site you get the identical capabilities — they just have different names.</p>
         </div>
-        <figcaption>Keep the <code>'use client'</code> boundary as deep in the tree as possible. Everything above it is HTML-only; only the interactive leaf ships JS. In Nuxt the inverse default applies — components are universal (SSR + hydrate) by default; use <code>.server.vue</code> to make a component HTML-only, or <code>.client.vue</code> for client-only.</figcaption>
-      </div>
+      </section>
 
-      <div class="twoup">
-        <figure class="next">
-          <p class="stack-label"><span class="dot"></span> Next.js — App Router (RSC default)</p>
+      <!-- ============================================================= -->
+      <section id="rsc" class="reveal">
+        <h2><span class="idx">02</span>Server-first: RSC &amp; Nuxt islands</h2>
+        <p>The defining move of the modern App Router is the <strong>Server Component default</strong>: components render on the server, ship HTML, and send <em>zero</em> JS to the client unless you opt a leaf into interactivity. <span class="ref">Josh Comeau ↗</span>'s blog is the clean example — an RSC stack where the whole page is server-rendered and only the toys (generative art re-roller, sound widgets) are client islands. Nuxt 4's equivalent is <strong>server components</strong> (<code>.server.vue</code>) and the <code>&lt;NuxtIsland&gt;</code> primitive: render a component to HTML on the server and ship no component JS.</p>
+
+        <p>Mental model — the boundary is a one-way door. Server code (DB, secrets, heavy deps) stays on the server; mark a leaf as a client component only where you need state, effects, or event handlers.</p>
+
+        <div class="example">
+          <div class="boundary" aria-label="Server vs client component boundary">
+            <div class="row server"><div class="tag">Server</div><div class="body"><code>page.tsx — fetch, DB, secrets · 0 KB JS shipped</code></div></div>
+            <div class="row server"><div class="tag">Server</div><div class="body"><code>&lt;ArticleBody/&gt; — async, renders to HTML</code></div></div>
+            <div class="row client"><div class="tag">Client</div><div class="body"><code>'use client' &lt;LikeButton/&gt; — state + onClick, hydrated</code></div></div>
+          </div>
+          <figcaption>Keep the <code>'use client'</code> boundary as deep in the tree as possible. Everything above it is HTML-only; only the interactive leaf ships JS. In Nuxt the inverse default applies — components are universal (SSR + hydrate) by default; use <code>.server.vue</code> to make a component HTML-only, or <code>.client.vue</code> for client-only.</figcaption>
+        </div>
+
+        <div class="twoup">
+          <figure class="next">
+            <p class="stack-label"><span class="dot"></span> Next.js — App Router (RSC default)</p>
 <pre><code>// app/posts/[slug]/page.tsx  — Server Component
 // Runs on the server. No 'use client' = 0 KB JS.
 import { db } from '@/lib/db';
@@ -156,9 +815,9 @@ export default function LikeButton({ id }) {
   const [n, set] = useState(0);
   return &lt;button onClick={() =&gt; set(n + 1)}&gt;♥ {n}&lt;/button&gt;;
 }</code></pre>
-        </figure>
-        <figure class="nuxt">
-          <p class="stack-label"><span class="dot"></span> Nuxt 4 — universal default + islands</p>
+          </figure>
+          <figure class="nuxt">
+            <p class="stack-label"><span class="dot"></span> Nuxt 4 — universal default + islands</p>
 <pre><code>&lt;!-- pages/posts/[slug].vue  — SSR + hydrate (universal) --&gt;
 &lt;script setup lang="ts"&gt;
 const { slug } = useRoute().params
@@ -180,35 +839,35 @@ const { data: post } = await useAsyncData(
 &lt;!-- components/Heavy.server.vue --&gt;
 &lt;!-- renders to HTML on the server, ships NO component JS --&gt;
 &lt;template&gt;&lt;MarkdownRender :src="huge" /&gt;&lt;/template&gt;</code></pre>
-        </figure>
-      </div>
-
-      <div class="callout warn">
-        <p><strong>Pitfall — the 'use client' contagion.</strong> Marking a high-up component <code>'use client'</code> forces its whole subtree client-side, blowing up the bundle. Push the directive to the smallest leaf that needs interactivity. In Nuxt the symmetric trap is reaching for <code>.client.vue</code> on a content component — you lose SSR HTML and the content vanishes for crawlers and on first paint. Server-render content; client-only the truly dynamic bits.</p>
-      </div>
-    </section>
-
-    <!-- ============================================================= -->
-    <section id="render">
-      <h2>3 · Render strategy per route (SSG / SSR / ISR)</h2>
-      <p>The same app can render different routes different ways. The leaders mix them: a marketing home is static, a dashboard is dynamic, a blog index is incrementally regenerated. <span class="ref">Family ↗</span> and <span class="ref">14islands ↗</span> ship pure SSG (<code>_ssgManifest</code> present); <span class="ref">Stripe ↗</span> is "heavily SSR'd … localizes by geo (<code>/en-jp</code>)"; <span class="ref">Ramp ↗</span> rides Vercel's ISR. Pick per route, not per app.</p>
-
-      <div class="example render-demo">
-        <div class="modes" role="group" aria-label="Render strategy">
-          <button data-mode="ssg" aria-pressed="true">SSG</button>
-          <button data-mode="ssr" aria-pressed="false">SSR</button>
-          <button data-mode="isr" aria-pressed="false">ISR</button>
-          <button data-mode="csr" aria-pressed="false">CSR / SPA</button>
+          </figure>
         </div>
-        <div class="panel" id="render-panel"></div>
-        <figcaption>Click a strategy — it shows when to reach for it and the one-line config in both frameworks. Rule of thumb: static unless you have a reason not to be.</figcaption>
-      </div>
 
-      <p>The configuration is a one-liner in both. Next uses route-segment exports; Nuxt uses <code>routeRules</code> in <code>nuxt.config</code> (powered by Nitro, applied at the host's CDN edge).</p>
+        <div class="callout warn">
+          <p><strong>Pitfall — the 'use client' contagion.</strong> Marking a high-up component <code>'use client'</code> forces its whole subtree client-side, blowing up the bundle. Push the directive to the smallest leaf that needs interactivity. In Nuxt the symmetric trap is reaching for <code>.client.vue</code> on a content component — you lose SSR HTML and the content vanishes for crawlers and on first paint. Server-render content; client-only the truly dynamic bits.</p>
+        </div>
+      </section>
 
-      <div class="twoup">
-        <figure class="next">
-          <p class="stack-label"><span class="dot"></span> Next.js — route segment config</p>
+      <!-- ============================================================= -->
+      <section id="render" class="reveal">
+        <h2><span class="idx">03</span>Render strategy per route (SSG / SSR / ISR)</h2>
+        <p>The same app can render different routes different ways. The leaders mix them: a marketing home is static, a dashboard is dynamic, a blog index is incrementally regenerated. <span class="ref">Family ↗</span> and <span class="ref">14islands ↗</span> ship pure SSG (<code>_ssgManifest</code> present); <span class="ref">Stripe ↗</span> is "heavily SSR'd … localizes by geo (<code>/en-jp</code>)"; <span class="ref">Ramp ↗</span> rides Vercel's ISR. Pick per route, not per app.</p>
+
+        <div class="example render-demo">
+          <div class="modes" role="group" aria-label="Render strategy">
+            <button data-mode="ssg" aria-pressed="true">SSG</button>
+            <button data-mode="ssr" aria-pressed="false">SSR</button>
+            <button data-mode="isr" aria-pressed="false">ISR</button>
+            <button data-mode="csr" aria-pressed="false">CSR / SPA</button>
+          </div>
+          <div class="panel" id="render-panel"></div>
+          <figcaption>Click a strategy — it shows when to reach for it and the one-line config in both frameworks. Rule of thumb: static unless you have a reason not to be.</figcaption>
+        </div>
+
+        <p>The configuration is a one-liner in both. Next uses route-segment exports; Nuxt uses <code>routeRules</code> in <code>nuxt.config</code> (powered by Nitro, applied at the host's CDN edge).</p>
+
+        <div class="twoup">
+          <figure class="next">
+            <p class="stack-label"><span class="dot"></span> Next.js — route segment config</p>
 <pre><code>// app/blog/page.tsx
 export const revalidate = 60;       // ISR: regenerate &le; every 60s
 export const dynamic = 'force-static'; // or 'force-dynamic' (SSR)
@@ -218,9 +877,9 @@ export const dynamic = 'force-static'; // or 'force-dynamic' (SSR)
 //   fetch(url, { cache: 'no-store' })            -&gt; dynamic (SSR)
 // default in App Router: static when possible,
 //   dynamic the moment you touch cookies()/headers()/searchParams</code></pre>
-        </figure>
-        <figure class="nuxt">
-          <p class="stack-label"><span class="dot"></span> Nuxt 4 — routeRules (Nitro)</p>
+          </figure>
+          <figure class="nuxt">
+            <p class="stack-label"><span class="dot"></span> Nuxt 4 — routeRules (Nitro)</p>
 <pre><code>// nuxt.config.ts
 export default defineNuxtConfig({
   routeRules: {
@@ -232,22 +891,22 @@ export default defineNuxtConfig({
   },
 })
 // isr/swr cache on Vercel/Netlify edge; payloads cached too</code></pre>
-        </figure>
-      </div>
+          </figure>
+        </div>
 
-      <div class="callout tip">
-        <p><strong>ISR is the highest-ROI setting for content sites.</strong> You get static-CDN speed <em>and</em> fresh content without a redeploy. In Next, multiple fetches with different <code>revalidate</code> times collapse to the lowest for the route. In Nuxt, <code>isr</code> persists in the CDN until the next deploy when set to <code>true</code>, or for N seconds when set to a number — and Nuxt 4 now caches the <em>payload</em> alongside the HTML so client-side navigation to an ISR page skips the API round-trip entirely.</p>
-      </div>
-    </section>
+        <div class="callout tip">
+          <p><strong>ISR is the highest-ROI setting for content sites.</strong> You get static-CDN speed <em>and</em> fresh content without a redeploy. In Next, multiple fetches with different <code>revalidate</code> times collapse to the lowest for the route. In Nuxt, <code>isr</code> persists in the CDN until the next deploy when set to <code>true</code>, or for N seconds when set to a number — and Nuxt 4 now caches the <em>payload</em> alongside the HTML so client-side navigation to an ISR page skips the API round-trip entirely.</p>
+        </div>
+      </section>
 
-    <!-- ============================================================= -->
-    <section id="data">
-      <h2>4 · Data fetching &amp; caching</h2>
-      <p>The App Router's headline change: <strong>fetch on the server, in the component</strong>. It ships HTML fast, keeps secrets server-side, and cuts the client bundle — no <code>getServerSideProps</code>, no client <code>useEffect</code> waterfall. Nuxt's <code>useFetch</code> / <code>useAsyncData</code> do the same job, with the killer feature of <strong>payload forwarding</strong>: data fetched on the server is serialised into the payload so the client never re-fetches it.</p>
+      <!-- ============================================================= -->
+      <section id="data" class="reveal">
+        <h2><span class="idx">04</span>Data fetching &amp; caching</h2>
+        <p>The App Router's headline change: <strong>fetch on the server, in the component</strong>. It ships HTML fast, keeps secrets server-side, and cuts the client bundle — no <code>getServerSideProps</code>, no client <code>useEffect</code> waterfall. Nuxt's <code>useFetch</code> / <code>useAsyncData</code> do the same job, with the killer feature of <strong>payload forwarding</strong>: data fetched on the server is serialised into the payload so the client never re-fetches it.</p>
 
-      <div class="twoup">
-        <figure class="next">
-          <p class="stack-label"><span class="dot"></span> Next.js — fetch in a Server Component</p>
+        <div class="twoup">
+          <figure class="next">
+            <p class="stack-label"><span class="dot"></span> Next.js — fetch in a Server Component</p>
 <pre><code>// Server Component — runs once, on the server
 export default async function Products() {
   // Tagged cache: one mutation invalidates many views
@@ -265,9 +924,9 @@ export async function addProduct(data) {
   await db.product.create(data);
   revalidateTag('products'); // every view tagged 'products' refreshes
 }</code></pre>
-        </figure>
-        <figure class="nuxt">
-          <p class="stack-label"><span class="dot"></span> Nuxt 4 — useFetch / useAsyncData</p>
+          </figure>
+          <figure class="nuxt">
+            <p class="stack-label"><span class="dot"></span> Nuxt 4 — useFetch / useAsyncData</p>
 <pre><code>&lt;script setup lang="ts"&gt;
 // SSR-first; payload forwarded to client (no double fetch)
 const { data: products, refresh } = await useFetch(
@@ -281,25 +940,25 @@ async function addProduct(body) {
 }
 &lt;/script&gt;
 // data is a shallowRef in Nuxt 4 — cheaper reactivity for big lists</code></pre>
-        </figure>
-      </div>
+          </figure>
+        </div>
 
-      <div class="callout warn">
-        <p><strong>Pitfall — the request waterfall.</strong> Awaiting fetches in sequence (each depending on the last) serialises latency. Fire independent fetches in parallel: <code>Promise.all([...])</code> in a Next Server Component, or multiple <code>useAsyncData</code> calls with distinct <code>key</code>s in Nuxt. And never fetch user-specific data with a long <code>revalidate</code> — you'll leak one user's cached page to another. Per-user data is <code>cache: 'no-store'</code> (Next) / <code>ssr: true</code> dynamic (Nuxt).</p>
-      </div>
-    </section>
+        <div class="callout warn">
+          <p><strong>Pitfall — the request waterfall.</strong> Awaiting fetches in sequence (each depending on the last) serialises latency. Fire independent fetches in parallel: <code>Promise.all([...])</code> in a Next Server Component, or multiple <code>useAsyncData</code> calls with distinct <code>key</code>s in Nuxt. And never fetch user-specific data with a long <code>revalidate</code> — you'll leak one user's cached page to another. Per-user data is <code>cache: 'no-store'</code> (Next) / <code>ssr: true</code> dynamic (Nuxt).</p>
+        </div>
+      </section>
 
-    <!-- ============================================================= -->
-    <section id="image">
-      <h2>5 · Image &amp; font optimisation</h2>
-      <p>Two framework primitives kill the two biggest Core Web Vitals offenders for free: the <strong>image component</strong> (LCP + CLS) and the <strong>font loader</strong> (CLS + render-blocking). Every Next leader uses both.</p>
+      <!-- ============================================================= -->
+      <section id="image" class="reveal">
+        <h2><span class="idx">05</span>Image &amp; font optimisation</h2>
+        <p>Two framework primitives kill the two biggest Core Web Vitals offenders for free: the <strong>image component</strong> (LCP + CLS) and the <strong>font loader</strong> (CLS + render-blocking). Every Next leader uses both.</p>
 
-      <h3>Fonts — self-host, inline, zero layout shift</h3>
-      <p><span class="ref">Brittany Chiang ↗</span> loads Inter via <code>next/font</code> (the hashed <code>__inter_*</code> class proves it self-hosts and inlines the <code>@font-face</code>). <span class="ref">Ramp ↗</span> uses <code>next/font local</code> for its paid Lausanne face <em>with a metric-matched fallback</em> to kill layout shift — the same trick <span class="ref">Lee Robinson ↗</span> and <span class="ref">Josh Comeau ↗</span> use with self-hosted fallback faces. The principle: never hit a third-party font CDN on the critical path, and always ship a size-adjusted fallback so swap causes no reflow. Nuxt's <code>@nuxt/fonts</code> module does the identical optimisation (self-host, preload, woff2, fallback metrics) with zero config.</p>
+        <h3>Fonts — self-host, inline, zero layout shift</h3>
+        <p><span class="ref">Brittany Chiang ↗</span> loads Inter via <code>next/font</code> (the hashed <code>__inter_*</code> class proves it self-hosts and inlines the <code>@font-face</code>). <span class="ref">Ramp ↗</span> uses <code>next/font local</code> for its paid Lausanne face <em>with a metric-matched fallback</em> to kill layout shift — the same trick <span class="ref">Lee Robinson ↗</span> and <span class="ref">Josh Comeau ↗</span> use with self-hosted fallback faces. The principle: never hit a third-party font CDN on the critical path, and always ship a size-adjusted fallback so swap causes no reflow. Nuxt's <code>@nuxt/fonts</code> module does the identical optimisation (self-host, preload, woff2, fallback metrics) with zero config.</p>
 
-      <div class="twoup">
-        <figure class="next">
-          <p class="stack-label"><span class="dot"></span> Next.js — next/font</p>
+        <div class="twoup">
+          <figure class="next">
+            <p class="stack-label"><span class="dot"></span> Next.js — next/font</p>
 <pre><code>// app/layout.tsx — self-hosted, inlined, CLS-safe
 import { Inter } from 'next/font/google';
 const inter = Inter({
@@ -315,9 +974,9 @@ export default function Root({ children }) {
   );
 }
 // auto size-adjusted fallback -&gt; 0 CLS, no font CDN hit</code></pre>
-        </figure>
-        <figure class="nuxt">
-          <p class="stack-label"><span class="dot"></span> Nuxt 4 — @nuxt/fonts</p>
+          </figure>
+          <figure class="nuxt">
+            <p class="stack-label"><span class="dot"></span> Nuxt 4 — @nuxt/fonts</p>
 <pre><code>// nuxt.config.ts
 export default defineNuxtConfig({
   modules: ['@nuxt/fonts'],
@@ -331,15 +990,15 @@ export default defineNuxtConfig({
 })
 /* then just use it in CSS — no &lt;link&gt; needed: */
 /* body { font-family: 'Inter', sans-serif; } */</code></pre>
-        </figure>
-      </div>
+          </figure>
+        </div>
 
-      <h3>Images — modern formats, sized, lazy</h3>
-      <p><code>next/image</code> and <code>&lt;NuxtImg&gt;</code> auto-serve AVIF/WebP, set explicit <code>width</code>/<code>height</code> (reserving space → no CLS), lazy-load below the fold, and generate responsive <code>srcset</code>. <span class="ref">Godly ↗</span> shows the manual version of the same discipline — lazy <code>background-image</code> from an R2 object store at a <em>fixed render width</em> (<code>/images/480/&lt;uuid&gt;.jpg</code>), so the initial DOM has near-zero <code>&lt;img&gt;</code> tags and zero layout shift. Let the framework do this for you.</p>
+        <h3>Images — modern formats, sized, lazy</h3>
+        <p><code>next/image</code> and <code>&lt;NuxtImg&gt;</code> auto-serve AVIF/WebP, set explicit <code>width</code>/<code>height</code> (reserving space → no CLS), lazy-load below the fold, and generate responsive <code>srcset</code>. <span class="ref">Godly ↗</span> shows the manual version of the same discipline — lazy <code>background-image</code> from an R2 object store at a <em>fixed render width</em> (<code>/images/480/&lt;uuid&gt;.jpg</code>), so the initial DOM has near-zero <code>&lt;img&gt;</code> tags and zero layout shift. Let the framework do this for you.</p>
 
-      <div class="twoup">
-        <figure class="next">
-          <p class="stack-label"><span class="dot"></span> Next.js — next/image</p>
+        <div class="twoup">
+          <figure class="next">
+            <p class="stack-label"><span class="dot"></span> Next.js — next/image</p>
 <pre><code>import Image from 'next/image';
 
 // LCP hero: priority = preload, no lazy
@@ -349,9 +1008,9 @@ export default defineNuxtConfig({
 // Below the fold: lazy by default, AVIF/WebP auto
 &lt;Image src={thumb} alt="" width={480} height={300}
        sizes="(max-width:768px) 100vw, 480px" /&gt;</code></pre>
-        </figure>
-        <figure class="nuxt">
-          <p class="stack-label"><span class="dot"></span> Nuxt 4 — &lt;NuxtImg&gt;</p>
+          </figure>
+          <figure class="nuxt">
+            <p class="stack-label"><span class="dot"></span> Nuxt 4 — &lt;NuxtImg&gt;</p>
 <pre><code>&lt;!-- LCP hero: preload, eager --&gt;
 &lt;NuxtImg src="/hero.jpg" alt="" width="1600" height="900"
   preload loading="eager" format="avif,webp" sizes="100vw" /&gt;
@@ -360,25 +1019,25 @@ export default defineNuxtConfig({
 &lt;NuxtImg :src="thumb" alt="" width="480" height="300"
   loading="lazy" format="avif,webp"
   sizes="100vw md:480px" /&gt;</code></pre>
-        </figure>
-      </div>
+          </figure>
+        </div>
 
-      <div class="callout steal">
-        <p><strong>Two lines of framework config buy you a green Lighthouse.</strong> <code>next/font</code> + <code>next/image</code> (or <code>@nuxt/fonts</code> + <code>&lt;NuxtImg&gt;</code>) eliminate the two CLS killers and the largest LCP cost without you writing a single byte of optimisation logic. Set <code>priority</code>/<code>preload</code> on the one LCP image, give every image explicit dimensions, and you're done.</p>
-      </div>
-    </section>
+        <div class="callout steal">
+          <p><strong>Two lines of framework config buy you a green Lighthouse.</strong> <code>next/font</code> + <code>next/image</code> (or <code>@nuxt/fonts</code> + <code>&lt;NuxtImg&gt;</code>) eliminate the two CLS killers and the largest LCP cost without you writing a single byte of optimisation logic. Set <code>priority</code>/<code>preload</code> on the one LCP image, give every image explicit dimensions, and you're done.</p>
+        </div>
+      </section>
 
-    <!-- ============================================================= -->
-    <section id="metadata">
-      <h2>6 · Metadata, streaming &amp; transitions</h2>
-      <p>Three more framework features the leaders lean on: typed metadata for SEO/OG, streaming for perceived speed, and native route transitions.</p>
+      <!-- ============================================================= -->
+      <section id="metadata" class="reveal">
+        <h2><span class="idx">06</span>Metadata, streaming &amp; transitions</h2>
+        <p>Three more framework features the leaders lean on: typed metadata for SEO/OG, streaming for perceived speed, and native route transitions.</p>
 
-      <h3>Metadata &amp; OG</h3>
-      <p>App Router replaces hand-rolled <code>&lt;head&gt;</code> tags with a typed <code>metadata</code> export (static) or <code>generateMetadata</code> (async, per-page). Nuxt uses <code>useSeoMeta</code> / <code>useHead</code>. Both generate correct OG/Twitter cards and canonical tags.</p>
+        <h3>Metadata &amp; OG</h3>
+        <p>App Router replaces hand-rolled <code>&lt;head&gt;</code> tags with a typed <code>metadata</code> export (static) or <code>generateMetadata</code> (async, per-page). Nuxt uses <code>useSeoMeta</code> / <code>useHead</code>. Both generate correct OG/Twitter cards and canonical tags.</p>
 
-      <div class="twoup">
-        <figure class="next">
-          <p class="stack-label"><span class="dot"></span> Next.js — metadata API</p>
+        <div class="twoup">
+          <figure class="next">
+            <p class="stack-label"><span class="dot"></span> Next.js — metadata API</p>
 <pre><code>// static
 export const metadata = {
   title: 'Posts', description: '…',
@@ -390,9 +1049,9 @@ export async function generateMetadata({ params }) {
   return { title: post.title,
            openGraph: { images: [post.cover] } };
 }</code></pre>
-        </figure>
-        <figure class="nuxt">
-          <p class="stack-label"><span class="dot"></span> Nuxt 4 — useSeoMeta</p>
+          </figure>
+          <figure class="nuxt">
+            <p class="stack-label"><span class="dot"></span> Nuxt 4 — useSeoMeta</p>
 <pre><code>&lt;script setup lang="ts"&gt;
 const { data: post } = await useFetch(`/api/post/${slug}`)
 useSeoMeta({
@@ -402,11 +1061,11 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
 })
 &lt;/script&gt;</code></pre>
-        </figure>
-      </div>
+          </figure>
+        </div>
 
-      <h3>Streaming &amp; transitions</h3>
-      <p>Streaming sends the shell immediately and flushes slow parts as they resolve — wrap a slow subtree in <code>&lt;Suspense&gt;</code> (or drop a <code>loading.tsx</code> at a route boundary) in Next; Nuxt streams server-rendered components and supports <code>&lt;Suspense&gt;</code> + the View Transitions API. <span class="ref">Lee Robinson ↗</span> wires the <strong>View Transitions API</strong> into App Router navigation so essays "morph rather than hard-cut" — an app-like feel on a static content site. Nuxt 4 ships this as a one-line config.</p>
+        <h3>Streaming &amp; transitions</h3>
+        <p>Streaming sends the shell immediately and flushes slow parts as they resolve — wrap a slow subtree in <code>&lt;Suspense&gt;</code> (or drop a <code>loading.tsx</code> at a route boundary) in Next; Nuxt streams server-rendered components and supports <code>&lt;Suspense&gt;</code> + the View Transitions API. <span class="ref">Lee Robinson ↗</span> wires the <strong>View Transitions API</strong> into App Router navigation so essays "morph rather than hard-cut" — an app-like feel on a static content site. Nuxt 4 ships this as a one-line config.</p>
 
 <pre><code>// Next.js — instant shell, stream the slow part
 import { Suspense } from 'react';
@@ -428,22 +1087,22 @@ export default defineNuxtConfig({
   app: { pageTransition: { name: 'page' } },
 })</code></pre>
 
-      <div class="callout tip">
-        <p><strong>Stream at meaningful boundaries, not everywhere.</strong> A <code>loading.tsx</code> at a route boundary gives instant navigation feedback; a <code>&lt;Suspense&gt;</code> around one genuinely slow widget keeps the rest interactive. Don't wrap the whole page — you just reintroduce a single blocking spinner with extra steps.</p>
-      </div>
-    </section>
+        <div class="callout tip">
+          <p><strong>Stream at meaningful boundaries, not everywhere.</strong> A <code>loading.tsx</code> at a route boundary gives instant navigation feedback; a <code>&lt;Suspense&gt;</code> around one genuinely slow widget keeps the rest interactive. Don't wrap the whole page — you just reintroduce a single blocking spinner with extra steps.</p>
+        </div>
+      </section>
 
-    <!-- ============================================================= -->
-    <section id="vitals">
-      <h2>7 · Core Web Vitals &amp; bundle discipline</h2>
-      <p>The frameworks hand you fast defaults; you still have to not break them. The three Core Web Vitals map cleanly to the levers above:</p>
-      <ul>
-        <li><strong>LCP</strong> (largest paint &lt; 2.5s) — server-render the hero (RSC / SSR), <code>priority</code>/<code>preload</code> the LCP image, self-host fonts. <span class="ref">Cassidy Williams ↗</span> (Astro) and <span class="ref">Tania Rascia ↗</span> (system-font body, zero webfont cost) optimise LCP by shipping almost no JS at all.</li>
-        <li><strong>CLS</strong> (layout shift &lt; 0.1) — explicit image dimensions + metric-matched font fallback. This is exactly <span class="ref">Ramp ↗</span>'s and <span class="ref">Josh Comeau ↗</span>'s fallback-face discipline, and what <span class="ref">Godly ↗</span> buys with fixed-width object-store thumbnails.</li>
-        <li><strong>INP</strong> (interaction &lt; 200ms) — ship less JS so the main thread is free. The RSC default and the deep <code>'use client'</code> boundary are your primary tools.</li>
-      </ul>
+      <!-- ============================================================= -->
+      <section id="vitals" class="reveal">
+        <h2><span class="idx">07</span>Core Web Vitals &amp; bundle discipline</h2>
+        <p>The frameworks hand you fast defaults; you still have to not break them. The three Core Web Vitals map cleanly to the levers above:</p>
+        <ul>
+          <li><strong>LCP</strong> (largest paint &lt; 2.5s) — server-render the hero (RSC / SSR), <code>priority</code>/<code>preload</code> the LCP image, self-host fonts. <span class="ref">Cassidy Williams ↗</span> (Astro) and <span class="ref">Tania Rascia ↗</span> (system-font body, zero webfont cost) optimise LCP by shipping almost no JS at all.</li>
+          <li><strong>CLS</strong> (layout shift &lt; 0.1) — explicit image dimensions + metric-matched font fallback. This is exactly <span class="ref">Ramp ↗</span>'s and <span class="ref">Josh Comeau ↗</span>'s fallback-face discipline, and what <span class="ref">Godly ↗</span> buys with fixed-width object-store thumbnails.</li>
+          <li><strong>INP</strong> (interaction &lt; 200ms) — ship less JS so the main thread is free. The RSC default and the deep <code>'use client'</code> boundary are your primary tools.</li>
+        </ul>
 
-      <p>Bundle discipline is the through-line. <span class="ref">Josh Comeau ↗</span> chose Linaria (zero-runtime CSS) and Shiki (compile-time highlighting) <em>to remove client runtime</em>. <span class="ref">Tania Rascia ↗</span> uses a system body stack for "zero webfont cost, instant render." <span class="ref">Manu Arora ↗</span> keeps exactly one fixed interactive element and "makes everything else static — near-zero JS." The discipline: every kilobyte of JS is a tax on INP and LCP; ship HTML, hydrate islands.</p>
+        <p>Bundle discipline is the through-line. <span class="ref">Josh Comeau ↗</span> chose Linaria (zero-runtime CSS) and Shiki (compile-time highlighting) <em>to remove client runtime</em>. <span class="ref">Tania Rascia ↗</span> uses a system body stack for "zero webfont cost, instant render." <span class="ref">Manu Arora ↗</span> keeps exactly one fixed interactive element and "makes everything else static — near-zero JS." The discipline: every kilobyte of JS is a tax on INP and LCP; ship HTML, hydrate islands.</p>
 
 <pre><code>// Both frameworks: lazy-load heavy client-only widgets so they
 // stay out of the initial bundle (no SSR, loaded on demand).
@@ -455,44 +1114,45 @@ const Map = dynamic(() =&gt; import('./HeavyMap'), { ssr: false });
 // Nuxt 4 — built-in Lazy prefix, or defineAsyncComponent
 &lt;LazyHeavyMap v-if="show" /&gt;   &lt;!-- code-split, loads when rendered --&gt;</code></pre>
 
-      <div class="callout warn">
-        <p><strong>Pitfall — shipping a SPA by accident.</strong> A <code>'use client'</code> at the layout root, a third-party widget that drags in 200KB, or fetching everything client-side turns your "fast framework" into a slow SPA with worse SEO than a plain HTML file. Audit your client bundle (<code>next build</code> output / <code>nuxi analyze</code>). If your "static" blog post ships 300KB of JS, something is wrong — the leaders' content pages ship almost none.</p>
-      </div>
-    </section>
+        <div class="callout warn">
+          <p><strong>Pitfall — shipping a SPA by accident.</strong> A <code>'use client'</code> at the layout root, a third-party widget that drags in 200KB, or fetching everything client-side turns your "fast framework" into a slow SPA with worse SEO than a plain HTML file. Audit your client bundle (<code>next build</code> output / <code>nuxi analyze</code>). If your "static" blog post ships 300KB of JS, something is wrong — the leaders' content pages ship almost none.</p>
+        </div>
+      </section>
 
-    <!-- ============================================================= -->
-    <section id="checklist">
-      <h2>8 · The portfolio-site checklist (Nuxt 4)</h2>
-      <p>Our project is Nuxt 4 / Vue. Distilled from the teardowns, here is the build sheet — every item has a Next equivalent in the sections above, but these are the Nuxt levers to pull:</p>
-      <ul>
-        <li><strong>Render</strong> — <code>routeRules</code>: <code>prerender: true</code> for the home/about, <code>isr: N</code> for the blog. Static unless a route truly needs per-request data.</li>
-        <li><strong>Fonts</strong> — <code>@nuxt/fonts</code> for self-hosted, CLS-safe loading (the <span class="ref">Brittany Chiang ↗</span> / <span class="ref">Ramp ↗</span> pattern, zero-config).</li>
-        <li><strong>Images</strong> — <code>&lt;NuxtImg&gt;</code> everywhere, explicit dimensions, <code>preload</code> on the one LCP image, <code>loading="lazy"</code> below the fold, AVIF/WebP.</li>
-        <li><strong>Data</strong> — <code>useFetch</code>/<code>useAsyncData</code> on the server with payload forwarding; <code>$fetch</code> for event-driven calls; never long-cache per-user data.</li>
-        <li><strong>SEO</strong> — <code>useSeoMeta</code> per page with a real OG image. Keep a semantic <code>&lt;h1&gt;</code>–<code>&lt;h3&gt;</code> outline (the <span class="ref">Teenage Engineering ↗</span> warning: don't drop headings for visual flair).</li>
-        <li><strong>Motion</strong> — native View Transitions (<code>experimental.viewTransition</code>) for the <span class="ref">Lee Robinson ↗</span> cross-fade feel; <code>&lt;Lazy*&gt;</code> any heavy animation lib so it stays out of the initial bundle.</li>
-        <li><strong>Bundle</strong> — server-render content, client-island only the interactive leaves; run <code>nuxi analyze</code> before shipping. Target: a content page that ships almost no JS.</li>
-      </ul>
+      <!-- ============================================================= -->
+      <section id="checklist" class="reveal">
+        <h2><span class="idx">08</span>The portfolio-site checklist (Nuxt 4)</h2>
+        <p>Our project is Nuxt 4 / Vue. Distilled from the teardowns, here is the build sheet — every item has a Next equivalent in the sections above, but these are the Nuxt levers to pull:</p>
+        <ul>
+          <li><strong>Render</strong> — <code>routeRules</code>: <code>prerender: true</code> for the home/about, <code>isr: N</code> for the blog. Static unless a route truly needs per-request data.</li>
+          <li><strong>Fonts</strong> — <code>@nuxt/fonts</code> for self-hosted, CLS-safe loading (the <span class="ref">Brittany Chiang ↗</span> / <span class="ref">Ramp ↗</span> pattern, zero-config).</li>
+          <li><strong>Images</strong> — <code>&lt;NuxtImg&gt;</code> everywhere, explicit dimensions, <code>preload</code> on the one LCP image, <code>loading="lazy"</code> below the fold, AVIF/WebP.</li>
+          <li><strong>Data</strong> — <code>useFetch</code>/<code>useAsyncData</code> on the server with payload forwarding; <code>$fetch</code> for event-driven calls; never long-cache per-user data.</li>
+          <li><strong>SEO</strong> — <code>useSeoMeta</code> per page with a real OG image. Keep a semantic <code>&lt;h1&gt;</code>–<code>&lt;h3&gt;</code> outline (the <span class="ref">Teenage Engineering ↗</span> warning: don't drop headings for visual flair).</li>
+          <li><strong>Motion</strong> — native View Transitions (<code>experimental.viewTransition</code>) for the <span class="ref">Lee Robinson ↗</span> cross-fade feel; <code>&lt;Lazy*&gt;</code> any heavy animation lib so it stays out of the initial bundle.</li>
+          <li><strong>Bundle</strong> — server-render content, client-island only the interactive leaves; run <code>nuxi analyze</code> before shipping. Target: a content page that ships almost no JS.</li>
+        </ul>
 
-      <figure class="figure">
-        <img src="../workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang portfolio hero: calm near-black canvas, Inter type, one teal accent, no hero gimmickry.">
-        <figcaption><strong>Brittany Chiang</strong> — a Next.js App Router rebuild with Inter via <code>next/font</code>: server-rendered HTML, self-hosted CLS-safe font, minimal client JS. "Calm engineering" — the stack <em>is</em> the portfolio piece. The Nuxt 4 equivalent (universal render + <code>@nuxt/fonts</code> + <code>&lt;NuxtImg&gt;</code>) ships the same green Lighthouse with the same discipline.</figcaption>
-      </figure>
+        <figure class="figure">
+          <img src="../workings/shots/brittany-chiang/01-hero.png" alt="Brittany Chiang portfolio hero: calm near-black canvas, Inter type, one teal accent, no hero gimmickry.">
+          <figcaption><strong>Brittany Chiang</strong> — a Next.js App Router rebuild with Inter via <code>next/font</code>: server-rendered HTML, self-hosted CLS-safe font, minimal client JS. "Calm engineering" — the stack <em>is</em> the portfolio piece. The Nuxt 4 equivalent (universal render + <code>@nuxt/fonts</code> + <code>&lt;NuxtImg&gt;</code>) ships the same green Lighthouse with the same discipline.</figcaption>
+        </figure>
 
-      <figure class="figure">
-        <img src="../workings/shots/vercel/02-mid.png" alt="Vercel marketing site: streaming code editor and live deploy logs rendered as the page's hero content.">
-        <figcaption><strong>Vercel</strong> — Next.js with 170+ <code>_next</code> chunks and self-hosted Geist. The lesson that transcends framework: make the <em>product</em> the hero — live, streaming, interactive surfaces (deploy logs, a real code editor, live data) instead of static screenshots. Streaming + RSC make those surfaces cheap to render and fast to paint.</figcaption>
-      </figure>
+        <figure class="figure">
+          <img src="../workings/shots/vercel/02-mid.png" alt="Vercel marketing site: streaming code editor and live deploy logs rendered as the page's hero content.">
+          <figcaption><strong>Vercel</strong> — Next.js with 170+ <code>_next</code> chunks and self-hosted Geist. The lesson that transcends framework: make the <em>product</em> the hero — live, streaming, interactive surfaces (deploy logs, a real code editor, live data) instead of static screenshots. Streaming + RSC make those surfaces cheap to render and fast to paint.</figcaption>
+        </figure>
 
-      <div class="callout steal">
-        <p><strong>The whole page in one rule:</strong> server-render by default, hydrate the minimum, optimise fonts and images at the framework layer, and choose a render strategy per route. Next.js and Nuxt 4 give you identical capabilities under different names — App Router RSC ≈ Nuxt universal + islands, route-segment config ≈ <code>routeRules</code>, <code>next/font</code> ≈ <code>@nuxt/fonts</code>, <code>next/image</code> ≈ <code>&lt;NuxtImg&gt;</code>. Learn the principle once; the syntax is a lookup.</p>
-      </div>
-    </section>
+        <div class="callout steal">
+          <p><strong>The whole page in one rule:</strong> server-render by default, hydrate the minimum, optimise fonts and images at the framework layer, and choose a render strategy per route. Next.js and Nuxt 4 give you identical capabilities under different names — App Router RSC ≈ Nuxt universal + islands, route-segment config ≈ <code>routeRules</code>, <code>next/font</code> ≈ <code>@nuxt/fonts</code>, <code>next/image</code> ≈ <code>&lt;NuxtImg&gt;</code>. Learn the principle once; the syntax is a lookup.</p>
+        </div>
+      </section>
+    </div>
   </main>
 
   <footer class="ftr">
-    <div class="wrap">
-      <p><a class="brand" href="../PLAN.html">◆ Craft Atlas</a></p>
+    <div class="inner">
+      <p><a class="brand" href="../PLAN.html">Craft Atlas</a></p>
       <p>Page 13 of 13 · <a href="../PLAN.html">← Back to the Build Plan</a></p>
       <p>Craft Atlas — synthesized from 80 live site teardowns.</p>
     </div>
@@ -533,14 +1193,15 @@ const Map = dynamic(() =&gt; import('./HeavyMap'), { ssr: false });
       };
       var panel = document.getElementById('render-panel');
       var btns = document.querySelectorAll('.render-demo button');
+      function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
       function render(mode) {
         var d = data[mode];
         panel.innerHTML =
           '<h4>' + d.h + '</h4>' +
           '<p>' + d.p + '</p>' +
           '<p class="meta"><b>Use it for:</b> ' + d.when + '</p>' +
-          '<p class="meta">Next: <b>' + d.next + '</b></p>' +
-          '<p class="meta">Nuxt: <b>' + d.nuxt + '</b></p>';
+          '<p class="meta"><span class="lbl-next">Next</span> <code>' + esc(d.next) + '</code></p>' +
+          '<p class="meta"><span class="lbl-nuxt">Nuxt</span> <code>' + esc(d.nuxt) + '</code></p>';
       }
       btns.forEach(function (b) {
         b.addEventListener('click', function () {
@@ -550,6 +1211,46 @@ const Map = dynamic(() =&gt; import('./HeavyMap'), { ssr: false });
         });
       });
       render('ssg');
+    })();
+
+    // --- scroll reveal (IntersectionObserver, reduced-motion safe) ---
+    (function () {
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var els = document.querySelectorAll('.reveal');
+      if (reduce || !('IntersectionObserver' in window)) {
+        els.forEach(function (el) { el.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+      els.forEach(function (el) { io.observe(el); });
+    })();
+
+    // --- TOC active-section highlight ---
+    (function () {
+      var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+      var map = {};
+      links.forEach(function (a) {
+        var id = a.getAttribute('href').slice(1);
+        var sec = document.getElementById(id);
+        if (sec) map[id] = a;
+      });
+      if (!('IntersectionObserver' in window)) return;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            var a = map[e.target.id];
+            if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+      Object.keys(map).forEach(function (id) {
+        io.observe(document.getElementById(id));
+      });
     })();
   </script>
 </body>
