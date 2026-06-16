@@ -6,7 +6,7 @@ import Contact from '~/components/Contact.vue'
 const UButton = {
   name: 'UButton',
   template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
-  props: ['variant', 'size', 'color', 'ariaLabel'],
+  props: ['variant', 'size', 'color'],
   emits: ['click']
 }
 

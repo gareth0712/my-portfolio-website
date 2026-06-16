@@ -1,13 +1,21 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
+
+// Mock the theme store to bypass useColorMode() Nuxt auto-import dependency
+vi.mock('~/stores/theme', () => ({
+  useThemeStore: () => ({
+    isDark: false,
+    toggle: vi.fn()
+  })
+}))
+
 import ThemeToggle from '~/components/ThemeToggle.vue'
 
-// Stub UButton and UIcon for unit tests
 const UButton = {
   name: 'UButton',
   template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
-  props: ['variant', 'color', 'ariaLabel'],
+  props: ['variant', 'color'],
   emits: ['click']
 }
 
@@ -17,16 +25,14 @@ const UIcon = {
   props: ['name']
 }
 
-describe('useThemeStore', () => {
+describe('ThemeToggle', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    vi.clearAllMocks()
   })
 
   const mountToggle = () => mount(ThemeToggle, {
     global: {
       components: { UButton, UIcon },
-      // ThemeToggle wraps its button in <ClientOnly>; render the default slot in tests
       stubs: { ClientOnly: { template: '<div><slot /></div>' } },
       plugins: [createPinia()]
     }
@@ -38,17 +44,16 @@ describe('useThemeStore', () => {
     expect(button.exists()).toBe(true)
   })
 
-  it('ThemeToggle has aria-label', () => {
+  it('ThemeToggle has aria-label containing "mode"', () => {
     const wrapper = mountToggle()
     const button = wrapper.find('button')
     const label = button.attributes('aria-label')
     expect(label).toMatch(/mode/)
   })
 
-  it('ThemeToggle button is clickable', () => {
+  it('ThemeToggle button aria-label is defined', () => {
     const wrapper = mountToggle()
     const button = wrapper.find('button')
-    // Verify the button exists and is rendered — click interaction tested at e2e level
     expect(button.exists()).toBe(true)
     expect(button.attributes('aria-label')).toBeDefined()
   })
