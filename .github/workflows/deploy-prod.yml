@@ -7,34 +7,34 @@ on:
 
 jobs:
   ci:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node: [14]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout 🛎
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Setup node env 🏗
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
-          check-latest: true
+          node-version: 22
+          cache: pnpm
 
       - name: Install dependencies 👨🏻‍💻
-        run: yarn
+        run: pnpm install --frozen-lockfile
 
-      - name: generate dist files
-        run: yarn generate
+      - name: Generate static site
+        run: pnpm generate
 
       - name: clone pages repo
         run: git clone https://github.com/gareth0712/gareth0712.github.io.git
 
-      - name: Copy files in dist to pages repo
-        run: cp -r ./dist/* ./gareth0712.github.io/
+      - name: Copy build output to pages repo
+        run: cp -r ./.output/public/* ./gareth0712.github.io/
 
       - name: commit changes
         run: |
@@ -42,7 +42,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add *
-          git commit -m "Update pages files"
+          git commit -m "Update pages files" || echo "No changes to commit"
 
       - name: Push changes
         uses: ad-m/github-push-action@master
