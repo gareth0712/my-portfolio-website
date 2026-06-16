@@ -1,82 +1,112 @@
-import type { NuxtConfig } from '@nuxt/types';
+// https://nuxt.com/docs/api/configuration/nuxt-config
+const isTest = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
 
-const config: NuxtConfig = {
-  target: 'static',
-  mode: 'spa',
-  head: {
-    title: "Gareth Lau's Portolio Website",
-    meta: [
-      { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' }
-    ],
-    link: [
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '32x32',
-        href: '/favicon/favicon-32x32.png'
-      },
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '16x16',
-        href: '/favicon/favicon-16x16.png'
-      },
-      {
-        rel: 'apple-touch-icon',
-        sizes: '180x180',
-        href: '/favicon/apple-touch-icon.png'
-      },
-      { rel: 'manifest', href: '/favicon/site.webmanifest' },
-      { rel: 'mask-icon', color: '#5bbad5', href: '/favicon/safari-pinned-tab.svg' }
-    ]
+export default defineNuxtConfig({
+  compatibilityDate: '2025-01-01',
+  future: {
+    compatibilityVersion: 4
   },
-  css: ['@/assets/css/global.scss', '@/assets/font/neuzeitGro/NeuzeitGro.css'],
-  server: {
-    port: 8080
-  },
+  ssr: true,
 
-  // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@/plugins/particles'],
-
-  // Auto import components: https://go.nuxtjs.dev/config-components
-  components: true,
-
-  // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
-  buildModules: [
-    // https://go.nuxtjs.dev/typescript
-    '@nuxt/typescript-build',
-    // https://go.nuxtjs.dev/stylelint
-    '@nuxtjs/stylelint-module',
-    '@nuxtjs/vuetify'
-  ],
-
-  // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
-    // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
-    // https://go.nuxtjs.dev/pwa
-    '@nuxtjs/pwa',
-    // https://go.nuxtjs.dev/content
-    '@nuxt/content'
+    '@nuxt/ui',
+    '@nuxt/content',
+    '@nuxt/fonts',
+    '@pinia/nuxt',
+    ...(isTest ? [] : ['@vite-pwa/nuxt']),
+    '@nuxt/eslint'
   ],
 
-  // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {},
+  css: ['~/assets/css/main.css'],
 
-  // PWA module configuration: https://go.nuxtjs.dev/pwa
-  pwa: {
-    manifest: {
-      lang: 'en'
+  app: {
+    head: {
+      title: "Gareth Lau's Portolio Website",
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: "Gareth Lau's Portfolio Website" }
+      ],
+      link: [
+        {
+          rel: 'icon',
+          type: 'image/png',
+          sizes: '32x32',
+          href: '/favicon/favicon-32x32.png'
+        },
+        {
+          rel: 'icon',
+          type: 'image/png',
+          sizes: '16x16',
+          href: '/favicon/favicon-16x16.png'
+        },
+        {
+          rel: 'apple-touch-icon',
+          sizes: '180x180',
+          href: '/favicon/apple-touch-icon.png'
+        },
+        { rel: 'manifest', href: '/favicon/site.webmanifest' },
+        {
+          rel: 'mask-icon',
+          color: '#5bbad5',
+          href: '/favicon/safari-pinned-tab.svg'
+        }
+      ]
     }
   },
 
-  // Content module configuration: https://go.nuxtjs.dev/config-content
-  content: {},
+  nitro: {
+    prerender: {
+      routes: ['/']
+    }
+  },
 
-  // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {}
-};
+  fonts: {
+    families: [{ name: 'Quicksand', provider: 'google' }]
+  },
 
-export default config;
+  ...(isTest ? {} : {
+    pwa: {
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'Gareth Lau',
+        short_name: 'GarethLau',
+        theme_color: '#ffffff',
+        background_color: '#ffffff',
+        display: 'standalone',
+        icons: [
+          {
+            src: '/favicon/android-chrome-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/favicon/android-chrome-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    }
+  }),
+
+  colorMode: {
+    classSuffix: '',
+    preference: 'dark',
+    fallback: 'dark'
+  },
+
+  content: {
+    experimental: {
+      nativeSqlite: true
+    }
+  },
+
+  eslint: {
+    config: {
+      stylistic: false
+    }
+  },
+
+  devtools: { enabled: false }
+})

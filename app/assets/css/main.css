@@ -1,0 +1,89 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* NeuzeitGro local font faces */
+@font-face {
+  font-family: 'neuzeit-grotesk-extra-black';
+  src: url('/fonts/neuzeitGro/NeuzeitGroExt-Bla.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'neuzeit-grotesk-black';
+  src: url('/fonts/neuzeitGro/NeuzeitGro-Bla.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'neuzeit-grotesk';
+  src: url('/fonts/neuzeitGro/NeuzeitGro-Reg.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'neuzeit-grotesk-light';
+  src: url('/fonts/neuzeitGro/NeuzeitGro-Lig.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'neuzeit-grotesk-bold';
+  src: url('/fonts/neuzeitGro/NeuzeitGro-Bol.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'neuzeit-grotesk-condensed-black';
+  src: url('/fonts/neuzeitGro/NeuzeitGroCon-Bla.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+}
+
+/* Allow the fixed particle canvas (z-0) to show through */
+html,
+body {
+  background: transparent !important;
+}
+
+/* Light mode: paint a solid light background BEHIND the particle layer */
+html:not(.dark) body {
+  background: #f8f8f8 !important;
+}
+
+/* Pin the tsparticles canvas to the viewport and OUT of normal flow.
+   tsparticles renders the canvas position:static inside an anonymous div,
+   which pushes all page content down by the canvas height. Force it fixed. */
+body canvas {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0 !important;
+}
+
+/* Appear animation keyframes */
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.appear {
+  animation: appear 0.6s ease forwards;
+}
