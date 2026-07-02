@@ -44,9 +44,15 @@ jobs:
           git add *
           git commit -m "Update pages files" || echo "No changes to commit"
 
+      - name: Verify deploy token is present
+        run: |
+          if [ -z "${{ secrets.TOKEN }}" ]; then
+            echo "::error::secrets.TOKEN is empty. Create a PAT with write access to gareth0712/gareth0712.github.io and save it as a repo secret named exactly TOKEN."
+            exit 1
+          fi
+          echo "TOKEN secret is present."
+
       - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.TOKEN }}
-          directory: "./gareth0712.github.io"
-          repository: "gareth0712/gareth0712.github.io"
+        run: |
+          cd ./gareth0712.github.io
+          git push "https://x-access-token:${{ secrets.TOKEN }}@github.com/gareth0712/gareth0712.github.io.git" HEAD:main
