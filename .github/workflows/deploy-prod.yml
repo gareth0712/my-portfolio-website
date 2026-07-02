@@ -62,4 +62,14 @@ jobs:
       - name: Push changes
         run: |
           cd ./gareth0712.github.io
-          git push "https://x-access-token:${{ secrets.TOKEN }}@github.com/gareth0712/gareth0712.github.io.git" HEAD:main
+          echo "current branch: $(git rev-parse --abbrev-ref HEAD)"
+          echo "commits ahead: $(git log --oneline -3)"
+          set +e
+          out=$(git push "https://x-access-token:${{ secrets.TOKEN }}@github.com/gareth0712/gareth0712.github.io.git" HEAD:main 2>&1)
+          rc=$?
+          clean=$(echo "$out" | sed 's/github_pat_[A-Za-z0-9_]*/<redacted>/g')
+          echo "$clean"
+          if [ $rc -ne 0 ]; then
+            echo "::error::push rc=$rc :: $(echo "$clean" | tr '\n' ' ')"
+            exit $rc
+          fi
