@@ -52,24 +52,10 @@ jobs:
           fi
           echo "TOKEN secret is present."
 
-      - name: Probe token access (diagnostic)
-        run: |
-          user=$(curl -s -H "Authorization: Bearer ${{ secrets.TOKEN }}" https://api.github.com/user | python3 -c "import sys,json;d=json.load(sys.stdin);print(d.get('login', d.get('message','?')))" 2>/dev/null || echo "parse-fail")
-          code=$(curl -s -o /tmp/r.json -w "%{http_code}" -H "Authorization: Bearer ${{ secrets.TOKEN }}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/gareth0712/gareth0712.github.io)
-          push=$(python3 -c "import json;print(json.load(open('/tmp/r.json')).get('permissions',{}).get('push'))" 2>/dev/null || echo "?")
-          echo "::error::token_user=$user | repo_api_status=$code | push_permission=$push"
-
       - name: Push changes
         run: |
           cd ./gareth0712.github.io
-          echo "current branch: $(git rev-parse --abbrev-ref HEAD)"
-          echo "commits ahead: $(git log --oneline -3)"
-          set +e
-          out=$(git push "https://x-access-token:${{ secrets.TOKEN }}@github.com/gareth0712/gareth0712.github.io.git" HEAD:main 2>&1)
-          rc=$?
-          clean=$(echo "$out" | sed 's/github_pat_[A-Za-z0-9_]*/<redacted>/g')
-          echo "$clean"
-          if [ $rc -ne 0 ]; then
-            echo "::error::push rc=$rc :: $(echo "$clean" | tr '\n' ' ')"
-            exit $rc
-          fi
+          # Strip any stray whitespace/newline baked into the secret value,
+          # otherwise the credential-in-URL becomes malformed (curl: "Malformed input to a URL function").
+          TOKEN_CLEAN=$(printf '%s' "${{ secrets.TOKEN }}" | tr -d '[:space:]')
+          git push "https://x-access-token:${TOKEN_CLEAN}@github.com/gareth0712/gareth0712.github.io.git" HEAD:main
