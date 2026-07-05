@@ -1,0 +1,60 @@
+/* Cinematic page design tokens, fonts, grain overlay */
+
+@font-face {
+  font-family: 'Neuzeit Con';
+  src: url('/fonts/neuzeitGro/NeuzeitGroCon-Bla.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Neuzeit';
+  src: url('/fonts/neuzeitGro/NeuzeitGro-Reg.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neuzeit';
+  src: url('/fonts/neuzeitGro/NeuzeitGro-Bol.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.cinematic {
+  --ink: #07080a;
+  --emerald: #10b981;
+  --emerald-bright: #34d399;
+  --cream: #f2efe6;
+  --cream-dim: rgba(242, 239, 230, 0.55);
+
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'Neuzeit', sans-serif;
+  position: relative;
+  overflow-x: clip;
+}
+
+.cinematic .font-display {
+  font-family: 'Neuzeit Con', sans-serif;
+}
+
+/* Fixed full-screen grain overlay */
+.cinematic-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinematic * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,3 +1,7 @@
+// Shim Nuxt compiler macro for standalone vitest (no Nuxt runtime):
+// definePageMeta is a no-op outside the Nuxt app context
+;(globalThis as Record<string, unknown>).definePageMeta = () => {}
+
 // Mock localStorage for color-mode plugin compatibility
 // happy-dom provides window.localStorage but setItem may not be callable
 const localStorageStore: Record<string, string | undefined> = {}

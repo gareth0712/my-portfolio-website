@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 
+import ThemeToggle from '~/components/ThemeToggle.vue'
+
 // Mock the theme store to bypass useColorMode() Nuxt auto-import dependency
 vi.mock('~/stores/theme', () => ({
   useThemeStore: () => ({
@@ -9,8 +11,6 @@ vi.mock('~/stores/theme', () => ({
     toggle: vi.fn()
   })
 }))
-
-import ThemeToggle from '~/components/ThemeToggle.vue'
 
 const UButton = {
   name: 'UButton',
