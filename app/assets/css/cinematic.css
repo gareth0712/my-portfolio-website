@@ -24,6 +24,12 @@
   font-display: swap;
 }
 
+/* Keep the page ink-black regardless of the app's light/dark theme state —
+   must out-rank main.css `html:not(.dark) body { background: #f8f8f8 !important }` */
+html body:has(main.cinematic) {
+  background: #07080a !important;
+}
+
 .cinematic {
   --ink: #07080a;
   --emerald: #10b981;

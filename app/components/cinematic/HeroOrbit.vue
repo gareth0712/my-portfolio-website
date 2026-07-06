@@ -109,24 +109,26 @@ async function loadFrames(): Promise<void> {
   }))
 }
 
-onMounted(async () => {
+onMounted(() => {
   resizeCanvas()
   window.addEventListener('resize', resizeCanvas)
 
-  await loadFrames()
-
-  if (reducedMotion) {
-    targetFrame = (manifest?.count ?? 1) - 1
-    currentFrame = targetFrame
+  // Load frames asynchronously — the pinned trigger must be created NOW, in
+  // document order with the other sections' triggers, or their pin positions
+  // never account for this section's 400% spacer.
+  void loadFrames().then(() => {
+    if (reducedMotion) {
+      targetFrame = (manifest?.count ?? 1) - 1
+      currentFrame = targetFrame
+    }
     drawFrame(currentFrame)
-    return
-  }
+  })
+
+  if (reducedMotion) return
 
   rafId = requestAnimationFrame(tick)
 
   ctx = gsap.context(() => {
-    const frameCount = manifest?.count ?? 1
-
     ScrollTrigger.create({
       trigger: sectionRef.value,
       start: 'top top',
@@ -134,7 +136,7 @@ onMounted(async () => {
       pin: true,
       scrub: true,
       onUpdate: (self) => {
-        targetFrame = self.progress * (frameCount - 1)
+        targetFrame = self.progress * ((manifest?.count ?? 1) - 1)
       }
     })
 
