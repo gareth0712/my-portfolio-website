@@ -57,7 +57,7 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
-      routes: ['/']
+      routes: ['/', '/tools/yt-monitor']
     }
   },
 

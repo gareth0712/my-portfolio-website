@@ -81,6 +81,18 @@ onUnmounted(() => {
       </a>
     </div>
 
+    <div class="mt-16 flex justify-center">
+      <NuxtLink
+        to="/tools/yt-monitor"
+        class="group inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[var(--cream-dim)] transition-colors hover:text-[var(--emerald-bright)]"
+      >
+        <span>Tools</span>
+        <span>/</span>
+        <span>YouTube 爆款監控</span>
+        <span class="inline-block transition-transform group-hover:translate-x-1">↗</span>
+      </NuxtLink>
+    </div>
+
     <footer class="mt-24 flex flex-wrap items-center justify-center gap-8">
       <a
         v-for="social in socials"
